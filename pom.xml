@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>br.com.jgon</groupId>
   <artifactId>canary</artifactId>
-  <version>2017-07-16-SNAPSHOT</version>
+  <version>2017.07.16-SNAPSHOT</version>
   <name>Archetype - canary</name>
   <url>http://maven.apache.org</url>
   
