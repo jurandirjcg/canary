@@ -33,14 +33,7 @@ public @interface PaginatorTemplate {
 	 * Indica se inclui os query params vindos na requisicao, default true
 	 * @return
 	 */
-	boolean includeRequestQueryParams() default true;
-	
-	/**
-	 * Indica se inclui os query params vindos na requisicao, default true
-	 * @return
-	 */
-	boolean includeRequestPathParams() default true;
-		
+	boolean includeRequestQueryParams() default true;		
 	/**
 	 * define parametros PATH
 	 * @return

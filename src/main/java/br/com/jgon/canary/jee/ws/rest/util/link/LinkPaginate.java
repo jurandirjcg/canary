@@ -40,27 +40,27 @@ public @interface LinkPaginate {
 	 * Define o link SELF
 	 * @return
 	 */
-	LinkResource self() default @LinkResource(rel="self", title="Self", includeRequestQueryParams=true, includeRequestPathParams=true);
+	LinkResource self() default @LinkResource(rel="self", title="Self", includeRequestQueryParams=true);
 	/**
 	 * Define o link first
 	 * @return
 	 */
-	LinkResource first() default @LinkResource(rel="first", title="First", includeRequestQueryParams=true, includeRequestPathParams=true);
+	LinkResource first() default @LinkResource(rel="first", title="First", includeRequestQueryParams=true);
 	/**
 	 * Define o link previous
 	 * @return
 	 */
-	LinkResource previous() default @LinkResource(rel="prev", title="Previous", includeRequestQueryParams=true, includeRequestPathParams=true);
+	LinkResource previous() default @LinkResource(rel="prev", title="Previous", includeRequestQueryParams=true);
 	/**
 	 * Define o link next
 	 * @return
 	 */
-	LinkResource next() default @LinkResource(rel="next", title="Next", includeRequestQueryParams=true, includeRequestPathParams=true);
+	LinkResource next() default @LinkResource(rel="next", title="Next", includeRequestQueryParams=true);
 	/**
 	 * Define o link last
 	 * @return
 	 */
-	LinkResource last() default @LinkResource(rel="last", title="Last", includeRequestQueryParams=true, includeRequestPathParams=true);
+	LinkResource last() default @LinkResource(rel="last", title="Last", includeRequestQueryParams=true);
 	/**
 	 * Define o link com o template de navegacao
 	 * @return

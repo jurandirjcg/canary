@@ -33,14 +33,7 @@ public @interface LinkResource {
 	 * Indica se inclui os query params vindos na requisicao, default false
 	 * @return
 	 */
-	boolean includeRequestQueryParams() default false;
-	
-	/**
-	 * Indica se inclui os path params vindos na requisicao, default false
-	 * @return
-	 */
-	boolean includeRequestPathParams() default false;
-		
+	boolean includeRequestQueryParams() default false;	
 	/**
 	 * define parametros PATH - faz replace na ordem que esta definida na anotation Path.
 	 * Ex. path = /system/{id} e pathParameters = /user/${atributo_variavel} apos replace = /system/user/ATRBUTO_DO_USUARIO_RETORNADO
