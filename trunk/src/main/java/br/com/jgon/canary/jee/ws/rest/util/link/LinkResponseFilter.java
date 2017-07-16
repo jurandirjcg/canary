@@ -436,7 +436,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
      * @throws ApplicationException
      */
     private Link getLink(LinkResource linkResource, UriInfo uriInfo, List<SimpleEntry<String, Object>> queryParams, Object entity, Path path, boolean forceAbsolutePath) throws ApplicationException{
-    	return getLink(linkResource.pathParameters(), linkResource.queryParameters(), linkResource.serviceClass(), linkResource.serviceMethodName(), linkResource.basePath(), linkResource.includeRequestQueryParams(), linkResource.includeRequestPathParams(), linkResource.rel(), linkResource.type(), linkResource.title(), uriInfo, queryParams, entity, path, forceAbsolutePath);
+    	return getLink(linkResource.pathParameters(), linkResource.queryParameters(), linkResource.serviceClass(), linkResource.serviceMethodName(), linkResource.basePath(), linkResource.includeRequestQueryParams(), linkResource.rel(), linkResource.type(), linkResource.title(), uriInfo, queryParams, entity, path, forceAbsolutePath);
     }
     /**
      * Configura o link
@@ -457,13 +457,13 @@ public class LinkResponseFilter implements ContainerResponseFilter {
      * @return
      * @throws ApplicationException
      */
-    private Link getLink(String[] linkPathParameters, String[] linkQueryParameter, Class<?> linkServiceClass, String linkServiceMethodName, LinkResouceBasePath linkBasePath, boolean linkIncludeQueryParams, boolean linkIncludePathParams, String linkRel, String linkType, String linkTitle, UriInfo uriInfo, List<SimpleEntry<String, Object>> queryParams, Object entity, Path path, boolean forceAbsolutePath) throws ApplicationException{
+    private Link getLink(String[] linkPathParameters, String[] linkQueryParameter, Class<?> linkServiceClass, String linkServiceMethodName, LinkResouceBasePath linkBasePath, boolean linkIncludeQueryParams, String linkRel, String linkType, String linkTitle, UriInfo uriInfo, List<SimpleEntry<String, Object>> queryParams, Object entity, Path path, boolean forceAbsolutePath) throws ApplicationException{
     	Builder builder;
     	
     	List<Object> values = new LinkedList<Object>();
     	boolean linkTemplate = false;
    
-    	//if(linkIncludePathParams){
+    	//Configura os PathParams da requisicao original
     	for(String pk : uriInfo.getPathParameters().keySet()){
     		if(uriInfo.getPathParameters().get(pk).size() == 1){
     			values.add(uriInfo.getPathParameters().getFirst(pk));
@@ -471,8 +471,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     			values.add(uriInfo.getPathParameters().get(pk));
     		}
     	}
-    	//}
-    	
+    	//Configura os PathParams adicionados, vinculados ao objeto de retorno
 		if(linkPathParameters != null && linkPathParameters.length > 0){
 			for(int i = 0; i < linkPathParameters.length; i++){
 				if(StringUtils.isBlank(linkPathParameters[i])){
@@ -671,7 +670,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 		queryParamsAux.addAll(queryParams);
 		queryParamsAux.add(new SimpleEntry<String, Object>(linkPaginate.pageParamName(), linkPaginate.paginationTemplate().pageParamName()));
 		queryParamsAux.add(new SimpleEntry<String, Object>(linkPaginate.limitParamName(), linkPaginate.paginationTemplate().limitParamName()));
-    	paginationLinks.add(getLink(linkPaginate.paginationTemplate().pathParameters(), linkPaginate.paginationTemplate().queryParameters(), linkPaginate.paginationTemplate().serviceClass(), linkPaginate.paginationTemplate().serviceMethodName(), linkPaginate.paginationTemplate().basePath(), linkPaginate.paginationTemplate().includeRequestQueryParams(), linkPaginate.paginationTemplate().includeRequestPathParams(), linkPaginate.paginationTemplate().rel(), linkPaginate.paginationTemplate().type(), linkPaginate.paginationTemplate().title(), uriInfo, queryParamsAux, entity, path, linkPaginate.absolutePath()));
+    	paginationLinks.add(getLink(linkPaginate.paginationTemplate().pathParameters(), linkPaginate.paginationTemplate().queryParameters(), linkPaginate.paginationTemplate().serviceClass(), linkPaginate.paginationTemplate().serviceMethodName(), linkPaginate.paginationTemplate().basePath(), linkPaginate.paginationTemplate().includeRequestQueryParams(), linkPaginate.paginationTemplate().rel(), linkPaginate.paginationTemplate().type(), linkPaginate.paginationTemplate().title(), uriInfo, queryParamsAux, entity, path, linkPaginate.absolutePath()));
         	
     	return paginationLinks;
     }
@@ -737,10 +736,6 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 			@Override
 			public boolean includeRequestQueryParams() {
 				return link.includeRequestQueryParams();
-			}
-			@Override
-			public boolean includeRequestPathParams() {
-				return link.includeRequestPathParams();
 			}
 			@Override
 			public LinkResouceBasePath basePath() {
