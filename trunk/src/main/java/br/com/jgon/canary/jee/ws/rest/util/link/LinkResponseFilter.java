@@ -58,7 +58,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 	private static final String REGEX_PATH_PARAMETERS = "(\\#|\\$)\\{[a-z-A-Z\\.]+\\}";
 	private static final String REGEX_REPLACE_PARAM = "\\#|\\$|\\{|\\}";
 	private static final String REGEX_LINK_TEMPLATE = "(^\\{[a-zA-Z_-]+\\})|([^\\#\\$]\\{[a-zA-Z_-]+\\})";
-	private static final String MEDIA_TYPE_APPLICATION_HAL_JSON = "application/hal+json";
+	public static final String MEDIA_TYPE_APPLICATION_HAL_JSON = "application/hal+json";
 	
 	private Class<?> serviceClass;
 	private Method serviceMethod;
@@ -98,7 +98,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 	 * @param responseContext
 	 * @throws ApplicationException
 	 */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
 	private void configLinks(UriInfo uriInfo, ContainerResponseContext responseContext) throws ApplicationException{
     	LinkResource linkResource = null;
     	LinkResources linkResources = null;
@@ -270,9 +270,9 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 			}
     	}
     	    	
+    	Collection<String> attrNotPresentInRequest = getRequiredParamNotPresentInRequest(serviceMethod, uriInfo);
+    	
     	if(!linksEntity.isEmpty() || (linkPaginateEntity != null && !linkPaginateEntity.isEmpty())){
-    		Collection<String> attrNotPresentInRequest = getRequiredParamNotPresentInRequest(serviceMethod, uriInfo);
-    		
     		if(!(responseContext.getEntity() instanceof Collection)){
     			if(isHalLinks || (linkFormat != null && linkFormat.value().equals(LinkFormatType.HAL))){
     				JsonHALLinkEntity json = new JsonHALLinkEntity();
@@ -307,11 +307,10 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     			if(isHalLinks){
     				json.setEmbedded(getCollectionEntityLink((Collection<Object>) responseContext.getEntity(), isHalLinks, linkPaginateEntity, uriInfo, attrNotPresentInRequest));
     			}else{
-    				json.setEmbedded((Collection<Object>) responseContext.getEntity());
+    				json.setEmbedded(getCollectionEntity((Collection<Object>) responseContext.getEntity(), attrNotPresentInRequest));
     			}
     		
     			json.addAllLink(linksEntity);
-    		//	json.setItemsName(StringUtils.isBlank(childName) ? "items" : CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, childName).concat("_items"));
     			json.setItemsName(childName);
     			
     			responseContext.setEntity(json);
@@ -325,6 +324,14 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     				responseContext.getHeaders().remove(DominiosRest.X_PAGINATION_LIMIT);
     				responseContext.getHeaders().remove(DominiosRest.X_PAGINATION_PAGE);
     			}
+    		}
+    	}else if(!attrNotPresentInRequest.isEmpty()){
+    		if(responseContext.getEntity() instanceof Collection){
+    			responseContext.setEntity(getCollectionEntity((Collection<Object>) responseContext.getEntity(), attrNotPresentInRequest));
+    		}else if(responseContext.getEntity() instanceof Pagination){
+    			((Pagination) responseContext.getEntity()).setRegistros(getCollectionEntity(((Pagination) responseContext.getEntity()).getRegistros(), attrNotPresentInRequest)); ;
+    		}else{
+    			responseContext.setEntity(configEntityAttributes(responseContext.getEntity(), attrNotPresentInRequest));
     		}
     	}
     	
@@ -423,6 +430,22 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     	}
     	
     	return entityList;
+    }
+    /**
+     * 
+     * @param entityList
+     * @param attrNotPresentInRequest
+     * @return
+     * @throws ApplicationException
+     */
+    private Collection<Object> getCollectionEntity(Collection<Object> entityList, Collection<String> attrNotPresentInRequest) throws ApplicationException{
+    	List<Object> entityCollection = new ArrayList<Object>(entityList.size());
+    		
+    	for(Object entity : entityList){
+       		entityCollection.add(configEntityAttributes(entity, attrNotPresentInRequest));
+    	}
+
+    	return entityCollection;
     }
     /**
      * Configura o link

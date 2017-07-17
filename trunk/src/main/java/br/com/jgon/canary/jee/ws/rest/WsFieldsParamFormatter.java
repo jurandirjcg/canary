@@ -35,7 +35,7 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
 	private static final String REGEX_REPLACE_PARAM = "\\#|\\$|\\{|\\}";
 	
 	@Context
-	ResourceInfo resourceInfo;
+	private ResourceInfo resourceInfo;
 	
 	@Override
 	public void setAnnotations(Annotation[] annotations) {
