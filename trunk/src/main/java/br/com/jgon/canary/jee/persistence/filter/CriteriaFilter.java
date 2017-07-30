@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.criteria.JoinType;
 
@@ -75,6 +76,19 @@ public interface CriteriaFilter<T> {
 	 * @return
 	 */
 	public CriteriaFilter<T> addSelect(String field, String alias);
+	/**
+	 * 
+	 * @param fieldAlias
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelect(Map<String, String> fieldAlias);
+	/**
+	 * 
+	 * @param fieldAlias
+	 * @param defaultFieldAlias
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelect(Map<String, String> fieldAlias, Map<String, String> defaultFieldAlias);
 	/**
 	 * 
 	 * @param field
