@@ -810,8 +810,9 @@ public class ReflectionUtil {
 		List<Field> fields = listAttributes(klass, REG_EXP_TODOS);
 		for(Iterator<Field> itField = fields.iterator(); itField.hasNext();){
 			Field fld = itField.next();
-			if(getAnnotationFieldOrMethod(fld, annotationClass) == null)
+			if(getAnnotationFieldOrMethod(fld, annotationClass) == null){
 				itField.remove();
+			}
 		}
 		return fields;
 	}
@@ -834,7 +835,21 @@ public class ReflectionUtil {
 	public static boolean isCollection(Class<?> klass){
 		return ArrayUtils.contains(klass.getInterfaces(), Collection.class) || ArrayUtils.contains(klass.getInterfaces(), List.class) || ArrayUtils.contains(klass.getInterfaces(), Set.class);
 	}
-	
+	/**
+	 * 
+	 * @param obj
+	 * @param field
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getAttributteValue(Object obj, Field field){
+		field.setAccessible(true);
+		try {
+			return (T) field.get(obj);
+		} catch (Exception e) {
+			return null;
+		}
+	}
 	/**
 	 * Retorna valor do atributo, verifica o objeto recursivamente.
 	 * Ex: campo.campo1.campo2 - retorna o valor do campo2 da hierarquia de objetos

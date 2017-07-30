@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>br.com.jgon</groupId>
   <artifactId>canary</artifactId>
-  <version>2017.07.16-SNAPSHOT</version>
+  <version>2017.07.29-SNAPSHOT</version>
   <name>Archetype - canary</name>
   <url>http://maven.apache.org</url>
   
@@ -36,6 +36,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.13</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Testes -->
@@ -62,11 +63,6 @@
 			<artifactId>resteasy-jackson2-provider</artifactId>
 			<version>3.1.1.Final</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>22.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

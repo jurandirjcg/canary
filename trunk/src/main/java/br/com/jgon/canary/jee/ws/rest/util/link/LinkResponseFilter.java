@@ -325,7 +325,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     				responseContext.getHeaders().remove(DominiosRest.X_PAGINATION_PAGE);
     			}
     		}
-    	}else if(!attrNotPresentInRequest.isEmpty()){
+    	}else if(attrNotPresentInRequest != null && !attrNotPresentInRequest.isEmpty()){
     		if(responseContext.getEntity() instanceof Collection){
     			responseContext.setEntity(getCollectionEntity((Collection<Object>) responseContext.getEntity(), attrNotPresentInRequest));
     		}else if(responseContext.getEntity() instanceof Pagination){
@@ -373,7 +373,9 @@ public class LinkResponseFilter implements ContainerResponseFilter {
      */
     private Object configEntityAttributes(Object entity, Collection<String> listAttributes){
     	try {
-			ReflectionUtil.setValueToNullCascade(entity, CollectionUtil.convertCollectionToArray(String.class, listAttributes));
+    		if(listAttributes != null && !listAttributes.isEmpty()){
+    			ReflectionUtil.setValueToNullCascade(entity, CollectionUtil.convertCollectionToArray(String.class, listAttributes));
+    		}
 		} catch (Exception e) {
 			// Ignora o erro se nao conseguir setar para nulo
 		}
@@ -427,9 +429,9 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     			}
     		}
     		return entityCollection;
+    	}else{
+    		return getCollectionEntity(entityList, attrNotPresentInRequest);
     	}
-    	
-    	return entityList;
     }
     /**
      * 
@@ -439,13 +441,15 @@ public class LinkResponseFilter implements ContainerResponseFilter {
      * @throws ApplicationException
      */
     private Collection<Object> getCollectionEntity(Collection<Object> entityList, Collection<String> attrNotPresentInRequest) throws ApplicationException{
-    	List<Object> entityCollection = new ArrayList<Object>(entityList.size());
-    		
-    	for(Object entity : entityList){
-       		entityCollection.add(configEntityAttributes(entity, attrNotPresentInRequest));
-    	}
-
-    	return entityCollection;
+    	if(attrNotPresentInRequest != null && !attrNotPresentInRequest.isEmpty()){
+    		List<Object> entityCollection = new ArrayList<Object>(entityList.size());
+    		for(Object entity : entityList){
+    			entityCollection.add(configEntityAttributes(entity, attrNotPresentInRequest));
+    		}
+    		return entityCollection;
+    	}else{
+    		return entityList;
+    	}    	
     }
     /**
      * Configura o link
