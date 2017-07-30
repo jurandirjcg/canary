@@ -6,6 +6,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -179,6 +180,27 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	/**
 	 * 
 	 * @param id
+	 * @param fields
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public T find(K id, String[] fields) throws ApplicationException {
+		 return find(id, CollectionUtil.convertArrayToList(fields)); 
+	}
+	/**
+	 * 
+	 * @param id
+	 * @param resultClass
+	 * @param fields
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public <E> E find(K id, Class<E> resultClass, String[] fields) throws ApplicationException {
+		return find(id, resultClass, CollectionUtil.convertArrayToList(fields));
+	}
+	/**
+	 * 
+	 * @param id
 	 * @param resultClass
 	 * @param fields
 	 * @return
@@ -196,6 +218,33 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 				ReflectionUtil.setFieldValue(objRef, fld, id);
 				
 				return find(objRef, resultClass, fields);
+			}else{
+				return null;
+			}
+		} catch (Exception e) {
+			throw new ApplicationException(MessageSeverity.ERROR, ERROR_READ_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
+		}
+	}
+	/**
+	 * 
+	 * @param id
+	 * @param resultClass
+	 * @param fieldAlias
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public <E> E find(K id, Class<E> resultClass, Map<String, String> fieldAlias) throws ApplicationException {
+		try {
+			List<Field> flds = ReflectionUtil.listAttributeByAnnotation(getPrimaryClass(), Id.class);
+			if(flds.isEmpty()){
+				flds = ReflectionUtil.listAttributeByAnnotation(getPrimaryClass(), EmbeddedId.class);
+			}
+			if(!flds.isEmpty()){
+				Field fld = flds.get(0);
+				T objRef = getPrimaryClass().newInstance();
+				ReflectionUtil.setFieldValue(objRef, fld, id);
+				
+				return find(objRef, resultClass, fieldAlias);
 			}else{
 				return null;
 			}
@@ -251,6 +300,40 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 */
 	protected <E> List<E> getResultList(Class<E> resultClass, T objRef, List<String> fields, List<String> sort, Integer pagina, Integer qtde) throws ApplicationException {
 		return getResultList(resultClass, objRef, fields, null, sort, null, pagina, qtde);
+	}
+	
+	/**
+	 * 
+	 * @param resultClass
+	 * @param objRef
+	 * @param fieldAlias
+	 * @param defaultFieldAlias
+	 * @param sort
+	 * @param pagina
+	 * @param qtde
+	 * @return
+	 * @throws ApplicationException
+	 */
+	protected <E> List<E> getResultList(Class<E> resultClass, T objRef, Map<String, String> fieldAlias, Map<String, String> defaultFieldAlias, List<String> sort, String[] defaultSort, Integer pagina, Integer qtde) throws ApplicationException {
+		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
+				.addSelect(fieldAlias, defaultFieldAlias)
+				.addOrder(sort, defaultSort);
+		
+		return getResultList(resultClass, cf, pagina, qtde);
+	}
+	/**
+	 * 
+	 * @param resultClass
+	 * @param objRef
+	 * @param fieldAlias
+	 * @param sort
+	 * @param pagina
+	 * @param qtde
+	 * @return
+	 * @throws ApplicationException
+	 */
+	protected <E> List<E> getResultList(Class<E> resultClass, T objRef, Map<String, String> fieldAlias, List<String> sort, Integer pagina, Integer qtde) throws ApplicationException {
+		return getResultList(resultClass, objRef, fieldAlias, null, sort, null, pagina, qtde);
 	}
 	/**
 	 * 
@@ -391,6 +474,38 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 				.addOrder(sort, defaultSort);
 		
 		return (E) getSingleResult(resultClass, cf);
+	}
+	/**
+	 * 
+	 * @param resultClass
+	 * @param objRef
+	 * @param fieldAlias
+	 * @param defaultFieldAlias
+	 * @param sort
+	 * @param defaultSort
+	 * @param criteriaFilter
+	 * @return
+	 * @throws ApplicationException
+	 */
+	protected <E> E getSingleResult(Class<E> resultClass, T objRef, Map<String, String> fieldAlias, Map<String, String> defaultFieldAlias, List<String> sort, String[] defaultSort, CriteriaFilter<T> criteriaFilter) throws ApplicationException {
+		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
+				.addSelect(fieldAlias, defaultFieldAlias)
+				.addOrder(sort, defaultSort);
+		
+		return (E) getSingleResult(resultClass, cf);
+	}
+	/**
+	 * 
+	 * @param resultClass
+	 * @param objRef
+	 * @param fieldAlias
+	 * @param sort
+	 * @param criteriaFilter
+	 * @return
+	 * @throws ApplicationException
+	 */
+	protected <E> E getSingleResult(Class<E> resultClass, T objRef, Map<String, String> fieldAlias, List<String> sort, CriteriaFilter<T> criteriaFilter) throws ApplicationException {
+		return getSingleResult(resultClass, objRef, fieldAlias, null, sort, null, criteriaFilter);
 	}
 	/**
 	 * 
@@ -547,6 +662,18 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 * @return
 	 * @throws ApplicationException
 	 */
+	public <E> E find(T obj, Class<E> resultClass, String[] fields) throws ApplicationException{
+		return find(obj, resultClass, CollectionUtil.convertArrayToList(fields));
+	}
+	
+	/**
+	 * 
+	 * @param obj
+	 * @param resultClass
+	 * @param fields
+	 * @return
+	 * @throws ApplicationException
+	 */
 	@SuppressWarnings("unchecked")
 	public <E> E find(T obj, Class<E> resultClass, List<String> fields) throws ApplicationException {
 		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj);
@@ -557,7 +684,20 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			cf.addSelect(resultClass, fields);
 			return getSingleResult(resultClass, cf);
 		}
+	}
+	/**
+	 * 
+	 * @param obj
+	 * @param resultClass
+	 * @param fieldAlias
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public <E> E find(T obj, Class<E> resultClass, Map<String, String> fieldAlias) throws ApplicationException {
+		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj)
+			.addSelect(fieldAlias);
 		
+		return getSingleResult(resultClass, cf);
 	}
 	/**
 	 * 
@@ -569,7 +709,16 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	public T find(T obj, List<String> fields) throws ApplicationException {
 		return find(obj, getPrimaryClass(), fields);
 	}
-		
+	/**
+	 * 
+	 * @param obj
+	 * @param fields
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public T find(T obj, String[] fields) throws ApplicationException {
+		return find(obj, CollectionUtil.convertArrayToList(fields));
+	}
 	/**
 	 * 
 	 * @param pagina
@@ -701,6 +850,20 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	
 		return getResultPaginate(resultClass, cf, pagina, qtde);
 	}
+	/**
+	 * 
+	 * @param obj
+	 * @param resultClass
+	 * @param fieldAlias
+	 * @param sort
+	 * @param pagina
+	 * @param qtde
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public <E> Pagination<E> paginate(T obj, Class<E> resultClass, Map<String, String> fieldAlias, List<String> sort, Integer pagina, Integer qtde) throws ApplicationException{
+		return getResultPaginate(resultClass, obj, fieldAlias, sort, pagina, qtde);
+	}
 	
 	/**
 	 * 
@@ -715,6 +878,20 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 */
 	public <E> Pagination<E> paginate(T obj, Class<E> resultClass, String[] fields, String[] sort, Integer pagina, Integer qtde) throws ApplicationException{
 		return paginate(obj, resultClass, CollectionUtil.convertArrayToList(fields), CollectionUtil.convertArrayToList(sort), pagina, qtde);
+	}
+	/**
+	 * 
+	 * @param obj
+	 * @param resultClass
+	 * @param fieldAlias
+	 * @param sort
+	 * @param pagina
+	 * @param qtde
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public <E> Pagination<E> paginate(T obj, Class<E> resultClass, Map<String, String> fieldAlias, String[] sort, Integer pagina, Integer qtde) throws ApplicationException{
+		return paginate(obj, resultClass, fieldAlias, CollectionUtil.convertArrayToList(sort), pagina, qtde);
 	}
 	
 	/**
@@ -741,6 +918,20 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	
 		return (List<E>) getResultList(resultClass, cf, pagina, qtde);
 	}
+	/**
+	 * 
+	 * @param obj
+	 * @param resultClass
+	 * @param fieldAlias
+	 * @param sort
+	 * @param pagina
+	 * @param qtde
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public <E> List<E> list(T obj, Class<E> resultClass, Map<String, String> fieldAlias, List<String> sort, Integer pagina, Integer qtde) throws ApplicationException{
+		return getResultList(resultClass, obj, fieldAlias, sort, pagina, qtde);
+	}
 	
 	/**
 	 * 
@@ -755,6 +946,20 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 */
 	public <E> List<E> list(T obj, Class<E> resultClass, String[] fields, String[] sort, Integer pagina, Integer qtde) throws ApplicationException{
 		return list(obj, resultClass, CollectionUtil.convertArrayToList(fields), CollectionUtil.convertArrayToList(sort), pagina, qtde);
+	}
+	/**
+	 * 
+	 * @param obj
+	 * @param resultClass
+	 * @param fieldAlias
+	 * @param sort
+	 * @param pagina
+	 * @param qtde
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public <E> List<E> list(T obj, Class<E> resultClass, Map<String, String> fieldAlias, String[] sort, Integer pagina, Integer qtde) throws ApplicationException{
+		return list(obj, resultClass, fieldAlias, CollectionUtil.convertArrayToList(sort), pagina, qtde);
 	}
 	/**
 	 * 
@@ -843,6 +1048,40 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 				.addOrder(sort, defaultSort);
 		
 		return getResultPaginate(returnClass, cf, page, limit);
+	}
+	/**
+	 * 
+	 * @param returnClass
+	 * @param objRef
+	 * @param fieldAlias
+	 * @param defaultFieldAlias
+	 * @param sort
+	 * @param defaultSort
+	 * @param page
+	 * @param limit
+	 * @return
+	 * @throws ApplicationException
+	 */
+	protected <E> Pagination<E> getResultPaginate(Class<E> returnClass, T objRef, Map<String, String> fieldAlias, Map<String, String> defaultFieldAlias, List<String> sort, String[] defaultSort, Integer page, Integer limit) throws ApplicationException{
+		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
+				.addSelect(fieldAlias, defaultFieldAlias)
+				.addOrder(sort, defaultSort);
+		
+		return getResultPaginate(returnClass, cf, page, limit);
+	}
+	/**
+	 * 
+	 * @param returnClass
+	 * @param objRef
+	 * @param fieldAlias
+	 * @param sort
+	 * @param page
+	 * @param limit
+	 * @return
+	 * @throws ApplicationException
+	 */
+	protected <E> Pagination<E> getResultPaginate(Class<E> returnClass, T objRef, Map<String, String> fieldAlias, List<String> sort, Integer page, Integer limit) throws ApplicationException{
+		return getResultPaginate(returnClass, objRef, fieldAlias, null, sort, null, page, limit);
 	}
 	
 	/**

@@ -249,6 +249,24 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	}
 	
 	@Override
+	public CriteriaFilter<T> addSelect(Map<String, String> fieldAlias, Map<String, String> defaultFieldAlias){
+		if(fieldAlias == null || defaultFieldAlias.isEmpty()){
+			for(String k : defaultFieldAlias.keySet()){
+				addSelect(k, defaultFieldAlias.get(k));
+			}
+		}else{
+			for(String k : fieldAlias.keySet()){
+				addSelect(k, fieldAlias.get(k));
+			}
+		}
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addSelect(Map<String, String> fieldAlias){
+		return addSelect(fieldAlias, null);
+	}
+	
+	@Override
 	public CriteriaFilterImpl<T> addSelectCount(String field, String alias){
 		return addSelect(field, SelectAggregate.COUNT, alias);
 	}
