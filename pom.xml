@@ -3,10 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>br.com.jgon</groupId>
   <artifactId>canary</artifactId>
-  <version>2017.07.30-SNAPSHOT</version>
-  <name>Archetype - canary</name>
-  <url>http://maven.apache.org</url>
+  <version>2017.07.31-SNAPSHOT</version>
+  <packaging>jar</packaging>
   
+  <properties>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+	
   <dependencies>
 		<!-- Dependência da especificação do JBOSS -->
 		<dependency>
@@ -118,7 +121,7 @@
 							</execution>
 						</executions>
 					</plugin>
-					<plugin>
+					<!-- <plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<executions>
@@ -129,8 +132,9 @@
 								</goals>
 							</execution>
 						</executions>
-					</plugin>
+					</plugin>-->
 				</plugins>
 			</build>
 		</profile></profiles>
+	<name>Canary</name>
 </project>
