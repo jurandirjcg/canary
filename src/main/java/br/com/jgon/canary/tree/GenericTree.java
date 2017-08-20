@@ -60,7 +60,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 
 		try{
 			for(int k = 0;  k < nodes.length; k++){
-				Object resAux = ReflectionUtil.invocaGet(conteudo, nodes[k]);
+				Object resAux = ReflectionUtil.executeGet(conteudo, nodes[k]);
 				if(resAux != null)
 					nodeResAux += (k == 0 ? "" : SEPARATOR_NODE_NULL) + String.valueOf(resAux);
 			}
@@ -120,9 +120,9 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 							 */
 							if(subNodes.get(j) instanceof ComplexTreeNode){
 								if(ReflectionUtil.existAttribute(dd.getClass(), subNodes.get(j).getNode()))
-										res = ReflectionUtil.invocaGet(dd, subNodes.get(j).getNode());
+										res = ReflectionUtil.executeGet(dd, subNodes.get(j).getNode());
 							}else
-								res = ReflectionUtil.invocaGet(dd, subNodes.get(j).getNode());
+								res = ReflectionUtil.executeGet(dd, subNodes.get(j).getNode());
 							
 							//Percorre os nodes setados em nodesCaseNull
 							if(res == null){

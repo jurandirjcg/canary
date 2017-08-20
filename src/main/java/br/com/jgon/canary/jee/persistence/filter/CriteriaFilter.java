@@ -44,31 +44,11 @@ public interface CriteriaFilter<T> {
 	 * 
 	 * @param returnType
 	 * @param fields
-	 * @param defaultFields
-	 * @return
-	 * @throws ApplicationException 
-	 */
-	public CriteriaFilter<T> addSelect(Class<?> returnType, List<String> fields, String... defaultFields) throws ApplicationException;
-	
-	/**
-	 * 
-	 * @param returnType
-	 * @param fields
 	 * @return
 	 * @throws ApplicationException 
 	 */
 	public CriteriaFilter<T> addSelect(Class<?> returnType, String... fields) throws ApplicationException;
-	
-	/**
-	 * 
-	 * @param returnType
-	 * @param fields
-	 * @param defaultFields
-	 * @return
-	 * @throws ApplicationException 
-	 */
-	public CriteriaFilter<T> addSelect(Class<?> returnType, String[] fields, String... defaultFields) throws ApplicationException;
-	
+		
 	/**
 	 * 
 	 * @param field
@@ -177,33 +157,15 @@ public interface CriteriaFilter<T> {
 	 * 
 	 * @param fields
 	 * @return
-	 *//*
+	 */
 	public CriteriaFilter<T> addSelect(String... fields);
-	*/
-	/**
-	 * 
-	 * @param fields
-	 * @param defaultFields
-	 * @return
-	 * @throws ApplicationException 
-	 */
-	public CriteriaFilter<T> addSelect(String[] fields, String... defaultFields) throws ApplicationException;
 	
 	/**
 	 * 
 	 * @param fields
 	 * @return
-	 *//*
-	public CriteriaFilter<T> addSelect(List<String> fields);*/
-	
-	/**
-	 * 
-	 * @param fields
-	 * @param defaultFields
-	 * @return
-	 * @throws ApplicationException 
 	 */
-	public CriteriaFilter<T> addSelect(List<String> fields, String... defaultFields) throws ApplicationException;
+	public CriteriaFilter<T> addSelect(List<String> fields);
 	
 	/**
 	 * 
@@ -218,32 +180,11 @@ public interface CriteriaFilter<T> {
 	 * 
 	 * @param returnType
 	 * @param order
-	 * @param defaultOrder
-	 * @return
-	 * @throws ApplicationException 
-	 */
-	 
-	public CriteriaFilter<T> addOrder(Class<?> returnType, String[] order, String... defaultOrder) throws ApplicationException;
-	
-	/**
-	 * 
-	 * @param returnType
-	 * @param order
 	 * @return
 	 * @throws ApplicationException 
 	 */
 	public CriteriaFilter<T> addOrder(Class<?> returnType, List<String> order) throws ApplicationException;
 	
-	/**
-	 * 
-	 * @param returnType
-	 * @param order
-	 * @param defaultOrder
-	 * @return
-	 * @throws ApplicationException 
-	 */
-	public CriteriaFilter<T> addOrder(Class<?> returnType, List<String> order, String... defaultOrder) throws ApplicationException;
-
 	/**
 	 * 
 	 * @param order
@@ -254,25 +195,9 @@ public interface CriteriaFilter<T> {
 	/**
 	 * 
 	 * @param order
-	 * @param defaultOrder
-	 * @return
-	 */
-	public CriteriaFilter<T> addOrder(List<String> order, String... defaultOrder);
-	
-	/**
-	 * 
-	 * @param order
 	 * @return
 	 */
 	public CriteriaFilter<T> addOrder(String... order);
-	
-	/**
-	 * 
-	 * @param order
-	 * @param defaultOrder
-	 * @return
-	 */
-	public CriteriaFilter<T> addOrder(String[] order, String...defaultOrder);
 	
 	/**
 	 * 

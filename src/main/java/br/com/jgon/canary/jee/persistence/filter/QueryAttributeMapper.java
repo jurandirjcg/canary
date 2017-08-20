@@ -30,7 +30,7 @@ public @interface QueryAttributeMapper {
 	boolean isEnum() default false;
 	
 	/**
-	 * Utilizado em campos do tipo Collection, pois não é possível realizar reflection 
+	 * Utilizado em campos do tipo Collection, pois não é possível realizar reflection (Java generics)
 	 */
-	Class<?> valueType() default void.class;
+	Class<?> collectionTarget() default void.class;
 }

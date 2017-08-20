@@ -153,7 +153,7 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
 				}
 			
 				if(!lrs.serviceClass().equals(void.class)){
-					listResources.addAll(paramFields(ReflectionUtil.getMethodByName(lrs.serviceClass(), lrs.serviceMethodName())));
+					listResources.addAll(paramFields(ReflectionUtil.getMethod(lrs.serviceClass(), lrs.serviceMethodName())));
 				}
 			}
 
@@ -163,7 +163,7 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
 				}
 	
 				if(!lp.collectionLinks().serviceClass().equals(void.class)){
-					listResources.addAll(paramFields(ReflectionUtil.getMethodByName(lp.collectionLinks().serviceClass(), lp.collectionLinks().serviceMethodName())));
+					listResources.addAll(paramFields(ReflectionUtil.getMethod(lp.collectionLinks().serviceClass(), lp.collectionLinks().serviceMethodName())));
 				}
 			}
 			

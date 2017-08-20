@@ -8,6 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
@@ -63,8 +65,9 @@ abstract class QueryMapper {
 	 * @param klass
 	 * @param fieldName
 	 * @return
+	 * @throws ApplicationException 
 	 */
-	private SimpleEntry<String, String> verificaCampo(Class<?> klass, String fieldName){
+	private SimpleEntry<String, String> verificaCampo(Class<?> klass, String fieldName) throws ApplicationException{
 		String partField;
 		
 		boolean multiLevel = false;
@@ -87,6 +90,7 @@ abstract class QueryMapper {
 			}
 			
 			QueryAttributeMapper queryMapperAttribute = null;
+			
 			if(fl.isAnnotationPresent(QueryAttributeMapper.class)){
 				queryMapperAttribute = fl.getAnnotation(QueryAttributeMapper.class);
 			}
@@ -97,8 +101,22 @@ abstract class QueryMapper {
 				boolean add = true;
 				SimpleEntry<String, String> campoMultiLevel = null;
 				if(!isEnum && multiLevel){
-					Class<?> attrType = queryMapperAttribute != null && !queryMapperAttribute.valueType().equals(void.class) ? queryMapperAttribute.valueType() : fl.getType();
+					Class<?> attrType = null;
+
+					if(fl.isAnnotationPresent(OneToMany.class) && !fl.getAnnotation(OneToMany.class).targetEntity().equals(void.class)){
+						attrType = fl.getAnnotation(OneToMany.class).targetEntity();
+					}else if(fl.isAnnotationPresent(ManyToMany.class) && !fl.getAnnotation(ManyToMany.class).targetEntity().equals(void.class)){
+						attrType = fl.getAnnotation(ManyToMany.class).targetEntity();
+					}else if(queryMapperAttribute != null && !queryMapperAttribute.collectionTarget().equals(void.class)){
+						attrType = queryMapperAttribute.collectionTarget();
+					}else{
+						attrType = fl.getType();
+					}
 					
+					if(ReflectionUtil.isCollection(klass)){
+						throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-collection-not-definied", klass.getName() + "." + fl.getName());
+					}
+										
 					campoMultiLevel = verificaCampo(attrType, fieldName.substring(fieldName.indexOf(".") + 1));
 					add = campoMultiLevel != null;
 				}
@@ -120,7 +138,7 @@ abstract class QueryMapper {
 						}
 					}
 				}
-				return new SimpleEntry<String, String>(sb.toString(), fieldName);
+				return new SimpleEntry<String, String>(sb.length() == 0 ? fieldName : sb.toString() , fieldName);
 			}
 		}
 
