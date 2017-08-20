@@ -56,9 +56,6 @@ class SelectMapper extends QueryMapper {
 		List<SimpleEntry<String, String>> campos = new ArrayList<SimpleEntry<String, String>>(0);
 		QueryAttributeMapper queryMapperAttribute;
 		for(Field fld : ReflectionUtil.listAttributes(responseClass)){
-			/*if(fld.isAnnotationPresent(QueryMapperIgnore.class) || fld.isAnnotationPresent(Transient.class)){
-				continue;
-			}*/
 			
 			if(fld.isAnnotationPresent(Transient.class)){
 				continue;

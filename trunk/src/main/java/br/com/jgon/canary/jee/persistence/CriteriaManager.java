@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.ManyToMany;
@@ -45,7 +46,9 @@ class CriteriaManager<T> {
 	
 	private EntityManager entityManager;
 	private CriteriaFilterImpl<T> criteriaFilter;
+	//private Map<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>> collectionRelationSelect = new LinkedHashMap<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>>();
 	private CriteriaAssociations criteriaAssociations;
+	private Map<String, CriteriaFilterImpl<?>> listCollectionRelation = new HashMap<String, CriteriaFilterImpl<?>>(0);
 	private Root<T> rootEntry;
 	private Class<?> queryClass;
 	private CriteriaBuilder criteriaBuilder;
@@ -74,6 +77,10 @@ class CriteriaManager<T> {
 		return this.criteriaAssociations;
 	}
 	
+	public Map<String, CriteriaFilterImpl<?>> getListCollectionRelation() {
+		return listCollectionRelation;
+	}
+
 	@SuppressWarnings("unchecked")
 	public <E> CriteriaQuery<E> getCriteriaQuery(){
 		return (CriteriaQuery<E>) this.criteriaQuery;
@@ -176,6 +183,27 @@ class CriteriaManager<T> {
 			List<Selection> lista = new ArrayList<Selection>(0);
 						
 			for(String key: criteriaFilter.getListSelection().keySet()){
+				
+				//--- ADICIONADO PARA VERIFICAR COLECAO
+				Field field = null;
+				if(key.contains(".")){
+					field = ReflectionUtil.getAttribute(entityClass, key.substring(0, key.indexOf(".")));
+				}else{
+					field = ReflectionUtil.getAttribute(entityClass, key);
+				}
+				
+				if(field != null && ReflectionUtil.isCollection(field.getType())){
+					if(listCollectionRelation.containsKey(field.getName())){
+						listCollectionRelation.get(field.getName()).getListSelection().put(key, criteriaFilter.getListSelection().get(key));
+					}else{
+						CriteriaFilterImpl<?> criteriaFilterCollectionRelation = new CriteriaFilterImpl(field.getType());
+						criteriaFilterCollectionRelation.getListSelection().put(key, criteriaFilter.getListSelection().get(key));
+						listCollectionRelation.put(field.getName(), criteriaFilterCollectionRelation);
+					}
+					continue;
+				}
+				
+				// -----------------------------
 				
 				SimpleEntry<String, From<?, ?>> assocAux = configAssociation(from, key); 
 						
@@ -327,7 +355,7 @@ class CriteriaManager<T> {
 				auxObj = obj != null ? field.get(obj) : null;
 				
 				isStringType = field.getType().equals(String.class);
-				isEntityType = field.getType().isAnnotationPresent(Entity.class);
+				isEntityType = field.getType().isAnnotationPresent(Entity.class) || field.getType().isAnnotationPresent(Embeddable.class);
 				
 				Expression<?> pathExpression = pathEntry.get(field.getName());
 				
@@ -549,7 +577,7 @@ class CriteriaManager<T> {
 				attributeName = StringUtils.isBlank(attributeParent) ? field.getName() : attributeParent.concat(".").concat(field.getName());
 				
 				isStringType = field.getType().equals(String.class);
-				isEntityType = field.getType().isAnnotationPresent(Entity.class);
+				isEntityType = field.getType().isAnnotationPresent(Entity.class) || field.getType().isAnnotationPresent(Embeddable.class);
 				isCollectionEntity = ReflectionUtil.existAnnotation(field, OneToMany.class) || ReflectionUtil.existAnnotation(field, ManyToMany.class);
 				
 				Expression<?> pathExpression = pathEntry.get(field.getName());

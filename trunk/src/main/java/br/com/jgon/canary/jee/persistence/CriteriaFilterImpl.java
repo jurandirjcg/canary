@@ -91,6 +91,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	private Map<String, Where> listWhere = new LinkedHashMap<String, Where>(0);
 	private Map<String, SimpleEntry<Where, ?>> listWhereComplex = new LinkedHashMap<String, SimpleEntry<Where,?>>();
 	private Map<String, SimpleEntry<SelectAggregate, String>> listSelection = new LinkedHashMap<String, SimpleEntry<SelectAggregate, String>>(0);
+	private Map<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>> collectionSelection = new LinkedHashMap<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>>();
 	private Map<String, Order> listOrder = new LinkedHashMap<String, Order>(0);
 	private Set<String> listGroupBy = new LinkedHashSet<String>();
 	private Map<String, SimpleEntry<JoinType, Boolean>> listJoin = new LinkedHashMap<String, SimpleEntry<JoinType, Boolean>>();
@@ -114,8 +115,17 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 * 
 	 * @return
 	 */
+	@Override
 	public T getObjBase(){
 		return this.objBase;
+	}
+	
+	/**
+	 * 
+	 * @param objBase
+	 */
+	public void setObjBase(T objBase){
+		this.objBase = objBase;
 	}
 	/**
 	 * 
@@ -207,37 +217,17 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 				fieldAux.append(f);
 			}
 		}
-
-		List<SimpleEntry<String, String>> listaCampos = new SelectMapper(returnType == null ? this.objClass : returnType, fieldAux.toString()).getFields();
+		
+		Class<?> returnTypeAux = returnType == null ? this.objClass : returnType;
+		List<SimpleEntry<String, String>> listaCampos = new SelectMapper(returnTypeAux, fieldAux.toString()).getFields();
 
 		for(SimpleEntry<String, String> se : listaCampos){
-			addSelect(se.getKey(), se.getValue());
+				addSelect(se.getKey(), se.getValue());
 		}
-	
+		
 		return this;
 	}
-	
-
-	@Override
-	public CriteriaFilter<T> addSelect(Class<?> returnType, List<String> fields, String... defaultFields) throws ApplicationException {
-		return addSelect(returnType, checkFields(fields, defaultFields));
-	}
-
-	@Override
-	public CriteriaFilter<T> addSelect(Class<?> returnType, String[] fields, String... defaultFields) throws ApplicationException {
-		return addSelect(returnType, checkFields(fields, defaultFields));
-	}
-
-	@Override
-	public CriteriaFilter<T> addSelect(String[] fields, String... defaultFields) throws ApplicationException {
-		return addSelect(checkFields(fields, defaultFields));
-	}
-
-	@Override
-	public CriteriaFilter<T> addSelect(List<String> fields, String... defaultFields) throws ApplicationException {
-		return addSelect(null, checkFields(fields, defaultFields));
-	}
-	
+		
 	@Override
 	public CriteriaFilterImpl<T> addSelect(Class<?> returnType, String... fields) throws ApplicationException{
 		return addSelect(returnType, fields == null ? null : Arrays.asList(fields));
@@ -261,6 +251,20 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 		}
 		return this;
 	}
+
+	@Override
+	public CriteriaFilter<T> addSelect(String... fields){
+		for(String fld : fields){
+			addSelect(fld);
+		}
+		return this;
+	}
+
+	@Override
+	public CriteriaFilter<T> addSelect(List<String> fields) {
+		return addSelect(fields.toArray(new String[fields.size()]));
+	}
+	
 	@Override
 	public CriteriaFilter<T> addSelect(Map<String, String> fieldAlias){
 		return addSelect(fieldAlias, null);
@@ -379,26 +383,6 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 		}
 
 		return this;
-	}
-	
-	@Override
-	public CriteriaFilter<T> addOrder(Class<?> returnType, String[] order, String... defaultOrder) throws ApplicationException {
-		return addOrder(returnType, checkFields(order, defaultOrder));
-	}
-
-	@Override
-	public CriteriaFilter<T> addOrder(Class<?> returnType, List<String> order, String... defaultOrder) throws ApplicationException {
-		return addOrder(returnType, checkFields(order, defaultOrder));
-	}
-
-	@Override
-	public CriteriaFilter<T> addOrder(List<String> order, String... defaultOrder) {
-		return addOrder(checkFields(order, defaultOrder));
-	}
-
-	@Override
-	public CriteriaFilter<T> addOrder(String[] order, String... defaultOrder) {
-		return addOrder(checkFields(order, defaultOrder));
 	}
 	
 	@Override
@@ -804,7 +788,12 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	public CriteriaManager<T> createCriteriaManager(EntityManager entityManager, Class<T> entityClass, Class<?> queryClass) throws Exception{
 		return new CriteriaManager<T>(entityManager, entityClass, queryClass, this);
 	}
-	
+
+	public Map<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>> getCollectionSelection() {
+		return collectionSelection;
+	}
+
+	/*
 	private static List<String> checkFields(List<String> fields, String... defaultFields){
 		List<String> ret = fields;
 		if(fields == null || fields.isEmpty()){
@@ -819,6 +808,6 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 			return Arrays.asList(defaultFields);
 		}
 		return Arrays.asList(fields);
-	}
+	}*/
 
 }

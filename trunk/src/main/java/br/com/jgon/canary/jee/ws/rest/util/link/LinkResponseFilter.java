@@ -143,16 +143,16 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     			if(!linkPaginate.collectionLinks().serviceClass().equals(void.class) && StringUtils.isNotBlank(linkPaginate.collectionLinks().serviceMethodName())){
     				Class<?> serviceClassPag = linkPaginate.collectionLinks().serviceClass();
     				String serviceMethodNamePag = linkPaginate.collectionLinks().serviceMethodName();
-    				Path pathAux = ReflectionUtil.getAnnotationMethod(serviceClassPag, serviceMethodNamePag, Path.class);
+    				Path pathAux = ReflectionUtil.getAnnotation(serviceClassPag, serviceMethodNamePag, Path.class);
 
     				List<LinkResource> linkResAux = new ArrayList<LinkResource>();
 
-    				LinkResource lrAux = ReflectionUtil.getAnnotationMethod(serviceClassPag,  serviceMethodNamePag, LinkResource.class);
+    				LinkResource lrAux = ReflectionUtil.getAnnotation(serviceClassPag,  serviceMethodNamePag, LinkResource.class);
     				if(lrAux != null){    				
     					linkResAux.add(reconfigLink(lrAux, serviceClassPag,  serviceMethodNamePag));
     				}
 
-    				LinkResources lkRes = ReflectionUtil.getAnnotationMethod(serviceClassPag,  serviceMethodNamePag, LinkResources.class);
+    				LinkResources lkRes = ReflectionUtil.getAnnotation(serviceClassPag,  serviceMethodNamePag, LinkResources.class);
     				if(lkRes != null){
     					for(LinkResource lr : lkRes.value()){
     						linkResAux.add(reconfigLink(lr, serviceClassPag,  serviceMethodNamePag));
@@ -171,9 +171,9 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     		if(isCollection){
     			List<LinkResource> linkResAux;
     			if(!linkResource.serviceClass().equals(void.class)){
-    				Path pathAux = ReflectionUtil.getAnnotationMethod(linkResource.serviceClass(), linkResource.serviceMethodName(), Path.class);
+    				Path pathAux = ReflectionUtil.getAnnotation(linkResource.serviceClass(), linkResource.serviceMethodName(), Path.class);
     				linkResAux = new ArrayList<LinkResource>();
-    				LinkResource linkResourceAux = ReflectionUtil.getAnnotationMethod(linkResources.serviceClass(), linkResources.serviceMethodName(), LinkResource.class);
+    				LinkResource linkResourceAux = ReflectionUtil.getAnnotation(linkResources.serviceClass(), linkResources.serviceMethodName(), LinkResource.class);
     				if(linkResourceAux != null){
     					linkResAux.add(reconfigLink(linkResourceAux, linkResource.serviceClass(), linkResource.serviceMethodName()));
     					linkPaginateEntity.put(pathAux, linkResAux);
@@ -202,9 +202,9 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     			linkPaginateEntity = new HashMap<Path, List<LinkResource>>();
     			List<LinkResource> linkResAux;
     			if(!linkResources.serviceClass().equals(void.class)){
-    				Path pathAux = ReflectionUtil.getAnnotationMethod(linkResources.serviceClass(), linkResources.serviceMethodName(), Path.class);
+    				Path pathAux = ReflectionUtil.getAnnotation(linkResources.serviceClass(), linkResources.serviceMethodName(), Path.class);
     				linkResAux = new ArrayList<LinkResource>();
-    				LinkResources linkResourcesAux = ReflectionUtil.getAnnotationMethod(linkResources.serviceClass(), linkResources.serviceMethodName(), LinkResources.class);
+    				LinkResources linkResourcesAux = ReflectionUtil.getAnnotation(linkResources.serviceClass(), linkResources.serviceMethodName(), LinkResources.class);
     				if(linkResourcesAux != null && linkResourcesAux.value().length > 0){
     					for(LinkResource lr : linkResourcesAux.value()){
     						linkResAux.add(reconfigLink(lr, linkResources.serviceClass(), linkResources.serviceMethodName()));
@@ -231,8 +231,8 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     				}
     			}
     			if(!linkResources.serviceClass().equals(void.class)){
-	    			Path pathAux = ReflectionUtil.getAnnotationMethod(linkResources.serviceClass(), linkResources.serviceMethodName(), Path.class);
-					LinkResources linkResourcesAux = ReflectionUtil.getAnnotationMethod(linkResources.serviceClass(), linkResources.serviceMethodName(), LinkResources.class);
+	    			Path pathAux = ReflectionUtil.getAnnotation(linkResources.serviceClass(), linkResources.serviceMethodName(), Path.class);
+					LinkResources linkResourcesAux = ReflectionUtil.getAnnotation(linkResources.serviceClass(), linkResources.serviceMethodName(), LinkResources.class);
 					
 					if(linkResourcesAux != null){
 						for(LinkResource lr : linkResourcesAux.value()){
@@ -247,7 +247,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 						}
 					}
 					
-					LinkResource linkResourceAux =  ReflectionUtil.getAnnotationMethod(linkResources.serviceClass(), linkResources.serviceMethodName(), LinkResource.class);
+					LinkResource linkResourceAux =  ReflectionUtil.getAnnotation(linkResources.serviceClass(), linkResources.serviceMethodName(), LinkResource.class);
 					if(linkResourceAux != null){
 						link = getLink(linkResourceAux, uriInfo, null, responseContext.getEntity(), pathAux, false);
 						if(link != null){
@@ -903,7 +903,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 					listResources.addAll(CollectionUtil.convertArrayToList(lrs.value()));
 				}
 				if(!lrs.serviceClass().equals(void.class)){
-					listResources.addAll(paramFields(ReflectionUtil.getMethodByName(lrs.serviceClass(), lrs.serviceMethodName())));
+					listResources.addAll(paramFields(ReflectionUtil.getMethod(lrs.serviceClass(), lrs.serviceMethodName())));
 				}
 			}
 
@@ -913,7 +913,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 				}
 	
 				if(!lp.collectionLinks().serviceClass().equals(void.class)){
-					listResources.addAll(paramFields(ReflectionUtil.getMethodByName(lp.collectionLinks().serviceClass(), lp.collectionLinks().serviceMethodName())));
+					listResources.addAll(paramFields(ReflectionUtil.getMethod(lp.collectionLinks().serviceClass(), lp.collectionLinks().serviceMethodName())));
 				}
 			}
 			

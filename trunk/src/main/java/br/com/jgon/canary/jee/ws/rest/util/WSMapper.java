@@ -98,7 +98,7 @@ public class WSMapper {
 		}
 		
 		StringBuilder sb = new StringBuilder();
-		List<Field> fieldClass = ReflectionUtil.listAttributes(klass, ReflectionUtil.REG_EXP_TODOS);
+		List<Field> fieldClass = ReflectionUtil.listAttributes(klass);
 
 		for(Field fl : fieldClass){
 			if(fl.isAnnotationPresent(WSTransient.class)){
@@ -115,7 +115,7 @@ public class WSMapper {
 				boolean add = true;
 				String campoMultiLevel = null;
 				if(!isEnum && multiLevel){
-					Class<?> attrType = wsMapperAttribute != null && !wsMapperAttribute.valueType().equals(void.class) ? wsMapperAttribute.valueType() : fl.getType(); 
+					Class<?> attrType = wsMapperAttribute != null && !wsMapperAttribute.collectionType().equals(void.class) ? wsMapperAttribute.collectionType() : fl.getType(); 
 					
 					campoMultiLevel = verificaCampo(attrType, fieldName.substring(fieldName.indexOf(".") + 1));
 					add = StringUtils.isNotBlank(campoMultiLevel);

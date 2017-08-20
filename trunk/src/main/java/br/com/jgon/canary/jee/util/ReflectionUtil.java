@@ -20,18 +20,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ReflectionUtil {
 	
-	/**
-	 * Expressão para retorno de metodos get
-	 */
-	public static final String REG_EXP_METODOS_GET = "(get){1}[A-Z]+.*";
-	/**
-	 * Expressão para retorno de metodos set
-	 */
-	public static final String REG_EXP_METODOS_SET = "(set){1}[A-Z]+.*";
-	/**
-	 * Expressão para retorno de todos os atributos ou metodos
-	 */
-	public static final String REG_EXP_TODOS	= ".*";
+	private static final String REG_EXP_METHOD_GET = "(get){1}[A-Z]+.*";
+	private static final String REG_EXP_METHOD_SET = "(set){1}[A-Z]+.*";
+	private static final String REG_EXP_ALL	= ".*";
 	
 	/**
 	 * Lista os métodos get de um objeto passado como parâmetro.
@@ -39,7 +30,7 @@ public class ReflectionUtil {
 	 * @return List - lista de métodos da classe
 	 */
 	public static List<Method> listMethodsGet(Object o) {
-		return listMethods(o, REG_EXP_METODOS_GET);
+		return listMethods(o, REG_EXP_METHOD_GET);
     }
         
 	/**
@@ -48,7 +39,7 @@ public class ReflectionUtil {
 	 * @return List - lista de matodos da classe
 	 */
 	public static List<Method> listMethodsSet(Object o) {
-		return listMethods(o, REG_EXP_METODOS_SET);
+		return listMethods(o, REG_EXP_METHOD_SET);
 	}
 
 	/**
@@ -57,21 +48,14 @@ public class ReflectionUtil {
 	 * @return List - lista de metodos da classe
 	 */
 	public static List<Method> listMethods(Object o) {
-		return listMethods(o, REG_EXP_TODOS);
+		return listMethods(o, REG_EXP_ALL);
 	}
 	
 	/**
-	 * Devolve uma lista de metodos declarados pelo programador em um objeto
-	 * @param o - objeto a ser verificado
-	 * @param pattern - uma expressao regular dos metodos que desejam ser listados
-	 * @return List - lista de metodos da classe Method
-	 * <br>
-	 * Exemplo de utilizacao<br>
-	 * List l = new ArrayList();<br>
-	 * l = Util.listMethods(new Object(), ".*");  // todos os metodos da classe Object<br>
-	 * for (int i = 0; i < l.size(); i++)<br>
-	 * 		System.out.println(((Method)l.get(i)).getName());<br>
 	 * 
+	 * @param o
+	 * @param pattern
+	 * @return
 	 */
 	public static List<Method> listMethods(Object o, String pattern) {
 		return listMethods(o.getClass(), pattern);
@@ -104,9 +88,8 @@ public class ReflectionUtil {
 	 * @param Object - objeto a ser verificado
 	 * @return List - lista de atributos da classe Method 
 	 */
-	
 	public static List<Field> listAttributes(Object o) {
-		return listAttributes(o, REG_EXP_TODOS);
+		return listAttributes(o, REG_EXP_ALL);
 	}
 	
 	/**
@@ -118,7 +101,7 @@ public class ReflectionUtil {
 	public static List<Field> listAttributes(Class<?> klass, Class<?> attributeType){
 		List<Field> listFields = new ArrayList<Field>();
 		
-		for(Field field : listAttributes(klass, REG_EXP_TODOS)){
+		for(Field field : listAttributes(klass, REG_EXP_ALL)){
 			if(field.getType().equals(attributeType)){
 				listFields.add(field);
 			}
@@ -142,7 +125,7 @@ public class ReflectionUtil {
 	 * @param modifier
 	 * @return
 	 */
-	public static boolean checkAttributeModifier(Field fld, int modifier){
+	public static boolean checkModifier(Field fld, int modifier){
 		return fld.getModifiers() == modifier;
 	}
 	
@@ -153,15 +136,33 @@ public class ReflectionUtil {
 	 * @param annotationClass - Tipo de annotation a ser localizada
 	 * @return
 	 */
-	public static List<Field> listAttributes(Class<?> klass, Class<?> fieldClass, Class<? extends Annotation> annotationClass){
-		List<Field> fields = listAttributes(klass, REG_EXP_TODOS);
+	@SafeVarargs
+	public static List<Field> listAttributes(Class<?> klass, Class<?> fieldClass, Class<? extends Annotation>... annotationClass){
+		List<Field> fields = listAttributes(klass, REG_EXP_ALL);
 		for(Iterator<Field> itField = fields.iterator(); itField.hasNext();){
 			Field fld = itField.next();
-			if(!fld.getType().equals(fieldClass) || getAnnotationFieldOrMethod(fld, annotationClass) == null)
+			if(fieldClass != null && !fld.getType().equals(fieldClass)){
 				itField.remove();
+			}else{
+				for(Class<? extends Annotation> a : annotationClass){
+					if(getAnnotation(fld, a) == null){
+						itField.remove();
+					}
+				}
+			}
 		}
-	
 		return fields;
+	}
+	
+	/**
+	 * Retorna lista de atributos que contenham a(s) annotation(s) pesquisa tambem realizada nos metodos
+	 * @param klass
+	 * @param annotationClass
+	 * @return
+	 */
+	@SafeVarargs
+	public static List<Field> listAttributesByAnnotation(Class<?> klass, Class<? extends Annotation>... annotationClass){
+		return listAttributes(klass, null, annotationClass);
 	}
 	
 	/**
@@ -170,7 +171,7 @@ public class ReflectionUtil {
 	 * @return
 	 */
 	public static List<Field> listAttributes(Class<?> klass){
-		return listAttributes(klass, REG_EXP_TODOS);
+		return listAttributes(klass, REG_EXP_ALL);
 	}
 	/**
 	 * Retorna os atributos da classe
@@ -221,7 +222,7 @@ public class ReflectionUtil {
 	 * @return
 	 */
 	public static boolean existMethod(Class<?> klass, String name){
-		return existMethod(klass, name, REG_EXP_TODOS);
+		return existMethod(klass, name, REG_EXP_ALL);
 	}
 	
 	/**
@@ -231,7 +232,7 @@ public class ReflectionUtil {
 	 * @return
 	 */
 	public static boolean existMethodGet(Class<?> klass, String name){
-		return existMethod(klass, name, REG_EXP_METODOS_GET);
+		return existMethod(klass, name, REG_EXP_METHOD_GET);
 	}
 	
 	/**
@@ -241,7 +242,7 @@ public class ReflectionUtil {
 	 * @return
 	 */
 	public static boolean existMethodSet(Class<?> klass, String name){
-		return existMethod(klass, name, REG_EXP_METODOS_SET);
+		return existMethod(klass, name, REG_EXP_METHOD_SET);
 	}
 	
 	/**
@@ -271,9 +272,9 @@ public class ReflectionUtil {
 	 * @return
 	 */
 	public static boolean existAnnotation(Class<?> klass, String atributoNome, Class<? extends Annotation> annotationClass){
-		List<Field> listFields = listAttributes(klass, atributoNome);
+		List<Field> listFields = listAttributes(klass, StringUtils.isBlank(atributoNome) ? REG_EXP_ALL : atributoNome);
 		for(Field atributo : listFields)
-			if(getAnnotationFieldOrMethod(atributo, annotationClass) != null)
+			if(getAnnotation(atributo, annotationClass) != null)
 					return true;
 		
 		return false;
@@ -287,7 +288,7 @@ public class ReflectionUtil {
 	 * @return
 	 */
 	public static boolean existAnnotation(Field atributo, Class<? extends Annotation> annotationClass){
-		if(getAnnotationFieldOrMethod(atributo, annotationClass) != null)
+		if(getAnnotation(atributo, annotationClass) != null)
 					return true;
 		
 		return false;
@@ -300,13 +301,13 @@ public class ReflectionUtil {
 	 * @param annotationClass
 	 * @return
 	 */
-	public static <T extends Annotation> T getAnnotationFieldOrMethod(Field field, Class<T> annotationClass){
+	public static <T extends Annotation> T getAnnotation(Field field, Class<T> annotationClass){
 
 		if(field.isAnnotationPresent(annotationClass))
 			return field.getAnnotation(annotationClass);
 		else
 			try {
-			 Method method = getMethodTypeGet(field.getDeclaringClass(), field.getName());
+			 Method method = getMethodGet(field.getDeclaringClass(), field.getName());
 			if(method.isAnnotationPresent(annotationClass))
 				return method.getAnnotation(annotationClass);
 			
@@ -323,7 +324,7 @@ public class ReflectionUtil {
 	 * @param annotationClass
 	 * @return
 	 */
-	public static <T extends Annotation> T getAnnotationMethod(Class<?> klass, String methodName, Class<T> annotationClass){
+	public static <T extends Annotation> T getAnnotation(Class<?> klass, String methodName, Class<T> annotationClass){
 		try {
 			for(Method m : klass.getDeclaredMethods()){
 				if(m.getName().equals(methodName) && m.isAnnotationPresent(annotationClass)){
@@ -341,7 +342,7 @@ public class ReflectionUtil {
 	 * @param methodName
 	 * @return
 	 */
-	public static Method getMethodByName(Class<?> klass, String methodName){
+	public static Method getMethod(Class<?> klass, String methodName){
 		try {
 			for(Method m : klass.getDeclaredMethods()){
 				if(m.getName().equals(methodName)){
@@ -353,34 +354,16 @@ public class ReflectionUtil {
 		}
 		return null;
 	}
-	
-	/**
-	 * Retorna lista de atributos que contenham a(s) annotation(s) pesquisa tambem realizada nos metodos
-	 * @param klass
-	 * @param annotationClass
-	 * @return
-	 */
-	@SafeVarargs
-	public static List<Field> fieldsContainAnnotation(Class<?> klass, Class<? extends Annotation>... annotationClass){
-		List<Field> listField = new ArrayList<Field>(0);
-		for(Field field : listAttributes(klass, REG_EXP_TODOS)){
-			for(int i=0; i < annotationClass.length; i++)
-				if(getAnnotationFieldOrMethod(field, annotationClass[i]) != null)
-					listField.add(field);
-		}
 		
-		return listField;
-	}
 	/**
-	 * Invoca um metodo getXxxxx() para o objeto e o atributo informado.
-	 * @param obj - o objeto cujo metodo get sera chamado
-	 * @param atributo - o nome do atributo que identifica qual getter chamar
-	 * @param objParams - os parametros que devem ser passados para a invocar do metodo - geralmente null
+	 * @param obj
+	 * @param atributo
+	 * @param objParams
 	 * @return
 	 * @throws Exception
 	 */
-	public static Object invocaGet(Object obj, String atributo, Object[] objParams) throws Exception {
-		Method method = getMethodTypeGet(obj.getClass(), atributo, objParams);
+	public static Object executeGet(Object obj, String atributo, Object[] objParams) throws Exception {
+		Method method = getMethodGet(obj.getClass(), atributo, objParams);
 		if(!method.isAccessible()){
 			method.setAccessible(true);
 		}
@@ -399,7 +382,7 @@ public class ReflectionUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Object invocaStaticMetodo(Class<?> klass, String metodo, Object... params) throws Exception{
+	public static Object executeStaticMethod(Class<?> klass, String metodo, Object... params) throws Exception{
 		Method[] m = klass.getDeclaredMethods();
 		    
 		Method mt = null;
@@ -424,7 +407,7 @@ public class ReflectionUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Object invocaMetodo(Object obj, String metodo, Object... params) throws Exception{
+	public static Object executeMethod(Object obj, String metodo, Object... params) throws Exception{
 		List<Method> lstMethods = listMethods(obj, metodo);
 		
 		if(lstMethods.isEmpty())
@@ -446,7 +429,7 @@ public class ReflectionUtil {
 	 * @return
 	 */
 	
-	public static Method getMethodTypeGet(Class<?> klass, String atributeName, Object... objParams) throws Exception{
+	public static Method getMethodGet(Class<?> klass, String atributeName, Object... objParams) throws Exception{
 		String nomeGetter = "get" + StringUtils.capitalize(atributeName);
 		Method method = null;
 		Class<?>[] tipos = null;
@@ -524,8 +507,8 @@ public class ReflectionUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Object invocaGet(Object obj, String atributo) throws Exception {
-	    return invocaGet(obj, atributo, null);
+	public static Object executeGet(Object obj, String atributo) throws Exception {
+	    return executeGet(obj, atributo, null);
 	}
 
 	/**
@@ -536,7 +519,7 @@ public class ReflectionUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Object invocaSet(Object obj, String atributo, Object... objParams) throws Exception {
+	public static Object executeSet(Object obj, String atributo, Object... objParams) throws Exception {
 		String nomeSetter = "set" + StringUtils.capitalize(atributo);
 
 		boolean paramIsNull = true;
@@ -549,7 +532,7 @@ public class ReflectionUtil {
 		
 		if (paramIsNull)
 			//return obj.getClass().getMethod(nomeSetter, (Class[])null).invoke(obj, (Object[])null);
-			return invocaMetodo(obj, nomeSetter, objParams);
+			return executeMethod(obj, nomeSetter, objParams);
 
 		Class<?>[] tipos = new Class[objParams.length];
 		for (int i=0; i< objParams.length; i++) {
@@ -565,20 +548,13 @@ public class ReflectionUtil {
 	
 	
 	/**
-	 * Recupera o valor de uma propriedade de determinado objeto utilizando Reflection.
-	 * 
-	 * <b> Exemplo: </b><br/>
-	 * Object obj = Reflexao.invocaGetA(objetoContainer, "nomepropriedade.nomenested.maisumnome");
-	 * Ir� retornar:
-	 * objetoContainer.getNomepropriedade().getNomenested().getMaisumnome();
-	 * 
 	 * @param obj
 	 * @param nomePropriedade - nome da propriedade cujo valor deve ser recuperado
 	 * @return
 	 * @throws Exception
 	 */
 	
-	public static Object invocaGetAninhado(Object obj, String nomePropriedade) throws Exception {
+	public static Object executeGetCascade(Object obj, String nomePropriedade) throws Exception {
 		Object result = null;
 		Class<?> classe;
 		
@@ -610,7 +586,7 @@ public class ReflectionUtil {
 		
 		result = met.invoke(obj, (Object[])null);
 		
-		return rec ? invocaGetAninhado(result, propriedade) : result;
+		return rec ? executeGetCascade(result, propriedade) : result;
 	}
 	
 	/**
@@ -643,11 +619,11 @@ public class ReflectionUtil {
 	 * @param obj2
 	 * @return
 	 */
-	private static Object newValueField(Field field, Object obj, Object obj2) throws Exception{
+	private static Object concatValue(Field field, Object obj, Object obj2) throws Exception{
 		Object val1 = null, val2 = null;
 
-		val1 = invocaGet(obj, field.getName());
-		val2 = invocaGet(obj2, field.getName());
+		val1 = executeGet(obj, field.getName());
+		val2 = executeGet(obj2, field.getName());
 		
 		if(val1 == null)
 			return val2;
@@ -665,7 +641,7 @@ public class ReflectionUtil {
 		}else if(field.getType().equals(Integer.class) || field.getType().equals(int.class)){
 			return ((Integer) val1) + ((Integer)val2);
 		}else{
-			return val2;
+			return val1.toString() + val2.toString();
 		}
 	}
 	
@@ -676,11 +652,11 @@ public class ReflectionUtil {
 	 * @param fieldOff - campos que nao serao concatenados
 	 */
 	
-	public static <T>  T concatenaObject(T obj, T obj2, String... fieldOff) throws Exception{
+	public static <T>  T concatObject(T obj, T obj2, String... fieldOff) throws Exception{
 		if(obj == null)
 			obj = obj2;
 		else if (obj2 != null)
-			for(Field field :listAttributes(obj.getClass(), REG_EXP_TODOS)){				
+			for(Field field :listAttributes(obj.getClass(), REG_EXP_ALL)){				
 				boolean concatena = true;
 				for(int i = 0; i < fieldOff.length ; i++){
 					if(field.getName().equalsIgnoreCase(fieldOff[i])){
@@ -689,9 +665,9 @@ public class ReflectionUtil {
 					}
 				}
 				if(concatena){
-					Object novoValor = newValueField(field, obj, obj2);
+					Object novoValor = concatValue(field, obj, obj2);
 					if(novoValor != null)
-						invocaSet(obj, field.getName(), novoValor);
+						executeSet(obj, field.getName(), novoValor);
 				}
 			}
 		
@@ -705,22 +681,22 @@ public class ReflectionUtil {
 	 * @return
 	 * @throws Exception 
 	 */
-	public static Object intanciaObject(Object obj, Map<String, Object> fieldValue) throws Exception{
+	public static Object instanceObject(Object obj, Map<String, Object> fieldValue) throws Exception{
 		for(String atributo : fieldValue.keySet()){
 			if(fieldValue.get(atributo) == null)
 				continue;
 			
 			try {
-				invocaSet(obj, atributo, fieldValue.get(atributo));
+				executeSet(obj, atributo, fieldValue.get(atributo));
 			} catch (Exception e) {
 				if(fieldValue.get(atributo).getClass().equals(Long.class) || fieldValue.get(atributo).getClass().equals(long.class)){			
-					invocaSet(obj, atributo, Long.parseLong(String.valueOf(fieldValue.get(atributo))));
+					executeSet(obj, atributo, Long.parseLong(String.valueOf(fieldValue.get(atributo))));
 				}else if(fieldValue.get(atributo).getClass().equals(Float.class) || fieldValue.get(atributo).getClass().equals(float.class)){
-					invocaSet(obj, atributo, Float.parseFloat(String.valueOf(fieldValue.get(atributo))));
+					executeSet(obj, atributo, Float.parseFloat(String.valueOf(fieldValue.get(atributo))));
 				}else if(fieldValue.get(atributo).getClass().equals(Double.class) || fieldValue.get(atributo).getClass().equals(double.class)){
-					invocaSet(obj, atributo, Double.parseDouble(String.valueOf(fieldValue.get(atributo))));
+					executeSet(obj, atributo, Double.parseDouble(String.valueOf(fieldValue.get(atributo))));
 				}else if(fieldValue.get(atributo).getClass().equals(Integer.class) || fieldValue.get(atributo).getClass().equals(int.class))
-					invocaSet(obj, atributo, Integer.parseInt(String.valueOf(fieldValue.get(atributo))));
+					executeSet(obj, atributo, Integer.parseInt(String.valueOf(fieldValue.get(atributo))));
 			}
 		}
 		return obj;
@@ -789,7 +765,7 @@ public class ReflectionUtil {
 	 * @param name
 	 * @return
 	 */
-	public static Field attributeByName(Class<?> klass, String name){
+	public static Field getAttribute(Class<?> klass, String name){
 		List<Field> lFld = listAttributes(klass, name);
 		
 		for(Field fld: lFld){
@@ -799,24 +775,8 @@ public class ReflectionUtil {
 		}
 		
 		return null;
-	}
-	/**
-	 * 
-	 * @param klass
-	 * @param annotationClass
-	 * @return
-	 */
-	public static List<Field> listAttributeByAnnotation(Class<?> klass, Class<? extends Annotation> annotationClass){
-		List<Field> fields = listAttributes(klass, REG_EXP_TODOS);
-		for(Iterator<Field> itField = fields.iterator(); itField.hasNext();){
-			Field fld = itField.next();
-			if(getAnnotationFieldOrMethod(fld, annotationClass) == null){
-				itField.remove();
-			}
-		}
-		return fields;
-	}
-	
+	}	
+				
 	/**
 	 * Verifica se a classe e um wrapper para o tipo primitivo
 	 * @param klass
@@ -832,6 +792,11 @@ public class ReflectionUtil {
 				|| klass.equals(Character.class);
 	}
 	
+	/**
+	 * Verifica se é instancia de Collection, List, ou Set
+	 * @param klass
+	 * @return
+	 */
 	public static boolean isCollection(Class<?> klass){
 		return ArrayUtils.contains(klass.getInterfaces(), Collection.class) || ArrayUtils.contains(klass.getInterfaces(), List.class) || ArrayUtils.contains(klass.getInterfaces(), Set.class);
 	}
@@ -869,14 +834,14 @@ public class ReflectionUtil {
 				String[] listFields = field.split("\\.");
 				Object objValue = obj;
 				for(String fld: listFields){
-					objValue = invocaGet(objValue, fld);
+					objValue = executeGet(objValue, fld);
 					if(objValue == null){
 						return null;
 					}
 				}
 				return (T) objValue;
 			}else{
-				return (T) invocaGet(obj, field);
+				return (T) executeGet(obj, field);
 			}
 		}catch (Exception e) {
 			return null;

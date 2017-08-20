@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  *
  */
 @Retention (RetentionPolicy.RUNTIME)
-@Target (ElementType.FIELD)
+@Target ({ElementType.FIELD, })
 @Inherited
 public @interface WSAttributeMapper {
 	
@@ -28,7 +28,7 @@ public @interface WSAttributeMapper {
 	boolean isEnum() default false;
 	
 	/**
-	 * Utilizado em campos do tipo Collection, pois não é possível realizar reflection 
+	 * Utilizado em campos do tipo Collection, pois não é possível realizar reflection (Java generics)
 	 */
-	Class<?> valueType() default void.class;
+	Class<?> collectionType() default void.class;
 }
