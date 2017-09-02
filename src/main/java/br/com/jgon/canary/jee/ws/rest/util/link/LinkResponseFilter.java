@@ -532,7 +532,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 		
 		if(linkIncludeQueryParams){// || queryParams != null){
 			for(String key : uriInfo.getQueryParameters().keySet()){
-				uriBuilder.replaceQueryParam(key, uriInfo.getQueryParameters().getFirst(key));
+				uriBuilder.replaceQueryParam(key, uriInfo.getQueryParameters(false).get(key));
 			}
 		}
 		
@@ -644,7 +644,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     	
     	if(StringUtils.isNotBlank(linkPaginate.limitParamName())){
     		if(uriInfo.getQueryParameters().containsKey(linkPaginate.limitParamName())){
-    			int limit = Integer.parseInt(uriInfo.getQueryParameters().getFirst(linkPaginate.limitParamName()));
+    			int limit = Integer.parseInt(uriInfo.getQueryParameters(false).getFirst(linkPaginate.limitParamName()));
     			if(limit > limitPg){
     				queryParams.add(new SimpleEntry<String, Object>(linkPaginate.limitParamName(), limitPg));
     			}
@@ -821,7 +821,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 			
 			Set<String> listParams = new HashSet<String>();
 			if(uriInfo.getQueryParameters().containsKey(queryParam.value())){
-				listParams.addAll(uriInfo.getQueryParameters().get(queryParam.value()));
+				listParams.addAll(uriInfo.getQueryParameters(false).get(queryParam.value()));
 			}
 			
 			//Campos forcados na annotation

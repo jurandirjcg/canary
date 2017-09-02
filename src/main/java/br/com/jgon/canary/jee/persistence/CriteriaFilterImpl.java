@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.metamodel.Attribute;
 
 import br.com.jgon.canary.jee.exception.ApplicationException;
 import br.com.jgon.canary.jee.persistence.filter.CriteriaFilter;
@@ -33,34 +33,40 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 *
 	 */
 	enum Where{
-		IGNORE,
-		EQUAL,
-		LESS_THAN,
-		LESS_THAN_OR_EQUAL_TO,
-		GREATER_THAN,
-		GREATER_THAN_OR_EQUAL_TO,
-		NOT_EQUAL,
-		IN,
-		NOT_IN,
-		LIKE,
-		NOT_LIKE,
-		LIKE_ANY_BEFORE_AND_AFTER,
-		LIKE_ANY_BEFORE,
-		LIKE_ANY_AFTER,
-		ILIKE,
-		NOT_ILIKE,
-		ILIKE_ANY_BEFORE_AND_AFTER,
-		ILIKE_ANY_BEFORE,
-		ILIKE_ANY_AFTER,
-		IS_NULL,
-		IS_NOT_NULL,
-		BETWEEN,
-		EQUAL_OTHER_FIELD,
-		LESS_THAN_OTHER_FIELD,
-		GREATER_THAN_OTHER_FIELD,
-		LESS_THAN_OR_EQUAL_TO_OTHER_FIELD,
-		GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD,
-		NOT_EQUAL_OTHER_FIELD
+		IGNORE (null),
+		EQUAL ("="),
+		LESS_THAN ("<"),
+		LESS_THAN_OR_EQUAL_TO ("<="),
+		GREATER_THAN (">"),
+		GREATER_THAN_OR_EQUAL_TO (">="),
+		NOT_EQUAL ("!="),
+		IN (null),
+		NOT_IN (null),
+		LIKE (null),
+		NOT_LIKE (null),
+		LIKE_ANY_BEFORE_AND_AFTER (null),
+		LIKE_ANY_BEFORE (null),
+		LIKE_ANY_AFTER (null),
+		ILIKE (null),
+		NOT_ILIKE (null),
+		ILIKE_ANY_BEFORE_AND_AFTER (null),
+		ILIKE_ANY_BEFORE (null),
+		ILIKE_ANY_AFTER (null),
+		IS_NULL (null),
+		IS_NOT_NULL (null),
+		BETWEEN (null),
+		EQUAL_OTHER_FIELD (null),
+		LESS_THAN_OTHER_FIELD (null),
+		GREATER_THAN_OTHER_FIELD (null),
+		LESS_THAN_OR_EQUAL_TO_OTHER_FIELD (null),
+		GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD (null),
+		NOT_EQUAL_OTHER_FIELD (null);
+		
+		public String exp;
+		
+		private Where(String exp) {
+			this.exp = exp;
+		}
 	}
 	
 	/**
@@ -87,30 +93,40 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 		UPPER,
 		LOWER
 	}	
+		
+	private boolean collectionSelectionControl = true;
 	
 	private Map<String, Where> listWhere = new LinkedHashMap<String, Where>(0);
-	private Map<String, SimpleEntry<Where, ?>> listWhereComplex = new LinkedHashMap<String, SimpleEntry<Where,?>>();
+	private WhereRestriction whereRestriction = new WhereRestriction();// Map<String, SimpleEntry<Where, ?>> listWhereComplex = new LinkedHashMap<String, SimpleEntry<Where,?>>();
 	private Map<String, SimpleEntry<SelectAggregate, String>> listSelection = new LinkedHashMap<String, SimpleEntry<SelectAggregate, String>>(0);
 	private Map<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>> collectionSelection = new LinkedHashMap<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>>();
 	private Map<String, Order> listOrder = new LinkedHashMap<String, Order>(0);
 	private Set<String> listGroupBy = new LinkedHashSet<String>();
 	private Map<String, SimpleEntry<JoinType, Boolean>> listJoin = new LinkedHashMap<String, SimpleEntry<JoinType, Boolean>>();
 	private T objBase;
-	private Class<?> objClass;
+	private Class<T> objClass;
 	
 	/**
 	 * 
 	 * @param objBase
 	 */
-	public CriteriaFilterImpl(T objBase, Class<?> objClass){
+	public CriteriaFilterImpl(T objBase, Class<T> objClass){
 		this.objBase = objBase;
 		this.objClass = objClass;
 	}
 	
-	public CriteriaFilterImpl(Class<?> objClass) {
+	public CriteriaFilterImpl(Class<T> objClass) {
 		this.objClass = objClass;
 	}
 	
+	public boolean isCollectionSelectionControl() {
+		return collectionSelectionControl;
+	}
+
+	public void setCollectionSelectionControl(boolean collectionSelectionControl) {
+		this.collectionSelectionControl = collectionSelectionControl;
+	}
+
 	/**
 	 * 
 	 * @return
@@ -119,7 +135,6 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	public T getObjBase(){
 		return this.objBase;
 	}
-	
 	/**
 	 * 
 	 * @param objBase
@@ -142,20 +157,18 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	public Map<String, Where> getListWhere() {
 		return listWhere;
 	}
+	
 	/**
 	 * 
+	 * @param fieldName
 	 * @return
 	 */
-	public Map<String, SimpleEntry<Where, ?>> getListWhereComplex(){
-		return this.listWhereComplex;
+	public List<SimpleEntry<Where, ?>> getWhereRestriction(String fieldName){
+		return this.whereRestriction.getRestrictions(fieldName);
 	}
-	/**
-	 * 
-	 * @param field
-	 * @return
-	 */
-	public SimpleEntry<Where, ?> getWhereComplex(String field){
-		return this.listWhereComplex.get(field);
+	
+	public WhereRestriction getWhereRestriction(){
+		return this.whereRestriction;
 	}
 	/**
 	 * 
@@ -192,7 +205,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 * @param alias
 	 * @return
 	 */
-	private CriteriaFilterImpl<T> addSelect(String field, SelectAggregate selectFunction, String alias){
+	private CriteriaFilter<T> addSelect(String field, SelectAggregate selectFunction, String alias){
 		this.listSelection.put(field, new SimpleEntry<CriteriaFilterImpl.SelectAggregate, String>(selectFunction, alias));
 		return this;
 	}
@@ -202,40 +215,49 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 * @return
 	 * @throws ApplicationException 
 	 */
-	public CriteriaFilterImpl<T> addSelect(Class<?> returnType) throws ApplicationException{
+	public CriteriaFilter<T> addSelect(Class<?> returnType) throws ApplicationException{
 		return addSelect(returnType, (String[]) null);
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addSelect(Class<?> returnType, List<String> fields) throws ApplicationException{
-		StringBuilder fieldAux = new StringBuilder();
-		if(fields != null){
-			for(String f : fields){
-				if(fieldAux.length() > 0){
-					fieldAux.append(",");
-				}
-				fieldAux.append(f);
-			}
-		}
-		
+	public CriteriaFilter<T> addSelect(Class<?> returnType, List<String> fields) throws ApplicationException{
 		Class<?> returnTypeAux = returnType == null ? this.objClass : returnType;
-		List<SimpleEntry<String, String>> listaCampos = new SelectMapper(returnTypeAux, fieldAux.toString()).getFields();
+		
+		if(returnType.equals(this.objClass)){
+			addSelect(fields);
+		}else{
+			StringBuilder fieldAux = new StringBuilder();
+			if(fields != null){
+				for(String f : fields){
+					if(fieldAux.length() > 0){
+						fieldAux.append(",");
+					}
+					fieldAux.append(f);
+				}
+			}
+			List<SimpleEntry<String, String>> listaCampos = new SelectMapper(returnTypeAux, fieldAux.toString()).getFields();
 
-		for(SimpleEntry<String, String> se : listaCampos){
+			for(SimpleEntry<String, String> se : listaCampos){
 				addSelect(se.getKey(), se.getValue());
+			}
 		}
 		
 		return this;
 	}
 		
 	@Override
-	public CriteriaFilterImpl<T> addSelect(Class<?> returnType, String... fields) throws ApplicationException{
+	public CriteriaFilter<T> addSelect(Class<?> returnType, String... fields) throws ApplicationException{
 		return addSelect(returnType, fields == null ? null : Arrays.asList(fields));
+	}
+		
+	@Override
+	public CriteriaFilter<T> addSelect(String field, String alias){
+		return addSelect(field, SelectAggregate.FIELD, alias);
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addSelect(String field, String alias){
-		return addSelect(field, SelectAggregate.FIELD, alias);
+	public CriteriaFilter<T> addSelect(Attribute<?, ?> attribute, String alias){
+		return addSelect(attribute.getName(), alias);
 	}
 	
 	@Override
@@ -253,7 +275,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	}
 
 	@Override
-	public CriteriaFilter<T> addSelect(String... fields){
+	public CriteriaFilter<T> addSelect(String[] fields){
 		for(String fld : fields){
 			addSelect(fld);
 		}
@@ -261,8 +283,18 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	}
 
 	@Override
+	public CriteriaFilter<T> addSelect(Attribute<?, ?>... attributes){
+		for(Attribute<?, ?> fld : attributes){
+			addSelect(fld);
+		}
+		return this;
+	}
+	@Override
 	public CriteriaFilter<T> addSelect(List<String> fields) {
-		return addSelect(fields.toArray(new String[fields.size()]));
+		fields.forEach( item -> {
+			addSelect(item);
+		});
+		return this;
 	}
 	
 	@Override
@@ -271,68 +303,118 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addSelectCount(String field, String alias){
+	public CriteriaFilter<T> addSelectCount(String field, String alias){
 		return addSelect(field, SelectAggregate.COUNT, alias);
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addSelectCount(String field){
+	public CriteriaFilter<T> addSelectCount(Attribute<?, ?> attribute, String alias){
+		return addSelect(attribute.getName(), SelectAggregate.COUNT, alias);
+	}
+	
+	@Override
+	public CriteriaFilter<T> addSelectCount(String field){
 		return addSelect(field, SelectAggregate.COUNT, field);
 	}
+
+	@Override
+	public CriteriaFilter<T> addSelectCount(Attribute<?, ?> attribute){
+		return addSelect(attribute.getName(), SelectAggregate.COUNT, attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addSelectUpper(String field){
+	public CriteriaFilter<T> addSelectUpper(String field){
 		return addSelect(field, SelectAggregate.UPPER, field);
 	}
-	
+
 	@Override
-	public CriteriaFilterImpl<T> addSelectUpper(String field, String alias){
+	public CriteriaFilter<T> addSelectUpper(Attribute<?, ?> attribute){
+		return addSelect(attribute.getName(), SelectAggregate.UPPER, attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addSelectUpper(String field, String alias){
 		return addSelect(field, SelectAggregate.UPPER, alias);
 	}
-	
 	@Override
-	public CriteriaFilterImpl<T> addSelectLower(String field){
+	public CriteriaFilter<T> addSelectUpper(Attribute<?, ?> attribute, String alias){
+		return addSelect(attribute.getName(), SelectAggregate.UPPER, alias);
+	}
+	@Override
+	public CriteriaFilter<T> addSelectLower(String field){
 		return addSelect(field, SelectAggregate.LOWER, field);
 	}
-	
 	@Override
-	public CriteriaFilterImpl<T> addSelectLower(String field, String alias){
+	public CriteriaFilter<T> addSelectLower(Attribute<?, ?> attribute){
+		return addSelect(attribute.getName(), SelectAggregate.LOWER, attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addSelectLower(String field, String alias){
 		return addSelect(field, SelectAggregate.LOWER, alias);
 	}
+	@Override
+	public CriteriaFilter<T> addSelectLower(Attribute<?, ?> attribute, String alias){
+		return addSelect(attribute.getName(), SelectAggregate.LOWER, alias);
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addSelectMax(String field, String alias){
+	public CriteriaFilter<T> addSelectMax(String field, String alias){
 		return addSelect(field, SelectAggregate.MAX, alias);
 	}
-	
+
 	@Override
-	public CriteriaFilterImpl<T> addSelectMax(String field){
+	public CriteriaFilter<T> addSelectMax(Attribute<?, ?> attribute, String alias){
+		return addSelect(attribute.getName(), SelectAggregate.MAX, alias);
+	}
+	@Override
+	public CriteriaFilter<T> addSelectMax(String field){
 		return addSelect(field, SelectAggregate.MAX, field);
 	}
-	
+
 	@Override
-	public CriteriaFilterImpl<T> addSelectMin(String field, String alias){
+	public CriteriaFilter<T> addSelectMax(Attribute<?, ?> attribute){
+		return addSelect(attribute.getName(), SelectAggregate.MAX, attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addSelectMin(String field, String alias){
 		return addSelect(field, SelectAggregate.MIN, alias);
 	}
+	@Override
+	public CriteriaFilter<T> addSelectMin(Attribute<?, ?> attribute, String alias){
+		return addSelect(attribute.getName(), SelectAggregate.MIN, alias);
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addSelectMin(String field){
+	public CriteriaFilter<T> addSelectMin(String field){
 		return addSelect(field, SelectAggregate.MIN, field);
 	}
-	
 	@Override
-	public CriteriaFilterImpl<T> addSelectSum(String field, String alias){
+	public CriteriaFilter<T> addSelectMin(Attribute<?, ?> attribute){
+		return addSelect(attribute.getName(), SelectAggregate.MIN, attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addSelectSum(String field, String alias){
 		return addSelect(field, SelectAggregate.SUM, alias);
 	}
-	
 	@Override
-	public CriteriaFilterImpl<T> addSelectSum(String field){
-		return addSelect(field, SelectAggregate.SUM, field);
+	public CriteriaFilter<T> addSelectSum(Attribute<?, ?> attribute, String alias){
+		return addSelect(attribute.getName(), SelectAggregate.SUM, alias);
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addSelect(String field){
+	public CriteriaFilter<T> addSelectSum(String field){
+		return addSelect(field, SelectAggregate.SUM, field);
+	}
+	@Override
+	public CriteriaFilter<T> addSelectSum(Attribute<?, ?> attribute){
+		return addSelect(attribute.getName(), SelectAggregate.SUM, attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addSelect(String field){
 		return addSelect(field, SelectAggregate.FIELD, field);
+	}
+	@Override
+	public CriteriaFilter<T> addSelect(Attribute<?, ?> attribute){
+		return addSelect(attribute.getName(), SelectAggregate.FIELD, attribute.getName());
 	}
 	/*
 	@Override
@@ -356,12 +438,12 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	}*/
 	
 	@Override
-	public CriteriaFilterImpl<T> addOrder(Class<?> returnType, String... order) throws ApplicationException{
+	public CriteriaFilter<T> addOrder(Class<?> returnType, String... order) throws ApplicationException{
 		return addOrder(returnType, Arrays.asList(order));
 	}
-	
+		
 	@Override
-	public CriteriaFilterImpl<T> addOrder(Class<?> returnType, List<String> order) throws ApplicationException{
+	public CriteriaFilter<T> addOrder(Class<?> returnType, List<String> order) throws ApplicationException{
 		StringBuilder orderAux = new StringBuilder();
 		if(order != null){
 			for(String f : order){
@@ -386,7 +468,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addOrder(List<String> orderList){
+	public CriteriaFilter<T> addOrder(List<String> orderList){
 		if(orderList != null){
 			for(String o : orderList){
 				int aux;
@@ -401,27 +483,42 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addOrder(String... order){
+	public CriteriaFilter<T> addOrder(String... order){
 		return addOrder(Arrays.asList(order));
 	}
 	
 	
 	@Override
-	public CriteriaFilterImpl<T> addOrderAsc(String field){
+	public CriteriaFilter<T> addOrderAsc(String field){
 		this.listOrder.put(field, Order.ASC);
 		return this;
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addOrderDesc(String field){
+	public CriteriaFilter<T> addOrderAsc(Attribute<?, ?> attribute){
+		return this.addOrderAsc(attribute.getName());
+	}
+	
+	@Override
+	public CriteriaFilter<T> addOrderDesc(String field){
 		this.listOrder.put(field, Order.DESC);
 		return this;
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereEqual(String field){
+	public CriteriaFilter<T> addOrderDesc(Attribute<?, ?> attribute){
+		return addOrderDesc(attribute.getName());
+	}
+	
+	@Override
+	public CriteriaFilter<T> addWhereEqual(String field){
 		this.listWhere.put(field, Where.EQUAL);
 		return this;
+	}
+	
+	@Override
+	public CriteriaFilter<T> addWhereEqual(Attribute<?, ?> attribute){
+		return this.addWhereEqual(attribute.getName());
 	}
 	/**
 	 * 
@@ -430,9 +527,9 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 * @param values
 	 * @return
 	 */
-	private <E> CriteriaFilterImpl<T> addWhereListValues(String field, Where where, List<E> values){
+	private <E> CriteriaFilter<T> addWhereListValues(String field, Where where, List<E> values){
 		if(values != null){
-			this.listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, List<?>>(where, values));
+			this.whereRestriction.add(field, where, values);
 		}
 		return this;
 	}
@@ -443,63 +540,99 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 * @param values
 	 * @return
 	 */
-	private <E> CriteriaFilterImpl<T> addWhereListValues(String field, Where where, E[] values){
+	private <E> CriteriaFilter<T> addWhereListValues(String field, Where where, E[] values){
 		if(values != null){
 			return addWhereListValues(field, where, Arrays.asList(values));
 		}
 		return this;
 	}
-
+	
 	@Override
-	public <E> CriteriaFilterImpl<T> addWhereIn(String field, List<E> values){
+	public <E> CriteriaFilter<T> addWhereIn(String field, List<E> values){
+		return addWhereListValues(field, Where.IN, values);
+	}
+	
+	@Override
+	public <E> CriteriaFilter<T> addWhereIn(Attribute<?, ?> attribute, List<E> values){
+		return this.addWhereIn(attribute.getName(), values);
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> CriteriaFilter<T> addWhereIn(String field, E... values){
 		return addWhereListValues(field, Where.IN, values);
 	}
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> CriteriaFilterImpl<T> addWhereIn(String field, E... values){
-		return addWhereListValues(field, Where.IN, values);
+	public <E> CriteriaFilter<T> addWhereIn(Attribute<?, ?> attribute, E... values){
+		return this.addWhereIn(attribute.getName(), values);
 	}
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> CriteriaFilterImpl<T> addWhereNotIn(String field, E... values){
+	public <E> CriteriaFilter<T> addWhereNotIn(String field, E... values){
 		return addWhereListValues(field, Where.NOT_IN, values);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public <E> CriteriaFilterImpl<T> addWhereNotIn(String field, List<E> values){
+	public <E> CriteriaFilter<T> addWhereNotIn(Attribute<?, ?> attribute, E... values){
+		return this.addWhereNotIn(attribute.getName(), values);
+	}
+	
+	@Override
+	public <E> CriteriaFilter<T> addWhereNotIn(String field, List<E> values){
 		return addWhereListValues(field, Where.NOT_IN, values);
 	}
-	
 	@Override
-	@SuppressWarnings("unchecked")
-	public <E> CriteriaFilterImpl<T> addWhereEqual(String field, E... values){
-		return addWhereListValues(field, Where.EQUAL, values);
-	}
-	
-	@Override
-	public <E> CriteriaFilterImpl<T> addWhereEqual(String field, List<E> values){
-		return addWhereListValues(field, Where.EQUAL, values);
+	public <E> CriteriaFilter<T> addWhereNotIn(Attribute<?, ?> attribute, List<E> values){
+		return this.addWhereNotIn(attribute.getName(), values);
 	}
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> CriteriaFilterImpl<T> addWhereNotEqual(String field, E... values){
-		return addWhereListValues(field, Where.NOT_EQUAL, values);
+	public <E> CriteriaFilter<T> addWhereEqual(String field, E... values){
+		return addWhereListValues(field, Where.EQUAL, values);
+	}
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> CriteriaFilter<T> addWhereEqual(Attribute<?, ?> attribute, E... values){
+		return addWhereEqual(attribute.getName(), values);
 	}
 	
 	@Override
-	public <E> CriteriaFilterImpl<T> addWhereNotEqual(String field, List<E> values){
+	public <E> CriteriaFilter<T> addWhereEqual(String field, List<E> values){
+		return addWhereListValues(field, Where.EQUAL, values);
+	}
+	@Override
+	public <E> CriteriaFilter<T> addWhereEqual(Attribute<?, ?> attribute, List<E> values){
+		return addWhereEqual(attribute.getName(), values);
+	}
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> CriteriaFilter<T> addWhereNotEqual(String field, E... values){
 		return addWhereListValues(field, Where.NOT_EQUAL, values);
 	}
-	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> CriteriaFilter<T> addWhereNotEqual(Attribute<?, ?> attribute, E... values){
+		return addWhereNotEqual(attribute.getName(), values);
+	}
+	@Override
+	public <E> CriteriaFilter<T> addWhereNotEqual(String field, List<E> values){
+		return addWhereListValues(field, Where.NOT_EQUAL, values);
+	}
+	@Override
+	public <E> CriteriaFilter<T> addWhereNotEqual(Attribute<?, ?> attribute, List<E> values){
+		return addWhereNotEqual(attribute.getName(), values);
+	}
 	/**
 	 * 
 	 * @param listWhere
 	 * @return
 	 */
-	public CriteriaFilterImpl<T> addAllWhere(Map<String, Where> listWhere){
+	public CriteriaFilter<T> addAllWhere(Map<String, Where> listWhere){
 		this.listWhere.putAll(listWhere);
 		return this;
 	}
@@ -508,8 +641,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 * @param listComplexWhere
 	 * @return
 	 */
-	public CriteriaFilterImpl<T> addAllWhereComplex(Map<String, SimpleEntry<Where, ?>> listComplexWhere){
-		this.listWhereComplex.putAll(listComplexWhere);
+	public CriteriaFilter<T> addAllWhereComplex(Map<String, List<SimpleEntry<Where, ?>>> listComplexWhere){
+		this.whereRestriction.getRestrictions().putAll(listComplexWhere);
 		return this;
 	}
 	/**
@@ -517,7 +650,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 * @param listJoin
 	 * @return
 	 */
-	public CriteriaFilterImpl<T> addAllJoin(Map<String, SimpleEntry<JoinType, Boolean>> listJoin){
+	public CriteriaFilter<T> addAllJoin(Map<String, SimpleEntry<JoinType, Boolean>> listJoin){
 		this.listJoin.putAll(listJoin);
 		return this;
 	}
@@ -526,7 +659,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 * @param listSelection
 	 * @return
 	 */
-	public CriteriaFilterImpl<T> addAllSelection(Map<String, SimpleEntry<SelectAggregate, String>> listSelection){
+	public CriteriaFilter<T> addAllSelection(Map<String, SimpleEntry<SelectAggregate, String>> listSelection){
 		this.listSelection.putAll(listSelection);
 		return this;
 	}
@@ -542,125 +675,197 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	}*/
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereBetween(String field, Integer startValue, Integer endValue){
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, Integer[]>(Where.BETWEEN, new Integer[] {startValue, endValue}));
+	public CriteriaFilter<T> addWhereBetween(String field, Integer startValue, Integer endValue){
+		this.whereRestriction.add(field, Where.BETWEEN, new Integer[] {startValue, endValue});
 		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, Integer startValue, Integer endValue){
+		return addWhereBetween(attribute.getName(), startValue, endValue);
+	}
+	@Override
+	public CriteriaFilter<T> addWhereBetween(String field, Short startValue, Short endValue){
+		this.whereRestriction.add(field, Where.BETWEEN, new Short[] {startValue, endValue});
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, Short startValue, Short endValue){
+		return addWhereBetween(attribute.getName(), startValue, endValue);
+	}
+	@Override
+	public CriteriaFilter<T> addWhereBetween(String field, Long startValue, Long endValue){
+		this.whereRestriction.add(field, Where.BETWEEN, new Long[] {startValue, endValue});
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, Long startValue, Long endValue){
+		return addWhereBetween(attribute.getName(), startValue, endValue);
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereBetween(String field, Short startValue, Short endValue){
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, Short[]>(Where.BETWEEN, new Short[] {startValue, endValue}));
+	public CriteriaFilter<T> addWhereLessThanField(String field, String anotherField){
+		this.whereRestriction.add(field, Where.LESS_THAN_OTHER_FIELD, anotherField);
 		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLessThanField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute){
+		return addWhereLessThanField(attribute.getName(), anotherAttribute.getName());
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereBetween(String field, Long startValue, Long endValue){
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, Long[]>(Where.BETWEEN, new Long[] {startValue, endValue}));
+	public CriteriaFilter<T> addWhereGreaterThanField(String field, String anotherField){
+		this.whereRestriction.add(field, Where.GREATER_THAN_OTHER_FIELD, anotherField);
 		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereGreaterThanField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute){
+		return addWhereGreaterThanField(attribute.getName(), anotherAttribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLessThanOrEqualToField(String field, String anotherField){
+		this.whereRestriction.add(field, Where.LESS_THAN_OR_EQUAL_TO_OTHER_FIELD, anotherField);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLessThanOrEqualToField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute){
+		return addWhereLessThanOrEqualToField(attribute.getName(), anotherAttribute.getName());
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereLessThanField(String field, String anotherField){
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, String>(Where.LESS_THAN_OTHER_FIELD, anotherField));
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualToField(String field, String anotherField){
+		this.whereRestriction.add(field, Where.GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD, anotherField);
 		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualToField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute){
+		return addWhereGreaterThanField(attribute.getName(), anotherAttribute.getName());
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereGreaterThanField(String field, String anotherField){
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, String>(Where.GREATER_THAN_OTHER_FIELD, anotherField));
+	public CriteriaFilter<T> addWhereEqualField(String field, String anotherField){
+		this.whereRestriction.add(field, Where.EQUAL_OTHER_FIELD, anotherField);
 		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereEqualField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute){
+		return addWhereEqualField(attribute.getName(), anotherAttribute.getName());
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereLessThanOrEqualToField(String field, String anotherField){
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, String>(Where.LESS_THAN_OR_EQUAL_TO_OTHER_FIELD, anotherField));
+	public CriteriaFilter<T> addWhereNotEqualField(String field, String anotherField){
+		this.whereRestriction.add(field, Where.NOT_EQUAL_OTHER_FIELD, anotherField);
 		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereNotEqualField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute){
+		return addWhereNotEqualField(attribute.getName(), anotherAttribute.getName());
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualToField(String field, String anotherField){
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, String>(Where.GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD, anotherField));
-		return this;
-	}
-	
-	@Override
-	public CriteriaFilterImpl<T> addWhereEqualField(String field, String anotherField){
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, String>(Where.EQUAL_OTHER_FIELD, anotherField));
-		return this;
-	}
-	
-	@Override
-	public CriteriaFilterImpl<T> addWhereNotEqualField(String field, String anotherField){
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, String>(Where.NOT_EQUAL_OTHER_FIELD, anotherField));
-		return this;
-	}
-	
-	@Override
-	public CriteriaFilterImpl<T> addWhereBetween(String field, Date startValue, Date endValue){
+	public CriteriaFilter<T> addWhereBetween(String field, Date startValue, Date endValue){
 		LocalDate dtSrt = startValue.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		LocalDate dtEnd = endValue.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		
 		return addWhereBetween(field, dtSrt, dtEnd);
 	}
-	
 	@Override
-	public CriteriaFilterImpl<T> addWhereBetween(String field, LocalDate startValue, LocalDate endValue){
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, Date startValue, Date endValue){
+		return addWhereBetween(attribute.getName(), startValue, endValue);
+	}
+	@Override
+	public CriteriaFilter<T> addWhereBetween(String field, LocalDate startValue, LocalDate endValue){
 		Date dtSrt = Date.from(startValue.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		Date dtEnd = Date.from(LocalDateTime.of(endValue, LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant());
 		
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, Date[]>(Where.BETWEEN, new Date[] {dtSrt, dtEnd}));
+		this.whereRestriction.add(field, Where.BETWEEN, new Date[] {dtSrt, dtEnd});
 		return this;
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereBetween(String field, LocalDateTime startValue, LocalDateTime endValue){
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, LocalDate startValue, LocalDate endValue){
+		return addWhereBetween(attribute.getName(), startValue, endValue);
+	}
+		
+	@Override
+	public CriteriaFilter<T> addWhereBetween(String field, LocalDateTime startValue, LocalDateTime endValue){
 		Date dtSrt = Date.from(startValue.atZone(ZoneId.systemDefault()).toInstant());
 		Date dtEnd = Date.from(endValue.atZone(ZoneId.systemDefault()).toInstant());
 		
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilterImpl.Where, Date[]>(Where.BETWEEN, new Date[] {dtSrt, dtEnd}));
+		this.whereRestriction.add(field, Where.BETWEEN, new Date[] {dtSrt, dtEnd});
 		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, LocalDateTime startValue, LocalDateTime endValue){
+		return addWhereBetween(attribute.getName(), startValue, endValue);
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereGreaterThan(String field){
+	public CriteriaFilter<T> addWhereGreaterThan(String field){
 		this.listWhere.put(field, Where.GREATER_THAN);
 		return this;
 	}
-	
 	@Override
-	public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(String field){
+	public CriteriaFilter<T> addWhereGreaterThan(Attribute<?, ?> attribute){
+		return addWhereGreaterThan(attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(String field){
 		this.listWhere.put(field, Where.GREATER_THAN_OR_EQUAL_TO);
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(Attribute<?, ?> attribute){
+		return addWhereGreaterThanOrEqualTo(attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereIn(String field){
+	public CriteriaFilter<T> addWhereIn(String field){
 		this.listWhere.put(field, Where.IN);
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addWhereIn(Attribute<?, ?> attribute){
+		return addWhereIn(attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereIsNotNull(String field){
+	public CriteriaFilter<T> addWhereIsNotNull(String field){
 		this.listWhere.put(field, Where.IS_NOT_NULL);
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addWhereIsNotNull(Attribute<?, ?> attribute){
+		return addWhereIsNotNull(attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereIsNull(String field){
+	public CriteriaFilter<T> addWhereIsNull(String field){
 		this.listWhere.put(field, Where.IS_NULL);
 		return this;
 	}
-	
+
 	@Override
-	public CriteriaFilterImpl<T> addWhereLessThan(String field){
+	public CriteriaFilter<T> addWhereIsNull(Attribute<?, ?> attribute){
+		return addWhereIsNull(attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLessThan(String field){
 		this.listWhere.put(field, Where.LESS_THAN);
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addWhereLessThan(Attribute<?, ?> attribute){
+		return addWhereLessThan(attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(String field){
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(String field){
 		this.listWhere.put(field, Where.LESS_THAN_OR_EQUAL_TO);
 		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(Attribute<?, ?> attribute){
+		return addWhereLessThanOrEqualTo(attribute.getName());
 	}
 	/*
 	public CriteriaFilter<T> addWhereLessThan(String field, Number value){
@@ -685,112 +890,364 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	*/
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereLike(String field){
+	public CriteriaFilter<T> addWhereLike(String field){
 		this.listWhere.put(field, Where.LIKE);
 		return this;
 	}
-	
 	@Override
-	public CriteriaFilterImpl<T> addWhereNotLike(String field){
+	public CriteriaFilter<T> addWhereLike(Attribute<?, ?> attribute){
+		return addWhereLike(attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addWhereNotLike(String field){
 		this.listWhere.put(field, Where.NOT_LIKE);
 		return this;
 	}
-	
+
 	@Override
-	public CriteriaFilterImpl<T> addWhereLikeAnyAfter(String field){
+	public CriteriaFilter<T> addWhereNotLike(Attribute<?, ?> attribute){
+		return addWhereNotLike(attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLikeAnyAfter(String field){
 		this.listWhere.put(field, Where.LIKE_ANY_AFTER);
 		return this;
 	}
-	
 	@Override
-	public CriteriaFilterImpl<T> addWhereLikeAnyBefore(String field){
+	public CriteriaFilter<T> addWhereLikeAnyAfter(Attribute<?, ?> attribute){
+		return addWhereLikeAnyAfter(attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLikeAnyBefore(String field){
 		this.listWhere.put(field, Where.LIKE_ANY_BEFORE);
 		return this;
 	}
-	
+
 	@Override
-	public CriteriaFilterImpl<T> addWhereLikeAnyBeforeAfter(String field){
+	public CriteriaFilter<T> addWhereLikeAnyBefore(Attribute<?, ?> attribute){
+		return addWhereLikeAnyBefore(attribute.getName());
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLikeAnyBeforeAfter(String field){
 		this.listWhere.put(field, Where.LIKE_ANY_BEFORE_AND_AFTER);
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addWhereLikeAnyBeforeAfter(Attribute<?, ?> attribute){
+		return addWhereLikeAnyBeforeAfter(attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereILike(String field){
+	public CriteriaFilter<T> addWhereILike(String field){
 		this.listWhere.put(field, Where.ILIKE);
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addWhereILike(Attribute<?, ?> attribute){
+		return addWhereILike(attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereNotILike(String field){
+	public CriteriaFilter<T> addWhereNotILike(String field){
 		this.listWhere.put(field, Where.NOT_ILIKE);
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addWhereNotILike(Attribute<?, ?> attribute){
+		return addWhereNotILike(attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereILikeAnyAfter(String field){
+	public CriteriaFilter<T> addWhereILikeAnyAfter(String field){
 		this.listWhere.put(field, Where.ILIKE_ANY_AFTER);
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addWhereILikeAnyAfter(Attribute<?, ?> attribute){
+		return addWhereILikeAnyAfter(attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereILikeAnyBefore(String field){
+	public CriteriaFilter<T> addWhereILikeAnyBefore(String field){
 		this.listWhere.put(field, Where.ILIKE_ANY_BEFORE);
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addWhereILikeAnyBefore(Attribute<?, ?> attribute){
+		return addWhereILikeAnyBefore(attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereILikeAnyBeforeAfter(String field){
+	public CriteriaFilter<T> addWhereILikeAnyBeforeAfter(String field){
 		this.listWhere.put(field, Where.ILIKE_ANY_BEFORE_AND_AFTER);
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addWhereILikeAnyBeforeAfter(Attribute<?, ?> attribute){
+		return addWhereILikeAnyBeforeAfter(attribute.getName());
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addWhereNotEqual(String field){
+	public CriteriaFilter<T> addWhereNotEqual(String field){
 		this.listWhere.put(field, Where.NOT_EQUAL);
 		return this;
 	}
-	
 	@Override
-	public CriteriaFilterImpl<T> addWhereNotIn(String field){
-		this.listWhere.put(field, Where.NOT_IN);
-		return this;
+	public CriteriaFilter<T> addWhereNotEqual(Attribute<?, ?> attribute){
+		return addWhereNotEqual(attribute.getName());
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addGroupBy(String field){
+	public CriteriaFilter<T> addWhereNotIn(String field){
+		this.listWhere.put(field, Where.NOT_IN);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereNotIn(Attribute<?, ?> attribute){
+		return addWhereNotIn(attribute.getName());
+	}
+	
+	@Override
+	public CriteriaFilter<T> addGroupBy(String field){
 		this.listGroupBy.add(field);
 		return this;
 	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addJoin(String field, JoinType joinType, boolean fetch){
+	public CriteriaFilter<T> addGroupBy(Attribute<?, ?> attribute){
+		return addGroupBy(attribute.getName());
+	}
+	
+	@Override
+	public CriteriaFilter<T> addJoin(String field, JoinType joinType, boolean fetch){
 		this.listJoin.put(field, new SimpleEntry<JoinType, Boolean>(joinType, fetch));
 		return this;
 	}
+	@Override
+	public CriteriaFilter<T> addJoin(Attribute<?, ?> attribute, JoinType joinType, boolean fetch){
+		return addJoin(attribute.getName(), joinType, fetch);
+	}
 	
 	@Override
-	public CriteriaFilterImpl<T> addJoin(String field, JoinType joinType){
+	public CriteriaFilter<T> addJoin(String field, JoinType joinType){
 		return addJoin(field, joinType, false);
 	}
-	
+
 	@Override
-	public CriteriaFilterImpl<T> addJoin(String field){
+	public CriteriaFilter<T> addJoin(Attribute<?, ?> attribute, JoinType joinType){
+		return addJoin(attribute.getName(), joinType);
+	}
+	@Override
+	public CriteriaFilter<T> addJoin(String field){
 		return addJoin(field, JoinType.INNER, false);
 	}
-	/**
-	 * 
-	 * @param entityManager
-	 * @param entityClass
-	 * @param queryClass
-	 * @return
-	 * @throws Exception
-	 */
-	public CriteriaManager<T> createCriteriaManager(EntityManager entityManager, Class<T> entityClass, Class<?> queryClass) throws Exception{
-		return new CriteriaManager<T>(entityManager, entityClass, queryClass, this);
+	@Override
+	public CriteriaFilter<T> addJoin(Attribute<?, ?> attribute){
+		return addJoin(attribute.getName());
 	}
-
+	
 	public Map<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>> getCollectionSelection() {
 		return collectionSelection;
+	}
+
+	@Override
+	public <E> CriteriaFilter<T> addWhereEqual(String field, E value) {
+		this.whereRestriction.add(field, Where.EQUAL, value);
+		return this;
+	}
+	@Override
+	public <E> CriteriaFilter<T> addWhereEqual(Attribute<?, ?> attribute, E value) {
+		return addWhereEqual(attribute.getName(), value);
+	}
+
+	@Override
+	public <E> CriteriaFilter<T> addWhereNotEqual(String field, E value) {
+		this.whereRestriction.add(field, Where.NOT_EQUAL, value);
+		return this;
+	}
+
+	@Override
+	public <E> CriteriaFilter<T> addWhereNotEqual(Attribute<?, ?> attribute, E value) {
+		return addWhereNotEqual(attribute.getName(), value);
+	}
+	@Override
+	public <E> CriteriaFilter<T> addWhereGreaterThan(String field, Date value) {
+		this.whereRestriction.add(field, Where.GREATER_THAN, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereGreaterThan(Attribute<?, ?> attribute, Date value) {
+		return addWhereGreaterThan(attribute.getName(), value);
+	}
+
+	@Override
+	public <E> CriteriaFilter<T> addWhereGreaterThan(String field, Number value) {
+		this.whereRestriction.add(field, Where.GREATER_THAN, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereGreaterThan(Attribute<?, ?> attribute, Number value) {
+		return addWhereGreaterThan(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(String field, Date value) {
+		this.whereRestriction.add(field, Where.GREATER_THAN_OR_EQUAL_TO, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(Attribute<?, ?> attribute, Date value) {
+		return addWhereGreaterThanOrEqualTo(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(String field, Number value) {
+		this.whereRestriction.add(field, Where.GREATER_THAN_OR_EQUAL_TO, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(Attribute<?, ?> attribute, Number value) {
+		return addWhereGreaterThanOrEqualTo(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereLessThan(String field, Date value) {
+		this.whereRestriction.add(field, Where.LESS_THAN, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLessThan(Attribute<?, ?> attribute, Date value) {
+		return addWhereLessThan(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereLessThan(String field, Number value) {
+		this.whereRestriction.add(field, Where.LESS_THAN, value);
+		return this;
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereLessThan(Attribute<?, ?> attribute, Number value) {
+		return addWhereLessThan(attribute.getName(), value);
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(String field, Date value) {
+		this.whereRestriction.add(field, Where.LESS_THAN_OR_EQUAL_TO, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(Attribute<?, ?> attribute, Date value) {
+		return addWhereLessThanOrEqualTo(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(String field, Number value) {
+		this.whereRestriction.add(field, Where.LESS_THAN_OR_EQUAL_TO, value);
+		return this;
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(Attribute<?, ?> attribute, Number value) {
+		return addWhereLessThanOrEqualTo(attribute.getName(), value);
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLike(String field, String value) {
+		this.whereRestriction.add(field, Where.LIKE, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLike(Attribute<?, ?> attribute, String value) {
+		return addWhereLike(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereNotLike(String field, String value) {
+		this.whereRestriction.add(field, Where.NOT_LIKE, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereNotLike(Attribute<?, ?> attribute, String value) {
+		return addWhereNotLike(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereLikeAnyAfter(String field, String value) {
+		this.whereRestriction.add(field, Where.LIKE_ANY_AFTER, value);
+		return this;
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereLikeAnyAfter(Attribute<?, ?> attribute, String value) {
+		return addWhereLikeAnyAfter(attribute.getName(), value);
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLikeAnyBefore(String field, String value) {
+		this.whereRestriction.add(field, Where.LIKE_ANY_BEFORE, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLikeAnyBefore(Attribute<?, ?> attribute, String value) {
+		return addWhereLikeAnyBefore(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereLikeAnyBeforeAfter(String field, String value) {
+		this.whereRestriction.add(field, Where.LIKE_ANY_BEFORE_AND_AFTER, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereLikeAnyBeforeAfter(Attribute<?, ?> attribute, String value) {
+		return addWhereLikeAnyBeforeAfter(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereILike(String field, String value) {
+		this.whereRestriction.add(field, Where.ILIKE, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereILike(Attribute<?, ?> attribute, String value) {
+		return addWhereILike(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereNotILike(String field, String value) {
+		this.whereRestriction.add(field, Where.NOT_ILIKE, value);
+		return this;
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereNotILike(Attribute<?, ?> attribute, String value) {
+		return addWhereNotILike(attribute.getName(), value);
+	}
+	@Override
+	public CriteriaFilter<T> addWhereILikeAnyAfter(String field, String value) {
+		this.whereRestriction.add(field, Where.ILIKE_ANY_AFTER, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereILikeAnyAfter(Attribute<?, ?> attribute, String value) {
+		return addWhereILikeAnyAfter(attribute.getName(), value);
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereILikeAnyBefore(String field, String value) {
+		this.whereRestriction.add(field, Where.ILIKE_ANY_BEFORE, value);
+		return this;
+	}
+
+	@Override
+	public CriteriaFilter<T> addWhereILikeAnyBefore(Attribute<?, ?> attribute, String value) {
+		return addWhereILikeAnyBefore(attribute.getName(), value);
+	}
+	@Override
+	public CriteriaFilter<T> addWhereILikeAnyBeforeAfter(String field, String value) {
+		this.whereRestriction.add(field, Where.ILIKE_ANY_BEFORE_AND_AFTER, value);
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereILikeAnyBeforeAfter(Attribute<?, ?> attribute, String value) {
+		return addWhereILikeAnyBefore(attribute.getName(), value);
 	}
 
 	/*

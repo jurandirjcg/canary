@@ -288,10 +288,7 @@ public class ReflectionUtil {
 	 * @return
 	 */
 	public static boolean existAnnotation(Field atributo, Class<? extends Annotation> annotationClass){
-		if(getAnnotation(atributo, annotationClass) != null)
-					return true;
-		
-		return false;
+		return atributo.isAnnotationPresent(annotationClass);
 	}
 	/**
 	 * Retorna annotation tanto do field quanto do method do tipo GET, null caso nao encontre
@@ -731,32 +728,25 @@ public class ReflectionUtil {
 	 * @param obj
 	 * @param field
 	 * @param value
+	 * @throws Exception 
 	 */
-	public static void setFieldValue(Object obj, Field field, Object value){
-		try {
+	public static void setFieldValue(Object obj, Field field, Object value) throws Exception{
 			field.setAccessible(true);
 			field.set(obj, value);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		}
 	}
 	/**
 	 * 
 	 * @param obj
 	 * @param fieldName
 	 * @param value
+	 * @throws Exception 
 	 */
-	public static void setFieldValue(Object obj, String fieldName, Object value){
-		try {
-			List<Field> lFld = listAttributes(obj.getClass(), fieldName);
-			if(lFld.size() == 1){
-				Field fld = lFld.get(0);
-				fld.setAccessible(true);
-				fld.set(obj, value);
-			}
-		}catch (Exception e) {
-			// TODO: handle exception
+	public static void setFieldValue(Object obj, String fieldName, Object value) throws Exception{
+		List<Field> lFld = listAttributes(obj.getClass(), fieldName);
+		if(lFld.size() == 1){
+			Field fld = lFld.get(0);
+			fld.setAccessible(true);
+			fld.set(obj, value);
 		}
 	}
 	/**

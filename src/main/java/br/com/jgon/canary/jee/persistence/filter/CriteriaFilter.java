@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.JoinType;
+import javax.persistence.metamodel.Attribute;
 
 import br.com.jgon.canary.jee.exception.ApplicationException;
 
@@ -158,7 +159,7 @@ public interface CriteriaFilter<T> {
 	 * @param fields
 	 * @return
 	 */
-	public CriteriaFilter<T> addSelect(String... fields);
+	public CriteriaFilter<T> addSelect(String[] fields);
 	
 	/**
 	 * 
@@ -276,9 +277,22 @@ public interface CriteriaFilter<T> {
 	 * @param values
 	 * @return
 	 */
+	public <E> CriteriaFilter<T> addWhereEqual(String field, E value);
+	/**
+	 * 
+	 * @param field
+	 * @param values
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public <E> CriteriaFilter<T> addWhereNotEqual(String field, E... values);
-	
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public <E> CriteriaFilter<T> addWhereNotEqual(String field, E value);
 	/**
 	 * 
 	 * @param field
@@ -374,13 +388,41 @@ public interface CriteriaFilter<T> {
 	 * @param field
 	 * @return
 	 */
-	public CriteriaFilter<T> addWhereGreaterThan(String field);
+	public CriteriaFilter<T> addWhereGreaterThan(String field);	
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public <E> CriteriaFilter<T> addWhereGreaterThan(String field, Date value);
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public <E> CriteriaFilter<T> addWhereGreaterThan(String field, Number value);
 	/**
 	 * 
 	 * @param field
 	 * @return
 	 */
 	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(String field);
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(String field, Date value);
+	/**
+	 *
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(String field, Number value);
 	/**
 	 * 
 	 * @param field
@@ -408,16 +450,50 @@ public interface CriteriaFilter<T> {
 	/**
 	 * 
 	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThan(String field, Date value);
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThan(String field, Number value);
+	/**
+	 * 
+	 * @param field
 	 * @return
 	 */
 	public CriteriaFilter<T> addWhereLessThanOrEqualTo(String field);
-	/*
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(String field, Date value);
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(String field, Number value);
 	/**
 	 * 
 	 * @param field
 	 * @return
 	 */
 	public CriteriaFilter<T> addWhereLike(String field);
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLike(String field, String value);
 	
 	/**
 	 * 
@@ -425,6 +501,13 @@ public interface CriteriaFilter<T> {
 	 * @return
 	 */
 	public CriteriaFilter<T> addWhereNotLike(String field);
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereNotLike(String field, String value);
 	
 	/**
 	 * 
@@ -435,9 +518,23 @@ public interface CriteriaFilter<T> {
 	/**
 	 * 
 	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLikeAnyAfter(String field, String value);
+	/**
+	 * 
+	 * @param field
 	 * @return
 	 */
 	public CriteriaFilter<T> addWhereLikeAnyBefore(String field);
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLikeAnyBefore(String field, String value);
 	/**
 	 * 
 	 * @param field
@@ -447,16 +544,36 @@ public interface CriteriaFilter<T> {
 	/**
 	 * 
 	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLikeAnyBeforeAfter(String field, String value);
+	/**
+	 * 
+	 * @param field
 	 * @return
 	 */
 	public CriteriaFilter<T> addWhereILike(String field);
-	
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILike(String field, String value);
 	/**
 	 * 
 	 * @param field
 	 * @return
 	 */
 	public CriteriaFilter<T> addWhereNotILike(String field);
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereNotILike(String field, String value);
 	
 	/**
 	 * 
@@ -467,15 +584,36 @@ public interface CriteriaFilter<T> {
 	/**
 	 * 
 	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILikeAnyAfter(String field, String value);
+	/**
+	 * 
+	 * @param field
 	 * @return
 	 */
 	public CriteriaFilter<T> addWhereILikeAnyBefore(String field);
 	/**
 	 * 
 	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILikeAnyBefore(String field, String value);
+	/**
+	 * 
+	 * @param field
 	 * @return
 	 */
 	public CriteriaFilter<T> addWhereILikeAnyBeforeAfter(String field);
+	/**
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILikeAnyBeforeAfter(String field, String value);
 	/**
 	 * 
 	 * @param field
@@ -516,5 +654,577 @@ public interface CriteriaFilter<T> {
 	 * @return
 	 */
 	public CriteriaFilter<T> addJoin(String field);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param alias
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelect(Attribute<?, ?> attribute, String alias);
+
+	/**
+	 * 
+	 * @param attributes
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelect(Attribute<?, ?>... attributes);
 	
+	/**
+	 * 
+	 * @param attribute
+	 * @param alias
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectCount(Attribute<?, ?> attribute, String alias);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectCount(Attribute<?, ?> attribute);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectUpper(Attribute<?, ?> attribute);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param alias
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectUpper(Attribute<?, ?> attribute, String alias);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectLower(Attribute<?, ?> attribute);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param alias
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectLower(Attribute<?, ?> attribute, String alias);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param alias
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectMax(Attribute<?, ?> attribute, String alias);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectMax(Attribute<?, ?> attribute);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param alias
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectMin(Attribute<?, ?> attribute, String alias);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectMin(Attribute<?, ?> attribute);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param alias
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectSum(Attribute<?, ?> attribute, String alias);
+
+	/**
+	 *
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelectSum(Attribute<?, ?> attribute);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addSelect(Attribute<?, ?> attribute);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addOrderAsc(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addOrderDesc(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereEqual(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param values
+	 * @return
+	 */
+	public <E> CriteriaFilter<T> addWhereIn(Attribute<?, ?> attribute, List<E> values);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param values
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public <E> CriteriaFilter<T> addWhereIn(Attribute<?, ?> attribute, E... values);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param values
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public <E> CriteriaFilter<T> addWhereNotIn(Attribute<?, ?> attribute, E... values);
+	/**
+	 * 
+	 * @param attribute
+	 * @param values
+	 * @return
+	 */
+	public <E> CriteriaFilter<T> addWhereNotIn(Attribute<?, ?> attribute, List<E> values);
+	/**
+	 * 
+	 * @param attribute
+	 * @param values
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public <E> CriteriaFilter<T> addWhereEqual(Attribute<?, ?> attribute, E... values);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param values
+	 * @return
+	 */
+	public <E> CriteriaFilter<T> addWhereEqual(Attribute<?, ?> attribute, List<E> values);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param values
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public <E> CriteriaFilter<T> addWhereNotEqual(Attribute<?, ?> attribute, E... values);
+	/**
+	 * 
+	 * @param attribute
+	 * @param values
+	 * @return
+	 */
+	public <E> CriteriaFilter<T> addWhereNotEqual(Attribute<?, ?> attribute, List<E> values);
+	/**
+	 * 
+	 * @param attribute
+	 * @param startValue
+	 * @param endValue
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, Integer startValue, Integer endValue);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param startValue
+	 * @param endValue
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, Short startValue, Short endValue);
+	/**
+	 * 
+	 * @param attribute
+	 * @param startValue
+	 * @param endValue
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute,
+			Long startValue, Long endValue);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThanField(Attribute<?, ?> attribute,
+			Attribute<?, ?> anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereGreaterThanField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThanOrEqualToField(Attribute<?, ?> attribute, 	Attribute<?, ?> anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualToField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereEqualField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereNotEqualField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param startValue
+	 * @param endValue
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, Date startValue, Date endValue);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @param startValue
+	 * @param endValue
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, LocalDate startValue, LocalDate endValue);
+	/**
+	 * 
+	 * @param attribute
+	 * @param startValue
+	 * @param endValue
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereBetween(Attribute<?, ?> attribute, LocalDateTime startValue, LocalDateTime endValue);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereGreaterThan(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereIsNotNull(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereIsNull(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereIn(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThan(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLike(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereNotLike(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLikeAnyAfter(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLikeAnyBefore(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLikeAnyBeforeAfter(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILike(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereNotILike(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILikeAnyAfter(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILikeAnyBefore(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILikeAnyBeforeAfter(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereNotEqual(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereNotIn(Attribute<?, ?> attribute);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addGroupBy(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param joinType
+	 * @param fetch
+	 * @return
+	 */
+	public CriteriaFilter<T> addJoin(Attribute<?, ?> attribute, JoinType joinType, boolean fetch);
+	/**
+	 * 
+	 * @param attribute
+	 * @param joinType
+	 * @return
+	 */
+	public CriteriaFilter<T> addJoin(Attribute<?, ?> attribute, JoinType joinType);
+	/**
+	 * 
+	 * @param attribute
+	 * @return
+	 */
+	public CriteriaFilter<T> addJoin(Attribute<?, ?> attribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public <E> CriteriaFilter<T> addWhereEqual(Attribute<?, ?> attribute, E value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public <E> CriteriaFilter<T> addWhereNotEqual(Attribute<?, ?> attribute, E value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereGreaterThan(Attribute<?, ?> attribute, Date value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereGreaterThan(Attribute<?, ?> attribute, Number value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(Attribute<?, ?> attribute,	Date value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereGreaterThanOrEqualTo(Attribute<?, ?> attribute,	Number value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThan(Attribute<?, ?> attribute, Date value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThan(Attribute<?, ?> attribute, Number value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(Attribute<?, ?> attribute,	Date value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLessThanOrEqualTo(Attribute<?, ?> attribute,	Number value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLike(Attribute<?, ?> attribute, String value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereNotLike(Attribute<?, ?> attribute, String value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLikeAnyAfter(Attribute<?, ?> attribute, String value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLikeAnyBefore(Attribute<?, ?> attribute,	String value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereLikeAnyBeforeAfter(Attribute<?, ?> attribute,	String value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILike(Attribute<?, ?> attribute, String value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereNotILike(Attribute<?, ?> attribute, String value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILikeAnyAfter(Attribute<?, ?> attribute, String value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILikeAnyBefore(Attribute<?, ?> attribute, String value);
+	/**
+	 * 
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereILikeAnyBeforeAfter(Attribute<?, ?> attribute, String value);
+		
 }
