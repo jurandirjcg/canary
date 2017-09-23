@@ -3,9 +3,11 @@ package br.com.jgon.canary.jee.persistence;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,10 +66,16 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	private EntityManager entityManager;
 	/**
 	 * 
+	 */
+	private Field fieldId;
+	/**
+	 * 
 	 * @param entityManager
 	 */
 	public GenericDAO(EntityManager entityManager){
 		this.entityManager = entityManager;
+		this.fieldId = DAOUtil.getFieldId(getPrimaryClass());
+		fieldId.setAccessible(true);
 	}
 	/**
 	 * 
@@ -94,13 +102,9 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public T saveOrUpdate(T obj) throws UpdateEntityException, SaveEntityException {
-		List<Field> flds = ReflectionUtil.listAttributesByAnnotation(getPrimaryClass(), Id.class);
-		if(flds.isEmpty()){
-			flds = ReflectionUtil.listAttributesByAnnotation(getPrimaryClass(), EmbeddedId.class);
-		}
 		boolean isSave = true;
-		if(!flds.isEmpty()){
-			isSave = ReflectionUtil.getAttributteValue(obj, flds.get(0)) == null;
+		if(fieldId != null){
+			isSave = ReflectionUtil.getAttributteValue(obj, fieldId) == null;
 		}
 		try {
 			if(isSave){
@@ -361,7 +365,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			}
 			CriteriaManager<T> criteriaManager = getCriteriaManager(resultClass, (CriteriaFilterImpl<T>) criteriaFilter);
 			CriteriaQuery<?> query = criteriaManager.getCriteriaQuery();
-			List<E> returnList = getResultList(resultClass, query, pagina, qtde);
+			List<SimpleEntry<?, E>> returnList = getPreparedResultList(resultClass, query, pagina, qtde);
 						
 			return checkTupleResultList(criteriaManager, returnList);
 		} catch (Exception e) {
@@ -370,28 +374,36 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	}
 	
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private <E> List<E> checkTupleResultList(CriteriaManager<T> criteriaManager, List<E> returnList) throws InstantiationException, IllegalAccessException, ApplicationException{
+	private <E> List<E> checkTupleResultList(CriteriaManager<T> criteriaManager, List<SimpleEntry<?, E>> returnList) throws InstantiationException, IllegalAccessException, ApplicationException{
+		List<E> listReturn = new LinkedList<E>();
+		for(SimpleEntry<?, E> se : returnList){
+			listReturn.add(se.getValue());
+		}
 		//------------ ADICIONADO PARA TRATAR COLLECTION
 		if(!criteriaManager.getListCollectionRelation().isEmpty()){
 			Field fldAux = null;
-			Field fieldId = DAOUtil.getFieldId(getPrimaryClass());
-			fieldId.setAccessible(true);
 						
-			List<K> objAux= new ArrayList<K>();
+			//ID DO OBJETO
+			List<K> listId= new ArrayList<K>();
+			for(SimpleEntry<?, E> ret: returnList){
+				if(ret.getKey() != null){
+					listId.add((K) ret.getKey());
+				}else{
+					listId.add((K) fieldId.get(ret));
+				}
+			}
+			//VERIFICA CORRECAO
 			for(String k : criteriaManager.getListCollectionRelation().keySet()){
 				fldAux = ReflectionUtil.getAttribute(getPrimaryClass(), k);
 				fldAux.setAccessible(true);
-				for(E ret: returnList){
-					objAux.add((K) fieldId.get(ret));
-				}
-			
+				
 				CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) criteriaManager.getListCollectionRelation().get(k)
 						.addSelect(fieldId.getName())
-						.addWhereIn(fieldId.getName(), objAux);
+						.addWhereIn(fieldId.getName(), listId);
 				
 				List<?> listAux = getResultList(cf, null, null);
 				
-				for(E ret: returnList){
+				for(E ret: listReturn){
 					for(Object retList: listAux){
 						if(fieldId.get(ret).equals(fieldId.get(retList))){
 							Collection col = (Collection<?>) fldAux.get(ret);
@@ -401,31 +413,34 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 							}
 							col.addAll((Collection<?>) fldAux.get(retList));
 						}
-						if(criteriaManager.isForcedIdSelect()){
+						/*if(criteriaManager.isForcedIdSelect()){
 							fieldId.set(ret, null);
-						}
+						}*/
 					}
 				}				
 			}
-		}	
-		// ------------------------------
-		return returnList;
+		}
+
+		return listReturn;
 	}
 	
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private <E> E checkTupleSingleResult(CriteriaManager<T> criteriaManager, E ret) throws InstantiationException, IllegalAccessException, ApplicationException{
+	private <E> E checkTupleSingleResult(CriteriaManager<T> criteriaManager, SimpleEntry<?, E> result) throws InstantiationException, IllegalAccessException, ApplicationException{
+		E ret = result.getValue();
 		if(!criteriaManager.getListCollectionRelation().isEmpty()){
 			Field fldAux = null;
-			Field fieldId = DAOUtil.getFieldId(getPrimaryClass());
-			fieldId.setAccessible(true);
-		
+			
 			T objAux;
 			for(String k : criteriaManager.getListCollectionRelation().keySet()){
 				fldAux = ReflectionUtil.getAttribute(getPrimaryClass(), k);
 				fldAux.setAccessible(true);	
 				
 				objAux = getPrimaryClass().newInstance();
-				fieldId.set(objAux, fieldId.get(ret));
+				if(result.getKey() == null){
+					fieldId.set(objAux, fieldId.get(ret));
+				}else{
+					fieldId.set(objAux, result.getKey());
+				}
 				
 				CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) criteriaManager.getListCollectionRelation().get(k);
 				cf.setObjBase(objAux);
@@ -472,9 +487,9 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 
 		try{
 			if(isTuple){	
-				return new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), getPrimaryClass(), (CriteriaFilterImpl<T>) criteriaFilter, getPrimaryClass().equals(resultClass));
+				return new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), getPrimaryClass(), resultClass, (CriteriaFilterImpl<T>) criteriaFilter);
 			}else{
-				return new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), resultClass, (CriteriaFilterImpl<T>) criteriaFilter, getPrimaryClass().equals(resultClass));
+				return new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), resultClass, resultClass, (CriteriaFilterImpl<T>) criteriaFilter);
 			}
 		}catch (Exception e) {
 			throw new ApplicationException(MessageSeverity.ERROR, ERROR_CRITERIA, e, new String[] { getPrimaryClass().getSimpleName() });
@@ -490,9 +505,13 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 * @return
 	 * @throws ApplicationException
 	 */
-	@SuppressWarnings("unchecked")
 	protected <E> List<E> getResultList(Class<E> resultClass, CriteriaQuery<?> criteriaQuery, Integer pagina, Integer qtde) throws ApplicationException {
-		try {
+		List<E> listReturn = new LinkedList<E>();
+		for(SimpleEntry<?, E> se : getPreparedResultList(resultClass, criteriaQuery, pagina, qtde)){
+			listReturn.add(se.getValue());
+		}
+		return listReturn;
+		/**try {
 			boolean isTuple = criteriaQuery.getResultType().equals(Tuple.class);
 		
 			if(isTuple){
@@ -513,6 +532,37 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 				TypedQuery<E> tQuery = getEntityManager().createQuery(query);
 				configPaginacao(tQuery, pagina, qtde);
 				return (List<E>) tQuery.getResultList();
+			}
+		} catch (Exception e) {
+			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
+		}**/
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <E> List<SimpleEntry<?, E>> getPreparedResultList(Class<E> resultClass, CriteriaQuery<?> criteriaQuery, Integer pagina, Integer qtde) throws ApplicationException {
+		try {
+			boolean isTuple = criteriaQuery.getResultType().equals(Tuple.class);
+			List<SimpleEntry<?, E>> listReturn = new LinkedList<SimpleEntry<?, E>>();
+			
+			if(isTuple){
+				CriteriaQuery<Tuple> query = (CriteriaQuery<Tuple>) criteriaQuery;
+				TypedQuery<Tuple> tQuery = getEntityManager().createQuery(query);
+				configPaginacao(tQuery, pagina, qtde);
+				List<Tuple> tuple = tQuery.getResultList();
+				
+				for(Tuple t: tuple){
+					listReturn.add(tupleToResultClass(t, resultClass));
+				}
+				
+				return listReturn;
+			}else{
+				CriteriaQuery<E> query = (CriteriaQuery<E>) criteriaQuery;
+				TypedQuery<E> tQuery = getEntityManager().createQuery(query);
+				configPaginacao(tQuery, pagina, qtde);
+				for(E oRet : tQuery.getResultList()){
+					listReturn.add(new SimpleEntry<Object, E>(null, oRet));
+				}
+				return listReturn;
 			}
 		} catch (Exception e) {
 			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
@@ -581,7 +631,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			CriteriaManager<T> criteriaManager = getCriteriaManager(resultClass, (CriteriaFilterImpl<T>) criteriaFilter); 
 			CriteriaQuery<?> query = criteriaManager.getCriteriaQuery();
 			
-			E result = getSingleResult(resultClass, query);
+			SimpleEntry<?, E> result = getPreparedSingleResult(resultClass, query);
 			return checkTupleSingleResult(criteriaManager, result);
 			
 		} catch (NoResultException nre){
@@ -598,9 +648,9 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 * @return
 	 * @throws ApplicationException
 	 */
-	@SuppressWarnings("unchecked")
 	protected <E> E getSingleResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationException {
-		try {
+		return getPreparedSingleResult(resultClass, criteriaQuery).getValue();
+		/*try {
 			boolean isTuple = criteriaQuery.getResultType().equals(Tuple.class);
 			
 			if(isTuple){
@@ -617,8 +667,31 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			return null;
 		} catch (Exception e) {
 			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
+		}*/
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <E> SimpleEntry<?, E> getPreparedSingleResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationException {
+		try {
+			boolean isTuple = criteriaQuery.getResultType().equals(Tuple.class);
+			
+			if(isTuple){
+				CriteriaQuery<Tuple> query = (CriteriaQuery<Tuple>) criteriaQuery;
+				TypedQuery<Tuple> tQuery = getEntityManager().createQuery(query);
+				Tuple tuple = tQuery.getSingleResult();
+				return tupleToResultClass(tuple, resultClass);
+			}else{
+				CriteriaQuery<E> query = (CriteriaQuery<E>) criteriaQuery;
+				TypedQuery<E> tQuery = getEntityManager().createQuery(query);
+				return new SimpleEntry<Object, E>(null, tQuery.getSingleResult());
+			}
+		} catch (NoResultException nre){
+			return null;
+		} catch (Exception e) {
+			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
 		}
 	}
+	
 	/**
 	 * 
 	 * @param criteriaQuery
@@ -647,17 +720,19 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 * @throws ApplicationException
 	 */
 	@SuppressWarnings("unchecked")
-	private <E> E tupleToResultClass(Tuple tuple, Class<E> resultClass) throws InstantiationException, IllegalAccessException, ApplicationException{
+	private <E> SimpleEntry<?, E> tupleToResultClass(Tuple tuple, Class<E> resultClass) throws InstantiationException, IllegalAccessException, ApplicationException{
 		if(resultClass == null){
 			resultClass = (Class<E>) getPrimaryClass();
 		}
 		
 		if(ReflectionUtil.isPrimitive(resultClass)){
-			return (E) tuple.get(0);
+			return new SimpleEntry<Object, E>(null, (E) tuple.get(0));
 		}
 		
 		E objReturn = resultClass.newInstance();
-	
+		
+		SimpleEntry<?, E> seReturn = null;
+		
 		for(TupleElement<?> te : tuple.getElements()){
 			if(te.getAlias().contains(".")){
 				String[] subObj = te.getAlias().split("\\.");
@@ -701,14 +776,25 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 					}
 				}
 			}else{
-				try {
-					ReflectionUtil.setFieldValue(objReturn, te.getAlias(), tuple.get(te));
-				} catch (Exception e) {
-					throw new ApplicationException(MessageSeverity.ERROR, "genericdao-field-not-found", resultClass.getName(), te.getAlias());
+				if(te.getAlias().equals(CriteriaManager.ALIAS_ATTR_FORCED_ID)){
+					seReturn = new SimpleEntry<Object, E>(tuple.get(te), objReturn);
+				}else{
+					if(te.getAlias().equals(fieldId.getName())){
+						seReturn = new SimpleEntry<Object, E>(tuple.get(te), objReturn);
+					}
+					try {
+						ReflectionUtil.setFieldValue(objReturn, te.getAlias(), tuple.get(te));
+					} catch (Exception e) {
+						throw new ApplicationException(MessageSeverity.ERROR, "genericdao-field-not-found", resultClass.getName(), te.getAlias());
+					}
 				}
 			}
 		}
-		return objReturn;
+		if(seReturn == null){
+			return new SimpleEntry<Object, E>(null, objReturn);
+		}else{
+			return seReturn;
+		}
 	}
 	
 	private Object getObjectCollectionInstance(Field fld) throws ApplicationException, InstantiationException, IllegalAccessException{
@@ -1197,7 +1283,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			query.orderBy(orderList);
 			query.groupBy(groupList);
 
-			List<E> returnList = getResultList(returnClass, query, page, limit);
+			List<SimpleEntry<?, E>> returnList = getPreparedResultList(returnClass, query, page, limit);
 			
 			try {
 				paginacao.setRegistros(checkTupleResultList(criteriaManager, returnList));

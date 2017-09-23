@@ -46,25 +46,25 @@ import br.com.jgon.canary.jee.util.ReflectionUtil;
  */
 class CriteriaManager<T> {
 		
+	public static final String ALIAS_ATTR_FORCED_ID = "ATTR_FORCED_ID";
 	private EntityManager entityManager;
 	private CriteriaFilterImpl<T> criteriaFilter;
 	private CriteriaAssociations criteriaAssociations;
 	private Map<String, CriteriaFilterImpl<?>> listCollectionRelation = new HashMap<String, CriteriaFilterImpl<?>>(0);
 	private Root<T> rootEntry;
 	private Class<?> queryClass;
+	private Class<?> resultClass;
 	private CriteriaBuilder criteriaBuilder;
 	private CriteriaQuery<?> criteriaQuery;
 	private Class<T> entityClass;
-	private boolean verifyCollectionRelation;
-	private boolean forcedIdSelect = false;
 		
-	public CriteriaManager(EntityManager entityManager, Class<T> entityClass, Class<?> queryClass, CriteriaFilterImpl<T> criteriaFilter, boolean verifyCollectionRelation) throws Exception {
+	public CriteriaManager(EntityManager entityManager, Class<T> entityClass, Class<?> queryClass, Class<?> resultClass, CriteriaFilterImpl<T> criteriaFilter) throws Exception {
 		this.entityManager = entityManager;
 		this.queryClass = queryClass;
 		this.criteriaFilter = criteriaFilter;
 		this.criteriaAssociations = new CriteriaAssociations();
 		this.entityClass = entityClass;
-		this.verifyCollectionRelation = verifyCollectionRelation;
+		this.resultClass = resultClass;
 		createCriteria();
 	}
 	
@@ -83,10 +83,6 @@ class CriteriaManager<T> {
 	@SuppressWarnings("unchecked")
 	public <E> CriteriaQuery<E> getCriteriaQuery(){
 		return (CriteriaQuery<E>) this.criteriaQuery;
-	}
-	
-	public boolean isForcedIdSelect() {
-		return forcedIdSelect;
 	}
 
 	/**
@@ -187,17 +183,24 @@ class CriteriaManager<T> {
 			for(String key: criteriaFilter.getListSelection().keySet()){
 				
 				//--- ADICIONADO PARA VERIFICAR COLECAO
-				if(verifyCollectionRelation){
-					Field field = null;
-					if(key.contains(".")){
-						field = ReflectionUtil.getAttribute(entityClass, key.substring(0, key.indexOf(".")));
-					}else{
-						field = ReflectionUtil.getAttribute(entityClass, key);
+				Field field = null;
+				if(key.contains(".")){
+					field = ReflectionUtil.getAttribute(entityClass, key.substring(0, key.indexOf(".")));
+				}else{
+					field = ReflectionUtil.getAttribute(entityClass, key);
+				}
+
+				if(field != null && ReflectionUtil.isCollection(field.getType()) && criteriaFilter.isCollectionSelectionControl()) {
+					SimpleEntry<SelectAggregate, String> selectionAux = criteriaFilter.getListSelection().get(key);
+
+					boolean addCollection = true;
+					if(!entityClass.equals(resultClass)){
+						int idxDot = selectionAux.getValue().indexOf(".");
+						Field fldResult = ReflectionUtil.getAttribute(resultClass, idxDot >= 0 ? selectionAux.getValue().substring(0, idxDot) : selectionAux.getValue());
+						addCollection = ReflectionUtil.isCollection(fldResult.getType());
 					}
-
-					if(field != null && ReflectionUtil.isCollection(field.getType()) && criteriaFilter.isCollectionSelectionControl()) {
-						SimpleEntry<SelectAggregate, String> selectionAux = criteriaFilter.getListSelection().get(key);
-
+					
+					if(addCollection){
 						if(listCollectionRelation.containsKey(field.getName())){
 							listCollectionRelation.get(field.getName()).getListSelection().put(key, selectionAux);
 						}else{
@@ -210,6 +213,7 @@ class CriteriaManager<T> {
 						continue;
 					}
 				}
+
 				// -----------------------------
 				
 				SimpleEntry<String, From<?, ?>> assocAux = configAssociation(from, key); 
@@ -257,8 +261,7 @@ class CriteriaManager<T> {
 			if(from.equals(rootEntry) && !listCollectionRelation.isEmpty()){
 				Field fldId =  DAOUtil.getFieldId(entityClass);
 				if(!criteriaFilter.getListSelection().containsKey(fldId.getName())){
-					lista.add(rootEntry.get(fldId.getName()).alias(fldId.getName()));
-					this.forcedIdSelect = true;
+					lista.add(rootEntry.get(fldId.getName()).alias(ALIAS_ATTR_FORCED_ID));//fldId.getName()));
 				}
 			}
 			return criteriaBuilder.tuple(CollectionUtil.convertCollectionToArray(Selection.class, lista));
