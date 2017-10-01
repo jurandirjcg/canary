@@ -33,6 +33,8 @@ import javax.persistence.criteria.Selection;
 
 import org.apache.commons.lang3.StringUtils;
 
+import br.com.jgon.canary.jee.exception.ApplicationException;
+import br.com.jgon.canary.jee.exception.MessageSeverity;
 import br.com.jgon.canary.jee.persistence.CriteriaFilterImpl.SelectAggregate;
 import br.com.jgon.canary.jee.persistence.CriteriaFilterImpl.Where;
 import br.com.jgon.canary.jee.util.CollectionUtil;
@@ -58,7 +60,7 @@ class CriteriaManager<T> {
 	private CriteriaQuery<?> criteriaQuery;
 	private Class<T> entityClass;
 		
-	public CriteriaManager(EntityManager entityManager, Class<T> entityClass, Class<?> queryClass, Class<?> resultClass, CriteriaFilterImpl<T> criteriaFilter) throws Exception {
+	public CriteriaManager(EntityManager entityManager, Class<T> entityClass, Class<?> queryClass, Class<?> resultClass, CriteriaFilterImpl<T> criteriaFilter) throws ApplicationException, Exception {
 		this.entityManager = entityManager;
 		this.queryClass = queryClass;
 		this.criteriaFilter = criteriaFilter;
@@ -174,9 +176,10 @@ class CriteriaManager<T> {
 	 * @param from
 	 * @param associations
 	 * @return
+	 * @throws ApplicationException 
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Selection configSelections(From<?, ?> from){
+	private Selection configSelections(From<?, ?> from) throws ApplicationException{
 		if(criteriaFilter != null && criteriaFilter.getListSelection().size() > 0){
 			List<Selection> lista = new ArrayList<Selection>(0);
 						
@@ -224,7 +227,7 @@ class CriteriaManager<T> {
 				try{
 					path = assocAux.getValue().get(assocAux.getKey());
 				}catch(IllegalArgumentException e)  {
-					continue;
+					throw new ApplicationException(MessageSeverity.ERROR, "genericdao-field-not-found", e, assocAux.getValue().getJavaType().getName(), assocAux.getKey());
 				}
 				
 				switch (se.getKey()) {

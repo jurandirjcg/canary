@@ -28,6 +28,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Selection;
+import javax.persistence.metamodel.Attribute;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -82,11 +83,19 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	protected abstract EntityManager getEntityManager();
 	
 	/**
+	 * Entity manager utilizado para pesquisa, default getEntityManager()
+	 * @return
+	 */
+	protected EntityManager getSearchEntityManager(){
+		return this.getEntityManager();
+	}
+	
+	/**
 	 * 
 	 * @param obj
 	 * @throws ApplicationException
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public T save(T obj) throws SaveEntityException {
 		try {
 			getEntityManager().persist(obj);
@@ -96,7 +105,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 		}
 	}
 	
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public T saveOrUpdate(T obj) throws UpdateEntityException, SaveEntityException {
 		boolean isSave = true;
 		if(fieldId != null){
@@ -121,7 +130,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 * @return
 	 * @throws ApplicationException
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public T update(T obj) throws UpdateEntityException {
 		try {
 			return getEntityManager().merge(obj);
@@ -135,7 +144,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 * @param obj
 	 * @throws ApplicationException
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public void remove(T obj) throws RemoveEntityException {
 		try {
 			obj = find(obj);
@@ -150,7 +159,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 * @param id
 	 * @throws ApplicationException
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public void remove(K id) throws RemoveEntityException {
 		try {
 			T obj = find(id);
@@ -168,7 +177,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 */
 	public T find(K id) throws ApplicationException {
 		try {
-			return getEntityManager().find(getPrimaryClass(), id);
+			return getSearchEntityManager().find(getPrimaryClass(), id);
 		} catch (Exception e) {
 			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
 		}
@@ -181,7 +190,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 */
 	public T findReference(K id) throws ApplicationException {
 		try {
-			return getEntityManager().getReference(getPrimaryClass(), id);
+			return getSearchEntityManager().getReference(getPrimaryClass(), id);
 		} catch (Exception e) {
 			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
 		}
@@ -422,6 +431,9 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private <E> E checkTupleSingleResult(CriteriaManager<T> criteriaManager, SimpleEntry<?, E> result) throws InstantiationException, IllegalAccessException, ApplicationException{
+		if(result == null){
+			return null;
+		}
 		E ret = result.getValue();
 		if(!criteriaManager.getListCollectionRelation().isEmpty()){
 			Field fldAux = null;
@@ -483,10 +495,12 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 
 		try{
 			if(isTuple){	
-				return new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), getPrimaryClass(), resultClass, (CriteriaFilterImpl<T>) criteriaFilter);
+				return new CriteriaManager<T>(getSearchEntityManager(), getPrimaryClass(), getPrimaryClass(), resultClass, (CriteriaFilterImpl<T>) criteriaFilter);
 			}else{
-				return new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), resultClass, resultClass, (CriteriaFilterImpl<T>) criteriaFilter);
+				return new CriteriaManager<T>(getSearchEntityManager(), getPrimaryClass(), resultClass, resultClass, (CriteriaFilterImpl<T>) criteriaFilter);
 			}
+		}catch (ApplicationException e){
+			throw e;
 		}catch (Exception e) {
 			throw new ApplicationException(MessageSeverity.ERROR, ERROR_CRITERIA, e, new String[] { getPrimaryClass().getSimpleName() });
 		}
@@ -542,7 +556,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			
 			if(isTuple){
 				CriteriaQuery<Tuple> query = (CriteriaQuery<Tuple>) criteriaQuery;
-				TypedQuery<Tuple> tQuery = getEntityManager().createQuery(query);
+				TypedQuery<Tuple> tQuery = getSearchEntityManager().createQuery(query);
 				configPaginacao(tQuery, pagina, qtde);
 				List<Tuple> tuple = tQuery.getResultList();
 				
@@ -553,7 +567,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 				return listReturn;
 			}else{
 				CriteriaQuery<E> query = (CriteriaQuery<E>) criteriaQuery;
-				TypedQuery<E> tQuery = getEntityManager().createQuery(query);
+				TypedQuery<E> tQuery = getSearchEntityManager().createQuery(query);
 				configPaginacao(tQuery, pagina, qtde);
 				for(E oRet : tQuery.getResultList()){
 					listReturn.add(new SimpleEntry<Object, E>(null, oRet));
@@ -629,7 +643,6 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			
 			SimpleEntry<?, E> result = getPreparedSingleResult(resultClass, query);
 			return checkTupleSingleResult(criteriaManager, result);
-			
 		} catch (NoResultException nre){
 			return null;
 		} catch (Exception e) {
@@ -646,24 +659,6 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 */
 	protected <E> E getSingleResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationException {
 		return getPreparedSingleResult(resultClass, criteriaQuery).getValue();
-		/*try {
-			boolean isTuple = criteriaQuery.getResultType().equals(Tuple.class);
-			
-			if(isTuple){
-				CriteriaQuery<Tuple> query = (CriteriaQuery<Tuple>) criteriaQuery;
-				TypedQuery<Tuple> tQuery = getEntityManager().createQuery(query);
-				Tuple tuple = tQuery.getSingleResult();
-				return tupleToResultClass(tuple, resultClass);
-			}else{
-				CriteriaQuery<E> query = (CriteriaQuery<E>) criteriaQuery;
-				TypedQuery<E> tQuery = getEntityManager().createQuery(query);
-				return tQuery.getSingleResult();
-			}
-		} catch (NoResultException nre){
-			return null;
-		} catch (Exception e) {
-			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
-		}*/
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -673,12 +668,12 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			
 			if(isTuple){
 				CriteriaQuery<Tuple> query = (CriteriaQuery<Tuple>) criteriaQuery;
-				TypedQuery<Tuple> tQuery = getEntityManager().createQuery(query);
+				TypedQuery<Tuple> tQuery = getSearchEntityManager().createQuery(query);
 				Tuple tuple = tQuery.getSingleResult();
 				return tupleToResultClass(tuple, resultClass);
 			}else{
 				CriteriaQuery<E> query = (CriteriaQuery<E>) criteriaQuery;
-				TypedQuery<E> tQuery = getEntityManager().createQuery(query);
+				TypedQuery<E> tQuery = getSearchEntityManager().createQuery(query);
 				return new SimpleEntry<Object, E>(null, tQuery.getSingleResult());
 			}
 		} catch (NoResultException nre){
@@ -1288,6 +1283,23 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			}			
 		}		
 		return paginacao;
+	}
+	
+	/**
+	 * 
+	 * @autor jurandirjcg
+	 * @param attributes
+	 * @return
+	 */
+	protected static String concatMetamodelAttribute(Attribute<?, ?>... attributes){
+		StringBuilder f = new StringBuilder();
+		for(int i=0; i < attributes.length; i++){
+			if(i > 0){
+				f.append(".");
+			}
+			f.append(attributes[i].getName());
+		}
+		return f.toString();
 	}
 	/*
 	*//**

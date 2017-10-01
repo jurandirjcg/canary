@@ -26,7 +26,7 @@ import br.com.jgon.canary.jee.ws.rest.util.link.LinkResources;
  * @author jurandir
  *
  */
-public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFieldsParam>{
+public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFieldParam>{
 	
 	private Class<?> returnType;
 	private String[] forceFields;
@@ -46,7 +46,7 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
 	}
 
 	@Override
-	public WSFieldsParam fromString(String str) {
+	public WSFieldParam fromString(String str) {
 		try{
 			StringBuilder sb = new StringBuilder();
 			sb.append(str);
@@ -59,7 +59,7 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
 			}
 			
 			String fieldsReconfig = configRequiredParam(resourceInfo.getResourceMethod(), sb.toString());
-			return new WSFieldsParam(returnType, fieldsReconfig);
+			return new WSFieldParam(returnType, fieldsReconfig);
 		}catch (ApplicationException e){
 			RuntimeException r = new RuntimeException(e);
 			r.addSuppressed(e);
@@ -126,7 +126,7 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
 		
 		for(int i=0; i < parametrosAnotados.length; i++){
 			Annotation[] parametroAnotado = parametrosAnotados[i];
-			if(parameterTypes[i].equals(WSFieldsParam.class)){
+			if(parameterTypes[i].equals(WSFieldParam.class)){
 				for(Annotation a : parametroAnotado){
 					if(a instanceof WSParamFormat){
 						wsAnnotation = (WSParamFormat) a;

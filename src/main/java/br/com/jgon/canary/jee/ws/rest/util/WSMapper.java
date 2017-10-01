@@ -1,7 +1,11 @@
 package br.com.jgon.canary.jee.ws.rest.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.time.temporal.Temporal;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -32,11 +36,11 @@ public class WSMapper {
 	}
 	
 	public List<String> getSort(Class<?> responseClass, String sort) throws ApplicationException{
-		return getCamposAjustados(responseClass, expSort, sort);
+		return getCamposAjustados(responseClass, expSort, sort.replace("/", ".").replace("(", "{").replace(")", "}"));
 	}
 	
 	public List<String> getFields(Class<?> responseClass, String fields) throws ApplicationException{
-		return getCamposAjustados(responseClass, expFields, fields);
+		return getCamposAjustados(responseClass, expFields, fields.replace("/*", "").replace("/", ".").replace("(", "{").replace(")", "}"));
 	}
 	/**
 	 * 
@@ -56,21 +60,65 @@ public class WSMapper {
 				List<String> retorno = new LinkedList<String>();
 
 				for(String fNome: fldAux){
-					String campoVerificado = verificaCampo(responseClass, fNome); 
-					if(StringUtils.isNotBlank(campoVerificado)){
-						if(sortAux){
-							retorno.add(campoVerificado.contains(":desc") ? campoVerificado : campoVerificado.concat(":asc"));
-						}else{
-							retorno.add(campoVerificado);
+					Field fldCheck = fNome.contains(".") ? null :  ReflectionUtil.getAttribute(responseClass, fNome);
+					if(fldCheck != null && !isPrimitive(fldCheck.getType())){
+						for(Field fldCheckAux : ReflectionUtil.listAttributes(fldCheck.getType())){
+							if(isModifierValid(fldCheckAux)){
+								String campoVerificado = verificaCampo(fldCheck.getType(), fldCheckAux.getName()); 
+								if(StringUtils.isNotBlank(campoVerificado)){
+									campoVerificado =  fNome.concat(".").concat(campoVerificado);
+									if(sortAux){
+										retorno.add(campoVerificado.contains(":desc") ? campoVerificado : campoVerificado.concat(":asc"));
+									}else{
+										retorno.add(campoVerificado);
+									}
+								}else{
+									throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+								}
+							}
 						}
 					}else{
-						throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+						String campoVerificado = verificaCampo(responseClass, fNome); 
+						if(StringUtils.isNotBlank(campoVerificado)){
+							if(sortAux){
+								retorno.add(campoVerificado.contains(":desc") ? campoVerificado : campoVerificado.concat(":asc"));
+							}else{
+								retorno.add(campoVerificado);
+							}
+						}else{
+							throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+						}
 					}
 				}
 				return retorno.stream().distinct().collect(Collectors.toList());
 			}
 		}
 		return Collections.emptyList();
+	}
+	/**
+	 * 
+	 * @param klass
+	 * @return
+	 */
+	private boolean isPrimitive(Class<?> klass){
+		return ReflectionUtil.isPrimitive(klass)
+				|| klass.equals(Date.class)
+				|| klass.equals(Calendar.class)
+				|| klass.equals(Temporal.class)
+				|| klass.isEnum();
+	}
+	
+	/**
+	 * 
+	 * @param fld
+	 * @return
+	 */
+	private boolean isModifierValid(Field fld){
+		boolean valid = ReflectionUtil.checkModifier(fld, Modifier.STATIC)
+				|| ReflectionUtil.checkModifier(fld, Modifier.ABSTRACT)
+				|| ReflectionUtil.checkModifier(fld, Modifier.FINAL);
+		
+		return !valid;
 	}
 	/**
 	 * 
@@ -116,7 +164,7 @@ public class WSMapper {
 				String campoMultiLevel = null;
 				if(!isEnum && multiLevel){
 					Class<?> attrType = wsMapperAttribute != null && !wsMapperAttribute.collectionType().equals(void.class) ? wsMapperAttribute.collectionType() : fl.getType(); 
-					
+							
 					campoMultiLevel = verificaCampo(attrType, fieldName.substring(fieldName.indexOf(".") + 1));
 					add = StringUtils.isNotBlank(campoMultiLevel);
 				}

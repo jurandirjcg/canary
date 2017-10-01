@@ -1,11 +1,11 @@
 package br.com.jgon.canary.jee.ws.rest.util.json;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.resteasy.util.DateUtil;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonParser;
@@ -49,6 +49,11 @@ public class JsonDateTimeDeserializer extends JsonDeserializer<Date> implements 
 
 	@Override
 	public Date deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		return DateUtil.parseDate(p.getValueAsString(), Arrays.asList(new String[]{pattern}));
+		SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+		try {
+			return formatter.parse(p.getValueAsString());
+		} catch (ParseException e) {
+			throw new IOException(e.getMessage());
+		}		
 	}
 }

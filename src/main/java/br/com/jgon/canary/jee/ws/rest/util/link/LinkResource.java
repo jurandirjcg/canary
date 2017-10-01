@@ -36,7 +36,7 @@ public @interface LinkResource {
 	boolean includeRequestQueryParams() default false;	
 	/**
 	 * define parametros PATH - faz replace na ordem que esta definida na anotation Path.
-	 * Ex. path = /system/{id} e pathParameters = /user/${atributo_variavel} apos replace = /system/user/ATRBUTO_DO_USUARIO_RETORNADO
+	 * Ex. path = /system/{id} e pathParameters = /user/${atributo_variavel} apos replace = /system/user/ATRIBUTO_VARIAVEL
 	 * @return
 	 */
 	String[] pathParameters() default {};
@@ -52,12 +52,12 @@ public @interface LinkResource {
 	 */
 	LinkTarget target() default LinkTarget.ENTITY;
 	/**
-	 * Utilizado somente para controle interno
+	 *  Classe onde esta o metodo que tera os links clonados
 	 * @return
 	 */
 	Class<?> serviceClass() default void.class;
 	/**
-	 * Utilizado somente para controle interno
+	 * Metodo que tera os links clonados
 	 * @return
 	 */
 	String serviceMethodName() default ""; 
