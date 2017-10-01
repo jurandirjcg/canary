@@ -1,7 +1,11 @@
 package br.com.jgon.canary.jee.persistence;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.time.temporal.Temporal;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -48,17 +52,58 @@ abstract class QueryMapper {
 				List<SimpleEntry<String, String>> retorno = new LinkedList<SimpleEntry<String, String>>();
 
 				for(String fNome: fldAux){
-					SimpleEntry<String, String> campoVerificado = verificaCampo(responseClass, fNome); 
-					if(campoVerificado != null){
-						retorno.add(campoVerificado);
+					Field fldCheck = fNome.contains(".") ? null :  ReflectionUtil.getAttribute(responseClass, fNome);
+					if(fldCheck != null && !isPrimitive(fldCheck.getType())){
+						for(Field fldCheckAux : ReflectionUtil.listAttributes(fldCheck.getType())){
+							if(isModifierValid(fldCheckAux)){
+								SimpleEntry<String, String> campoVerificado = verificaCampo(fldCheck.getType(), fldCheckAux.getName()); 
+								if(campoVerificado != null){
+									campoVerificado = new SimpleEntry<String, String>(fNome.concat(".").concat(campoVerificado.getKey()), fNome.concat(".").concat(campoVerificado.getValue()));
+									retorno.add(campoVerificado);
+								}else{
+									throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+								}
+							}
+						}
 					}else{
-						throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+						SimpleEntry<String, String> campoVerificado = verificaCampo(responseClass, fNome); 
+						if(campoVerificado != null){
+							retorno.add(campoVerificado);
+						}else{
+							throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+						}
 					}
 				}
 				return retorno.stream().distinct().collect(Collectors.toList());
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * 
+	 * @param klass
+	 * @return
+	 */
+	private boolean isPrimitive(Class<?> klass){
+		return ReflectionUtil.isPrimitive(klass)
+				|| klass.equals(Date.class)
+				|| klass.equals(Calendar.class)
+				|| klass.equals(Temporal.class)
+				|| klass.isEnum();
+	}
+	
+	/**
+	 * 
+	 * @param fld
+	 * @return
+	 */
+	private boolean isModifierValid(Field fld){
+		boolean valid = ReflectionUtil.checkModifier(fld, Modifier.STATIC)
+				|| ReflectionUtil.checkModifier(fld, Modifier.ABSTRACT)
+				|| ReflectionUtil.checkModifier(fld, Modifier.FINAL);
+		
+		return !valid;
 	}
 	/**
 	 * Verifica as propriedades do campo e configura os filhos se existir

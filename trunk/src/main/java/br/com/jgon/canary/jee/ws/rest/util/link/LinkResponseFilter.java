@@ -39,7 +39,7 @@ import br.com.jgon.canary.jee.exception.ApplicationException;
 import br.com.jgon.canary.jee.util.CollectionUtil;
 import br.com.jgon.canary.jee.util.Pagination;
 import br.com.jgon.canary.jee.util.ReflectionUtil;
-import br.com.jgon.canary.jee.ws.rest.WSFieldsParam;
+import br.com.jgon.canary.jee.ws.rest.WSFieldParam;
 import br.com.jgon.canary.jee.ws.rest.WSParamFormat;
 import br.com.jgon.canary.jee.ws.rest.util.DominiosRest;
 import br.com.jgon.canary.jee.ws.rest.util.ResponseError;
@@ -55,7 +55,9 @@ import br.com.jgon.canary.jee.ws.rest.util.json.JsonLinkEntity;
 @Provider
 public class LinkResponseFilter implements ContainerResponseFilter {
 
-	private static final String REGEX_PATH_PARAMETERS = "(\\#|\\$)\\{[a-z-A-Z\\.]+\\}";
+	private static final String REGEX_REQUEST_PATH_PARAMETERS = "\\{[a-z-A-Z]+\\}";
+	//private static final String REGEX_PATH_PARAMETERS_REQ = "[^\\#\\$]\\{[a-z-A-Z]+\\}";
+	private static final String REGEX_PATH_PARAMETERS_ENTITY = "(\\#|\\$)\\{[a-z-A-Z\\.]+\\}";
 	private static final String REGEX_REPLACE_PARAM = "\\#|\\$|\\{|\\}";
 	private static final String REGEX_LINK_TEMPLATE = "(^\\{[a-zA-Z_-]+\\})|([^\\#\\$]\\{[a-zA-Z_-]+\\})";
 	public static final String MEDIA_TYPE_APPLICATION_HAL_JSON = "application/hal+json";
@@ -347,7 +349,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
      * @return
      */
     private String valueFromParameter(String param, Object entity){
-    	Pattern pattern = Pattern.compile(REGEX_PATH_PARAMETERS);
+    	Pattern pattern = Pattern.compile(REGEX_PATH_PARAMETERS_ENTITY);
     	Matcher m = pattern.matcher(param);
  
     	StringBuffer sb = new StringBuffer();
@@ -486,101 +488,155 @@ public class LinkResponseFilter implements ContainerResponseFilter {
      */
     private Link getLink(String[] linkPathParameters, String[] linkQueryParameter, Class<?> linkServiceClass, String linkServiceMethodName, LinkResouceBasePath linkBasePath, boolean linkIncludeQueryParams, String linkRel, String linkType, String linkTitle, UriInfo uriInfo, List<SimpleEntry<String, Object>> queryParams, Object entity, Path path, boolean forceAbsolutePath) throws ApplicationException{
     	Builder builder;
-    	
+
     	List<Object> values = new LinkedList<Object>();
     	boolean linkTemplate = false;
-   
+
+    	Pattern pattern = Pattern.compile(REGEX_REQUEST_PATH_PARAMETERS);
+    	Matcher mReqPathParam = pattern.matcher(path.toString());
+
+    	List<String> reqPathParamOrder = new LinkedList<String>();
+
+    	while(mReqPathParam.find()){
+    		String mRAux = mReqPathParam.group();
+    		reqPathParamOrder.add(mRAux.substring(1, mRAux.length() - 1));
+    	}
+
     	//Configura os PathParams da requisicao original
-    	for(String pk : uriInfo.getPathParameters().keySet()){
-    		if(uriInfo.getPathParameters().get(pk).size() == 1){
-    			values.add(uriInfo.getPathParameters().getFirst(pk));
-    		}else{
-    			values.add(uriInfo.getPathParameters().get(pk));
+   /* 	for(String rpo : reqPathParamOrder){
+    		for(String pk : uriInfo.getPathParameters().keySet()){
+    			if(rpo.equals(pk)){
+    				if(uriInfo.getPathParameters().get(pk).size() == 1){
+    					values.add(uriInfo.getPathParameters(false).getFirst(pk));
+    				}else{
+    					values.add(uriInfo.getPathParameters(false).get(pk));
+    				}
+    			}
+    		}
+    	}*/
+    	//Configura os PathParams adicionados, vinculados ao objeto de retorno
+    /*	if(linkPathParameters != null && linkPathParameters.length > 0){
+    		for(int i = 0; i < linkPathParameters.length; i++){
+    			if(reqPathParamOrder.contains(linkPathParameters[i])){
+    				continue;
+    			}else if(StringUtils.isBlank(linkPathParameters[i])){
+    				values.add("");
+    			}else{
+    				if(linkPathParameters[i].matches(REGEX_LINK_TEMPLATE)){
+    					linkTemplate = true;
+    				}
+    				values.add(valueFromParameter(linkPathParameters[i], entity));
+    			}
+    		}
+    	}*/
+    	
+    	for(String rpAux : reqPathParamOrder){
+    		boolean test = true;
+    		if(linkPathParameters != null && linkPathParameters.length > 0){
+    			for(int i = 0; i < linkPathParameters.length; i++){
+    				if(linkPathParameters[i].equals("{" + rpAux + "}")){
+    					if(StringUtils.isBlank(linkPathParameters[i])){
+    						test = false;
+    						values.add("");
+    					}else if(linkPathParameters[i].matches(REGEX_PATH_PARAMETERS_ENTITY)){
+    						test = false;
+    						if(linkPathParameters[i].matches(REGEX_LINK_TEMPLATE)){
+    							linkTemplate = true;
+    						}
+    						values.add(valueFromParameter(linkPathParameters[i], entity));
+    					}
+    				}
+    			}
+    		}
+    		if(test){
+    			values.add(uriInfo.getPathParameters(false).get(rpAux));
     		}
     	}
+    	
     	//Configura os PathParams adicionados, vinculados ao objeto de retorno
-		if(linkPathParameters != null && linkPathParameters.length > 0){
-			for(int i = 0; i < linkPathParameters.length; i++){
-				if(StringUtils.isBlank(linkPathParameters[i])){
-					values.add("");
-				}else{
-					if(linkPathParameters[i].matches(REGEX_LINK_TEMPLATE)){
-			    		linkTemplate = true;
-					}
-					values.add(valueFromParameter(linkPathParameters[i], entity));
-				}
-			}
-		}
-		
-		UriBuilder uriBuilder = null;
-		
-		Class<?> serviceClassAux = linkServiceClass.equals(void.class) ? serviceClass : linkServiceClass;
-		String serviceMethodName = StringUtils.isBlank(linkServiceMethodName) ? serviceMethod.getName() : linkServiceMethodName;
-		
-		if(linkBasePath.equals(LinkResouceBasePath.COMPLETE) || forceAbsolutePath){
-			uriBuilder = uriInfo.getBaseUriBuilder().path(serviceClassAux);
-			if(StringUtils.isNotBlank(linkServiceMethodName)){
-				uriBuilder.path(serviceClassAux, serviceMethodName);
-			}else{
-				uriBuilder.path(serviceMethod);
-			}
-		}else if(linkBasePath.equals(LinkResouceBasePath.RESOURCE)){
-			uriBuilder = UriBuilder.fromResource(serviceClassAux);
-		}else if(linkBasePath.equals(LinkResouceBasePath.METHOD)){
-			uriBuilder = UriBuilder.fromMethod(serviceClassAux, serviceMethodName);
-		}
-		
-		if(linkIncludeQueryParams){// || queryParams != null){
-			for(String key : uriInfo.getQueryParameters().keySet()){
-				uriBuilder.replaceQueryParam(key, uriInfo.getQueryParameters(false).get(key));
-			}
-		}
-		
-		Pattern pattern = Pattern.compile(REGEX_LINK_TEMPLATE);
-				
-		if(queryParams != null){
-			for(SimpleEntry<String, Object> qp : queryParams){
-				Matcher m = pattern.matcher(qp.getValue().toString());
-				
-			    StringBuffer sb = new StringBuffer();
-			    
-			    while(m.find()){
-			    	linkTemplate = true;
-			    	String val = m.group().indexOf("{") == 1 ? m.group().substring(1) : m.group();
-			    	m.appendReplacement(sb, val);
-			    }
-			    if(linkTemplate){
-			    	m.appendTail(sb);
-			    	values.add(sb.toString());
-			    }
-				
-				uriBuilder.replaceQueryParam(qp.getKey(), qp.getValue());
-			}
-		}
-		
-		if(linkQueryParameter != null && linkQueryParameter.length > 0){
-			for(int i = 0; i < linkQueryParameter.length; i++){
-				if(StringUtils.isNotBlank(linkQueryParameter[i])){
-					String paramName = linkQueryParameter[i].substring(0, linkQueryParameter[i].indexOf("="));
-					uriBuilder.replaceQueryParam(paramName, valueFromParameter(linkQueryParameter[i].substring(linkQueryParameter[i].indexOf("=") + 1), entity));
-				}
-			}
-		}
-		
-		builder = Link.fromUriBuilder(uriBuilder).rel(linkRel);
-		
+    	if(linkPathParameters != null && linkPathParameters.length > 0){
+    		for(int i = 0; i < linkPathParameters.length; i++){
+    			if(reqPathParamOrder.contains(linkPathParameters[i])){
+    				continue;
+    			}else if(StringUtils.isBlank(linkPathParameters[i])){
+    				values.add("");
+    			}else{
+    				if(linkPathParameters[i].matches(REGEX_LINK_TEMPLATE)){
+    					linkTemplate = true;
+    				}
+    				values.add(valueFromParameter(linkPathParameters[i], entity));
+    			}
+    		}
+    	}
+
+    	UriBuilder uriBuilder = null;
+
+    	Class<?> serviceClassAux = linkServiceClass.equals(void.class) ? serviceClass : linkServiceClass;
+    	String serviceMethodName = StringUtils.isBlank(linkServiceMethodName) ? serviceMethod.getName() : linkServiceMethodName;
+
+    	if(linkBasePath.equals(LinkResouceBasePath.COMPLETE) || forceAbsolutePath){
+    		uriBuilder = uriInfo.getBaseUriBuilder().path(serviceClassAux);
+    		if(StringUtils.isNotBlank(linkServiceMethodName)){
+    			uriBuilder.path(serviceClassAux, serviceMethodName);
+    		}else{
+    			uriBuilder.path(serviceMethod);
+    		}
+    	}else if(linkBasePath.equals(LinkResouceBasePath.RESOURCE)){
+    		uriBuilder = UriBuilder.fromResource(serviceClassAux);
+    	}else if(linkBasePath.equals(LinkResouceBasePath.METHOD)){
+    		uriBuilder = UriBuilder.fromMethod(serviceClassAux, serviceMethodName);
+    	}
+
+    	if(linkIncludeQueryParams){// || queryParams != null){
+    		for(String key : uriInfo.getQueryParameters().keySet()){
+    			uriBuilder.replaceQueryParam(key, uriInfo.getQueryParameters(false).get(key));
+    		}
+    	}
+
+    	pattern = Pattern.compile(REGEX_LINK_TEMPLATE);
+
+    	if(queryParams != null){
+    		for(SimpleEntry<String, Object> qp : queryParams){
+    			Matcher m = pattern.matcher(qp.getValue().toString());
+
+    			StringBuffer sb = new StringBuffer();
+
+    			while(m.find()){
+    				linkTemplate = true;
+    				String val = m.group().indexOf("{") == 1 ? m.group().substring(1) : m.group();
+    				m.appendReplacement(sb, val);
+    			}
+    			if(linkTemplate){
+    				m.appendTail(sb);
+    				values.add(sb.toString());
+    			}
+    			uriBuilder.replaceQueryParam(qp.getKey(), qp.getValue());
+    		}
+    	}
+
+    	if(linkQueryParameter != null && linkQueryParameter.length > 0){
+    		for(int i = 0; i < linkQueryParameter.length; i++){
+    			if(StringUtils.isNotBlank(linkQueryParameter[i])){
+    				String paramName = linkQueryParameter[i].substring(0, linkQueryParameter[i].indexOf("="));
+    				uriBuilder.replaceQueryParam(paramName, valueFromParameter(linkQueryParameter[i].substring(linkQueryParameter[i].indexOf("=") + 1), entity));
+    			}
+    		}
+    	}
+
+    	builder = Link.fromUriBuilder(uriBuilder).rel(linkRel);
+
     	if(StringUtils.isNotBlank(linkTitle)){
     		builder = builder.title(linkTitle);
     	}
-    	
+
     	if(StringUtils.isNotBlank(linkType)){
-    		builder = builder.title(linkType);
+    		builder = builder.type(linkType);
     	}
-    	
+
     	if(linkTemplate){
     		builder.param("templated", "true");
     	}
-    	
+
     	try{
     		if(!values.isEmpty()){
     			Object[] valuesAux = values.toArray(new Object[]{});
@@ -793,7 +849,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 		
 		for(int i=0; i < parametrosAnotados.length; i++){
 			Annotation[] parametroAnotado = parametrosAnotados[i];
-			if(parameterTypes[i].equals(WSFieldsParam.class)){
+			if(parameterTypes[i].equals(WSFieldParam.class)){
 				for(Annotation a : parametroAnotado){
 					if(a instanceof QueryParam){
 						queryParam = (QueryParam) a;
@@ -815,7 +871,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 		listResources.addAll(paramFields(serviceMethod));
 
 		if(!listResources.isEmpty()){
-			Pattern pattern = Pattern.compile(REGEX_PATH_PARAMETERS);
+			Pattern pattern = Pattern.compile(REGEX_PATH_PARAMETERS_ENTITY);
 			Matcher matcher;
 			Set<String> listParamsRemove = new HashSet<String>();
 			
@@ -877,7 +933,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 		
 		for(int i=0; i < parametrosAnotados.length; i++){
 			Annotation[] parametroAnotado = parametrosAnotados[i];
-			if(parameterTypes[i].equals(WSFieldsParam.class)){
+			if(parameterTypes[i].equals(WSFieldParam.class)){
 				for(Annotation a : parametroAnotado){
 					if(a instanceof WSParamFormat){
 						wsAnnotation = (WSParamFormat) a;

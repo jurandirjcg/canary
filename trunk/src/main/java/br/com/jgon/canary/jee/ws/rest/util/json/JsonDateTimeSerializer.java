@@ -1,10 +1,10 @@
 package br.com.jgon.canary.jee.ws.rest.util.json;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.resteasy.util.DateUtil;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -34,7 +34,8 @@ public class JsonDateTimeSerializer extends JsonSerializer<Date> implements Cont
 	
 	@Override
 	public void serialize(Date date, JsonGenerator gen, SerializerProvider arg2) throws IOException, JsonProcessingException {
-		gen.writeString(DateUtil.formatDate(date, pattern));
+		SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+		gen.writeString(formatter.format(date));
 	}
 
 	@Override

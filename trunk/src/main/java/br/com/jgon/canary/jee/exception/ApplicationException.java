@@ -7,7 +7,7 @@ import br.com.jgon.canary.jee.util.MessageFactory;
  * @author jurandir
  *
  */
-@javax.ejb.ApplicationException(rollback=true)
+
 public class ApplicationException extends Exception {
 		
 	private static final long serialVersionUID = -8779781457082467689L;

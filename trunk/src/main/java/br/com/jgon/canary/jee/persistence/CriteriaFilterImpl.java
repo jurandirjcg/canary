@@ -275,7 +275,6 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 		}
 		return this;
 	}
-	
 	@Override
 	public CriteriaFilter<T> addSelect(List<String> fields) {
 		fields.forEach( item -> {
