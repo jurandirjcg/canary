@@ -63,13 +63,7 @@ public interface CriteriaFilter<T> {
 	 * @return
 	 */
 	public CriteriaFilter<T> addSelect(Map<String, String> fieldAlias);
-	/**
-	 * 
-	 * @param fieldAlias
-	 * @param defaultFieldAlias
-	 * @return
-	 */
-	public CriteriaFilter<T> addSelect(Map<String, String> fieldAlias, Map<String, String> defaultFieldAlias);
+	
 	/**
 	 * 
 	 * @param field

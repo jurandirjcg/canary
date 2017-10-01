@@ -1,5 +1,6 @@
 package br.com.jgon.canary.jee.exception;
 
+@javax.ejb.ApplicationException(rollback=true)
 public class SaveEntityException extends ApplicationException {
 
 	/**
