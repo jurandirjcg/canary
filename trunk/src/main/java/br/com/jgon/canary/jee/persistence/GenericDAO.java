@@ -63,7 +63,6 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 */
 	private static final long serialVersionUID = 6642196262998558242L;
 	
-	private EntityManager entityManager;
 	/**
 	 * 
 	 */
@@ -72,8 +71,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 * 
 	 * @param entityManager
 	 */
-	public GenericDAO(EntityManager entityManager){
-		this.entityManager = entityManager;
+	public GenericDAO(){
 		this.fieldId = DAOUtil.getFieldId(getPrimaryClass());
 		fieldId.setAccessible(true);
 	}
@@ -81,9 +79,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 * 
 	 * @return
 	 */
-	protected EntityManager getEntityManager(){
-		return this.entityManager;
-	}
+	protected abstract EntityManager getEntityManager();
 	
 	/**
 	 * 
