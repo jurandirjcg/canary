@@ -34,6 +34,12 @@ public @interface PaginatorTemplate {
 	 * @return
 	 */
 	boolean includeRequestQueryParams() default true;		
+	
+	/**
+	 * Inclui a exepressão de template para o parâmetro limit
+	 */
+	boolean includeLimitParamTemplate() default false;
+	
 	/**
 	 * define parametros PATH
 	 * @return

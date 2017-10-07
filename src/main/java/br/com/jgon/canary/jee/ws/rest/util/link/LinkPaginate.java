@@ -104,4 +104,10 @@ public @interface LinkPaginate {
 	 */
 	boolean disableLast() default false;
 	
+	/**
+	 * Desativa o link de template de paginacao
+	 * @return
+	 */
+	boolean disablePaginationTemplate() default false;
+	
 }

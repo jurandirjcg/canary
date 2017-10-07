@@ -3,6 +3,7 @@ package br.com.jgon.canary.jee.ws.rest.validation.exception;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -48,6 +49,9 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 			if(ae.getMessageSeverity().equals(MessageSeverity.ERROR) || ae.getMessageSeverity().equals(MessageSeverity.FATAL)){
 				LOG.severe(exception.getMessage());
 			}
+		}else if(exception instanceof WebApplicationException){
+			WebApplicationException wa = (WebApplicationException) exception;
+			return wa.getResponse();
 		}else{
 			retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, exception.getMessage(), MessageSeverity.ERROR);
 			LOG.severe(exception.getMessage());

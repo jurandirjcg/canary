@@ -36,9 +36,11 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 //import com.google.common.base.CaseFormat;
 
 import br.com.jgon.canary.jee.exception.ApplicationException;
+import br.com.jgon.canary.jee.exception.MessageSeverity;
 import br.com.jgon.canary.jee.util.CollectionUtil;
 import br.com.jgon.canary.jee.util.Pagination;
 import br.com.jgon.canary.jee.util.ReflectionUtil;
+import br.com.jgon.canary.jee.ws.rest.HalJsonRootName;
 import br.com.jgon.canary.jee.ws.rest.WSFieldParam;
 import br.com.jgon.canary.jee.ws.rest.WSParamFormat;
 import br.com.jgon.canary.jee.ws.rest.util.DominiosRest;
@@ -56,7 +58,7 @@ import br.com.jgon.canary.jee.ws.rest.util.json.JsonLinkEntity;
 public class LinkResponseFilter implements ContainerResponseFilter {
 
 	private static final String REGEX_REQUEST_PATH_PARAMETERS = "\\{[a-z-A-Z]+\\}";
-	//private static final String REGEX_PATH_PARAMETERS_REQ = "[^\\#\\$]\\{[a-z-A-Z]+\\}";
+	private static final String REGEX_PATH_PARAMETERS_REQ = "[^\\#\\$]\\{[a-z-A-Z]+\\}";
 	private static final String REGEX_PATH_PARAMETERS_ENTITY = "(\\#|\\$)\\{[a-z-A-Z\\.]+\\}";
 	private static final String REGEX_REPLACE_PARAM = "\\#|\\$|\\{|\\}";
 	private static final String REGEX_LINK_TEMPLATE = "(^\\{[a-zA-Z_-]+\\})|([^\\#\\$]\\{[a-zA-Z_-]+\\})";
@@ -534,22 +536,28 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     		boolean test = true;
     		if(linkPathParameters != null && linkPathParameters.length > 0){
     			for(int i = 0; i < linkPathParameters.length; i++){
-    				if(linkPathParameters[i].equals("{" + rpAux + "}")){
-    					if(StringUtils.isBlank(linkPathParameters[i])){
-    						test = false;
-    						values.add("");
-    					}else if(linkPathParameters[i].matches(REGEX_PATH_PARAMETERS_ENTITY)){
-    						test = false;
-    						if(linkPathParameters[i].matches(REGEX_LINK_TEMPLATE)){
-    							linkTemplate = true;
-    						}
-    						values.add(valueFromParameter(linkPathParameters[i], entity));
+    				//if(linkPathParameters[i].equals("{" + rpAux + "}")){
+    				if(StringUtils.isBlank(linkPathParameters[i])){
+    					test = false;
+    					values.add("");
+    				}else if(linkPathParameters[i].matches(REGEX_PATH_PARAMETERS_REQ) && uriInfo.getPathParameters(false).get(rpAux) != null){
+    					values.add(uriInfo.getPathParameters(false).get(rpAux));
+    				}else{
+    					test = false;
+    					if(linkPathParameters[i].matches(REGEX_LINK_TEMPLATE)){
+    						linkTemplate = true;
     					}
+    					values.add(valueFromParameter(linkPathParameters[i], entity));
     				}
+    				//	}
     			}
     		}
     		if(test){
-    			values.add(uriInfo.getPathParameters(false).get(rpAux));
+    			if(uriInfo.getPathParameters(false).get(rpAux) != null){
+    				values.add(uriInfo.getPathParameters(false).get(rpAux));
+    			}else{
+    				throw new ApplicationException(MessageSeverity.ERROR, "link-response.field-not-found", rpAux);
+    			}
     		}
     	}
     	
@@ -749,11 +757,15 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     	}
     	
     	//Pagination Template
-    	queryParamsAux.clear();
-		queryParamsAux.addAll(queryParams);
-		queryParamsAux.add(new SimpleEntry<String, Object>(linkPaginate.pageParamName(), linkPaginate.paginationTemplate().pageParamName()));
-		queryParamsAux.add(new SimpleEntry<String, Object>(linkPaginate.limitParamName(), linkPaginate.paginationTemplate().limitParamName()));
-    	paginationLinks.add(getLink(linkPaginate.paginationTemplate().pathParameters(), linkPaginate.paginationTemplate().queryParameters(), linkPaginate.paginationTemplate().serviceClass(), linkPaginate.paginationTemplate().serviceMethodName(), linkPaginate.paginationTemplate().basePath(), linkPaginate.paginationTemplate().includeRequestQueryParams(), linkPaginate.paginationTemplate().rel(), linkPaginate.paginationTemplate().type(), linkPaginate.paginationTemplate().title(), uriInfo, queryParamsAux, entity, path, linkPaginate.absolutePath()));
+    	if(!linkPaginate.disablePaginationTemplate()){
+    		queryParamsAux.clear();
+    		queryParamsAux.addAll(queryParams);
+    		queryParamsAux.add(new SimpleEntry<String, Object>(linkPaginate.pageParamName(), linkPaginate.paginationTemplate().pageParamName()));
+    		if(linkPaginate.paginationTemplate().includeLimitParamTemplate()){
+    			queryParamsAux.add(new SimpleEntry<String, Object>(linkPaginate.limitParamName(), linkPaginate.paginationTemplate().limitParamName()));
+    		}
+    		paginationLinks.add(getLink(linkPaginate.paginationTemplate().pathParameters(), linkPaginate.paginationTemplate().queryParameters(), linkPaginate.paginationTemplate().serviceClass(), linkPaginate.paginationTemplate().serviceMethodName(), linkPaginate.paginationTemplate().basePath(), linkPaginate.paginationTemplate().includeRequestQueryParams(), linkPaginate.paginationTemplate().rel(), linkPaginate.paginationTemplate().type(), linkPaginate.paginationTemplate().title(), uriInfo, queryParamsAux, entity, path, linkPaginate.absolutePath()));
+    	}
         	
     	return paginationLinks;
     }
@@ -765,13 +777,14 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     	if(list != null){
     		for(T obj: list){
     			Class<?> klass = obj.getClass();
-    			if(klass.isAnnotationPresent(JsonRootName.class)){
+    			if(klass.isAnnotationPresent(HalJsonRootName.class)){
+    				return klass.getAnnotation(HalJsonRootName.class).value();
+    			}else if(klass.isAnnotationPresent(JsonRootName.class)){
     				return klass.getAnnotation(JsonRootName.class).value();
     			}
     			return obj.getClass().getSimpleName();
     		}
     	}
-    	
     	return null;
     }
 	/**

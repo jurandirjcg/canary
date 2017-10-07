@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.time.temporal.Temporal;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -52,19 +53,25 @@ abstract class QueryMapper {
 				List<SimpleEntry<String, String>> retorno = new LinkedList<SimpleEntry<String, String>>();
 
 				for(String fNome: fldAux){
-					Field fldCheck = fNome.contains(".") ? null :  ReflectionUtil.getAttribute(responseClass, fNome);
-					if(fldCheck != null && !isPrimitive(fldCheck.getType())){
-						for(Field fldCheckAux : ReflectionUtil.listAttributes(fldCheck.getType())){
-							if(isModifierValid(fldCheckAux)){
-								SimpleEntry<String, String> campoVerificado = verificaCampo(fldCheck.getType(), fldCheckAux.getName()); 
-								if(campoVerificado != null){
-									campoVerificado = new SimpleEntry<String, String>(fNome.concat(".").concat(campoVerificado.getKey()), fNome.concat(".").concat(campoVerificado.getValue()));
-									retorno.add(campoVerificado);
-								}else{
-									throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
-								}
+					Field fldCheck=null;
+					if(fNome.contains(".")){
+						int idxStr = 0;
+						int idxEnd;
+						Class<?> testClass = responseClass;
+						do{
+							idxEnd = fNome.indexOf(".", idxStr);
+							fldCheck = ReflectionUtil.getAttribute(testClass, fNome.substring(idxStr, idxEnd < 0 ? fNome.length() - idxStr : idxEnd));
+							if(fldCheck == null){
+								break;
 							}
-						}
+							idxStr = fNome.indexOf(".", idxStr + 1);
+							testClass = fldCheck.getType();
+						}while(idxStr >= 0);
+					}
+					
+					fldCheck = fldCheck != null ? fldCheck :  ReflectionUtil.getAttribute(responseClass, fNome);
+					if(fldCheck != null && !isPrimitive(fldCheck.getType())){
+						retorno.addAll(verificaCampoObject(fldCheck, fNome.contains(".") ? fNome.substring(0, fNome.lastIndexOf(".")) : fNome));
 					}else{
 						SimpleEntry<String, String> campoVerificado = verificaCampo(responseClass, fNome); 
 						if(campoVerificado != null){
@@ -79,6 +86,31 @@ abstract class QueryMapper {
 		}
 		return null;
 	}
+	
+	private List<SimpleEntry<String, String>> verificaCampoObject(Field fldCheck, String fNome) throws ApplicationException{
+		QueryAttributeMapper queryMapperAttribute = null;
+		if(fldCheck.isAnnotationPresent(QueryAttributeMapper.class)){
+			queryMapperAttribute = fldCheck.getAnnotation(QueryAttributeMapper.class);
+		}
+		
+		List<SimpleEntry<String, String>> retorno = new ArrayList<SimpleEntry<String, String>>(0);
+		for(Field fldCheckAux : ReflectionUtil.listAttributes(fldCheck.getType())){
+			if(isModifierValid(fldCheckAux)){
+				SimpleEntry<String, String> campoVerificado = verificaCampo(fldCheck.getType(), fldCheckAux.getName()); 
+				if(campoVerificado != null){
+					if(queryMapperAttribute != null && StringUtils.isNotBlank(queryMapperAttribute.value())){
+						retorno.add(new SimpleEntry<String, String>(queryMapperAttribute.value().concat(".").concat(campoVerificado.getKey()), queryMapperAttribute.value().concat(".").concat(campoVerificado.getValue())));
+					}else{
+						retorno.add(new SimpleEntry<String, String>(fNome.concat(".").concat(campoVerificado.getKey()), fNome.concat(".").concat(campoVerificado.getValue())));
+					}
+				}else{
+					throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+				}
+			}
+		}
+		return retorno;
+	}
+	
 	
 	/**
 	 * 
@@ -135,7 +167,6 @@ abstract class QueryMapper {
 			}
 			
 			QueryAttributeMapper queryMapperAttribute = null;
-			
 			if(fl.isAnnotationPresent(QueryAttributeMapper.class)){
 				queryMapperAttribute = fl.getAnnotation(QueryAttributeMapper.class);
 			}
