@@ -1,3 +1,16 @@
+/*
+ * Copyright 2017 Jurandir C. Goncalves
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *      
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package br.com.jgon.canary.jee.persistence;
 
 import java.io.Serializable;
@@ -45,13 +58,14 @@ import br.com.jgon.canary.jee.util.ReflectionUtil;
 
 /**
  * Responsável por generalizar as operações simples de SELECT, DELETE, UPDADE e INSERT
- *  
- * @author jurandir
+ * 
+ * @author Jurandir C. Goncalves
+ * 
+ * @version 1.0
  *
- * @param <T> - Entidade
- * @param <K> - Chave
+ * @param <T>
+ * @param <K>
  */
-
 public abstract class GenericDAO<T, K extends Serializable> implements Serializable{
 
 	protected static final String ERROR_FIND_KEY = "error.find";
@@ -93,7 +107,8 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	/**
 	 * 
 	 * @param obj
-	 * @throws ApplicationException
+	 * @return
+	 * @throws SaveEntityException
 	 */
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public T save(T obj) throws SaveEntityException {
@@ -105,6 +120,13 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 		}
 	}
 	
+	/**
+	 * 
+	 * @param obj
+	 * @return
+	 * @throws UpdateEntityException
+	 * @throws SaveEntityException
+	 */
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public T saveOrUpdate(T obj) throws UpdateEntityException, SaveEntityException {
 		boolean isSave = true;
@@ -128,7 +150,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 * 
 	 * @param obj
 	 * @return
-	 * @throws ApplicationException
+	 * @throws UpdateEntityException
 	 */
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public T update(T obj) throws UpdateEntityException {
@@ -142,7 +164,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	/**
 	 * 
 	 * @param obj
-	 * @throws ApplicationException
+	 * @throws RemoveEntityException
 	 */
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public void remove(T obj) throws RemoveEntityException {
@@ -157,7 +179,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	/**
 	 * 
 	 * @param id
-	 * @throws ApplicationException
+	 * @throws RemoveEntityException
 	 */
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public void remove(K id) throws RemoveEntityException {
@@ -397,7 +419,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 					listId.add((K) fieldId.get(ret));
 				}
 			}
-			//VERIFICA CORRECAO
+			
 			for(String k : criteriaManager.getListCollectionRelation().keySet()){
 				fldAux = ReflectionUtil.getAttribute(getPrimaryClass(), k);
 				fldAux.setAccessible(true);
@@ -418,9 +440,6 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 							}
 							col.addAll((Collection<?>) fldAux.get(retList));
 						}
-						/*if(criteriaManager.isForcedIdSelect()){
-							fieldId.set(ret, null);
-						}*/
 					}
 				}				
 			}
@@ -428,7 +447,15 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 
 		return listReturn;
 	}
-	
+	/**
+	 * 
+	 * @param criteriaManager
+	 * @param result
+	 * @return
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ApplicationException
+	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private <E> E checkTupleSingleResult(CriteriaManager<T> criteriaManager, SimpleEntry<?, E> result) throws InstantiationException, IllegalAccessException, ApplicationException{
 		if(result == null){
@@ -464,7 +491,11 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 		}
 		return ret;
 	}
-	
+	/**
+	 * 
+	 * @param fldClass
+	 * @return
+	 */
 	private <E> Collection<E> instanceCollection(Class<E> fldClass){
 		if(ArrayUtils.contains(fldClass.getInterfaces(), List.class)){
 			return new ArrayList<E>();
@@ -521,33 +552,16 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			listReturn.add(se.getValue());
 		}
 		return listReturn;
-		/**try {
-			boolean isTuple = criteriaQuery.getResultType().equals(Tuple.class);
-		
-			if(isTuple){
-				CriteriaQuery<Tuple> query = (CriteriaQuery<Tuple>) criteriaQuery;
-				TypedQuery<Tuple> tQuery = getEntityManager().createQuery(query);
-				configPaginacao(tQuery, pagina, qtde);
-				List<Tuple> tuple = tQuery.getResultList();
-				
-				List<E> listReturn = new ArrayList<E>();
-				
-				for(Tuple t: tuple){
-					listReturn.add(tupleToResultClass(t, resultClass));
-				}
-								
-				return listReturn;
-			}else{
-				CriteriaQuery<E> query = (CriteriaQuery<E>) criteriaQuery;
-				TypedQuery<E> tQuery = getEntityManager().createQuery(query);
-				configPaginacao(tQuery, pagina, qtde);
-				return (List<E>) tQuery.getResultList();
-			}
-		} catch (Exception e) {
-			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
-		}**/
 	}
-	
+	/**
+	 * 
+	 * @param resultClass
+	 * @param criteriaQuery
+	 * @param pagina
+	 * @param qtde
+	 * @return
+	 * @throws ApplicationException
+	 */
 	@SuppressWarnings("unchecked")
 	private <E> List<SimpleEntry<?, E>> getPreparedResultList(Class<E> resultClass, CriteriaQuery<?> criteriaQuery, Integer pagina, Integer qtde) throws ApplicationException {
 		try {
@@ -660,7 +674,13 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	protected <E> E getSingleResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationException {
 		return getPreparedSingleResult(resultClass, criteriaQuery).getValue();
 	}
-	
+	/**
+	 * 
+	 * @param resultClass
+	 * @param criteriaQuery
+	 * @return
+	 * @throws ApplicationException
+	 */
 	@SuppressWarnings("unchecked")
 	private <E> SimpleEntry<?, E> getPreparedSingleResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationException {
 		try {
@@ -787,7 +807,14 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			return seReturn;
 		}
 	}
-	
+	/**
+	 * 
+	 * @param fld
+	 * @return
+	 * @throws ApplicationException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
 	private Object getObjectCollectionInstance(Field fld) throws ApplicationException, InstantiationException, IllegalAccessException{
 		Class<?> classAux = DAOUtil.getCollectionClass(fld);
 		if(ReflectionUtil.isCollection(classAux)){
@@ -1262,11 +1289,6 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 		
 		Long qtdeReg = getSingleResult(Long.class, query);
 		
-		/*Integer limitAux = getPaginateLimit();
-		if(limit > limitAux){
-			limit = limitAux;
-		}*/
-		
 		Pagination<E> paginacao = new Pagination<E>(qtdeReg, limit, page);
 		
 		if(qtdeReg > 0){			
@@ -1277,7 +1299,9 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			List<SimpleEntry<?, E>> returnList = getPreparedResultList(returnClass, query, page, limit);
 			
 			try {
-				paginacao.setRegistros(checkTupleResultList(criteriaManager, returnList));
+				paginacao.setElements(checkTupleResultList(criteriaManager, returnList));
+			} catch (ApplicationException e) {
+				throw e;
 			} catch (Exception e) {
 				throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
 			}			
@@ -1287,7 +1311,6 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	
 	/**
 	 * 
-	 * @autor jurandirjcg
 	 * @param attributes
 	 * @return
 	 */
@@ -1301,10 +1324,4 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 		}
 		return f.toString();
 	}
-	/*
-	*//**
-	 * Retorna a quantidade maxima de registros por página, permitido nas consultas de paginação
-	 * @return
-	 *//*
-	protected abstract Integer getPaginateLimit();*/
 }

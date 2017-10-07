@@ -51,7 +51,10 @@ import br.com.jgon.canary.jee.ws.rest.util.json.JsonLinkEntity;
 
 /**
  * Provider que habilita a inclusao de links na response
- * @author jurandir
+ *
+ * @author Jurandir C. Goncalves
+ * 
+ * @version 1.0
  *
  */
 @Provider
@@ -320,20 +323,22 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     			responseContext.setEntity(json);
     			
     			if(json.isHalLink()){
-    				json.setTotal(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_TOTAL_COUNT) == null ? null : Long.valueOf(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_TOTAL_COUNT).toString()));
-    				json.setLimit(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_LIMIT) == null ? null : Long.valueOf(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_LIMIT).toString()));
-    				json.setPage(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_PAGE) == null ? null : Integer.valueOf(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_PAGE).toString()));
+    				json.setTotalElements(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_TOTAL_ELEMENTS) == null ? null : Long.valueOf(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_TOTAL_ELEMENTS).toString()));
+    				json.setElementsPerPage(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_ELEMENTS_PER_PAGE) == null ? null : Integer.valueOf(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_ELEMENTS_PER_PAGE).toString()));
+    				json.setCurrentPage(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_CURRENT_PAGE) == null ? null : Integer.valueOf(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_CURRENT_PAGE).toString()));
+    				json.setTotalPages(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_TOTAL_PAGE) == null ? null : Integer.valueOf(responseContext.getHeaders().getFirst(DominiosRest.X_PAGINATION_TOTAL_PAGE).toString()));
     				
-    				responseContext.getHeaders().remove(DominiosRest.X_PAGINATION_TOTAL_COUNT);
-    				responseContext.getHeaders().remove(DominiosRest.X_PAGINATION_LIMIT);
-    				responseContext.getHeaders().remove(DominiosRest.X_PAGINATION_PAGE);
+    				responseContext.getHeaders().remove(DominiosRest.X_PAGINATION_TOTAL_ELEMENTS);
+    				responseContext.getHeaders().remove(DominiosRest.X_PAGINATION_ELEMENTS_PER_PAGE);
+    				responseContext.getHeaders().remove(DominiosRest.X_PAGINATION_CURRENT_PAGE);
+    				responseContext.getHeaders().remove(DominiosRest.X_PAGINATION_TOTAL_PAGE);
     			}
     		}
     	}else if(attrNotPresentInRequest != null && !attrNotPresentInRequest.isEmpty()){
     		if(responseContext.getEntity() instanceof Collection){
     			responseContext.setEntity(getCollectionEntity((Collection<Object>) responseContext.getEntity(), attrNotPresentInRequest));
     		}else if(responseContext.getEntity() instanceof Pagination){
-    			((Pagination) responseContext.getEntity()).setRegistros(getCollectionEntity(((Pagination) responseContext.getEntity()).getRegistros(), attrNotPresentInRequest)); ;
+    			((Pagination) responseContext.getEntity()).setElements(getCollectionEntity(((Pagination) responseContext.getEntity()).getElements(), attrNotPresentInRequest));
     		}else{
     			responseContext.setEntity(configEntityAttributes(responseContext.getEntity(), attrNotPresentInRequest));
     		}
@@ -503,34 +508,6 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     		String mRAux = mReqPathParam.group();
     		reqPathParamOrder.add(mRAux.substring(1, mRAux.length() - 1));
     	}
-
-    	//Configura os PathParams da requisicao original
-   /* 	for(String rpo : reqPathParamOrder){
-    		for(String pk : uriInfo.getPathParameters().keySet()){
-    			if(rpo.equals(pk)){
-    				if(uriInfo.getPathParameters().get(pk).size() == 1){
-    					values.add(uriInfo.getPathParameters(false).getFirst(pk));
-    				}else{
-    					values.add(uriInfo.getPathParameters(false).get(pk));
-    				}
-    			}
-    		}
-    	}*/
-    	//Configura os PathParams adicionados, vinculados ao objeto de retorno
-    /*	if(linkPathParameters != null && linkPathParameters.length > 0){
-    		for(int i = 0; i < linkPathParameters.length; i++){
-    			if(reqPathParamOrder.contains(linkPathParameters[i])){
-    				continue;
-    			}else if(StringUtils.isBlank(linkPathParameters[i])){
-    				values.add("");
-    			}else{
-    				if(linkPathParameters[i].matches(REGEX_LINK_TEMPLATE)){
-    					linkTemplate = true;
-    				}
-    				values.add(valueFromParameter(linkPathParameters[i], entity));
-    			}
-    		}
-    	}*/
     	
     	for(String rpAux : reqPathParamOrder){
     		boolean test = true;
@@ -675,33 +652,25 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     	List<Link> paginationLinks = new ArrayList<Link>(4);
     	
     	int pgAtual = 0;
-    	long total = 0L;
     	int limitPg = 0;
+    	long maxPgs = 0;
     	
     	if(entity != null && entity instanceof Pagination){
     		Pagination<?> pEntity = (Pagination<?>) entity;
     		
-    		pgAtual = pEntity.getPaginaAtual();
-    		total = pEntity.getQtdeTotalRegistros();
-    		limitPg = pEntity.getQtdeRegistrosPagina();
+    		pgAtual = pEntity.getCurrentPage();
+    		limitPg = pEntity.getElementsPerPage();
     		
-    	}else if(headers.containsKey(DominiosRest.X_PAGINATION_PAGE) 
-    				&& headers.containsKey(DominiosRest.X_PAGINATION_TOTAL_COUNT)
-    				&& headers.containsKey(DominiosRest.X_PAGINATION_LIMIT)){
+    	}else if(headers.containsKey(DominiosRest.X_PAGINATION_CURRENT_PAGE)
+    				&& headers.containsKey(DominiosRest.X_PAGINATION_ELEMENTS_PER_PAGE)
+    				&& headers.containsKey(DominiosRest.X_PAGINATION_TOTAL_PAGE)){
     		
-    		pgAtual = Integer.parseInt(headers.getFirst(DominiosRest.X_PAGINATION_PAGE));
-        	total = Long.parseLong(headers.getFirst(DominiosRest.X_PAGINATION_TOTAL_COUNT));
-        	limitPg = Integer.parseInt(headers.getFirst(DominiosRest.X_PAGINATION_LIMIT));
+    		pgAtual = Integer.parseInt(headers.getFirst(DominiosRest.X_PAGINATION_CURRENT_PAGE));
+        	limitPg = Integer.parseInt(headers.getFirst(DominiosRest.X_PAGINATION_ELEMENTS_PER_PAGE));
+        	maxPgs = Long.parseLong(headers.getFirst(DominiosRest.X_PAGINATION_TOTAL_PAGE));
     	}else{
-    		//Retorna lista vazia pois não tem parâmetros de paginação
+    		//Retorna lista vazia pois não tem parâmetros de paginaçao
     		return Collections.emptyList();
-    	}
-    	
-    	long maxPgs = total/limitPg;
-    	float resMaxPgs = total % limitPg;
-    	
-    	if(resMaxPgs != 0){
-    		maxPgs++;
     	}
     	
     	List<SimpleEntry<String, Object>> queryParams = new ArrayList<SimpleEntry<String, Object>>(2);
@@ -991,10 +960,19 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param value
+	 * @return
+	 */
 	public static String toSnakeCase(String value){
 		return  value.replaceAll("([A-Z]+)","\\_$1").toLowerCase(); 
 	}	
-	
+	/**
+	 * 
+	 * @param value
+	 * @return
+	 */
 	public static String toCamelCase(String value){
 		StringBuilder sb = new StringBuilder();
 		for (String s : value.split("_")) {

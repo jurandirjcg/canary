@@ -13,7 +13,10 @@ import br.com.jgon.canary.jee.ws.rest.util.link.LinkEntity;
 
 /**
  * Serializa os link da colecao
- * @author jurandir
+ *
+ * @author Jurandir C. Goncalves
+ * 
+ * @version 1.0
  *
  */
 public class JsonCollectionLinkEntitySerializer extends JsonSerializer<JsonCollectionLinkEntity>{
@@ -26,13 +29,15 @@ public class JsonCollectionLinkEntitySerializer extends JsonSerializer<JsonColle
 	public void serialize(JsonCollectionLinkEntity entity, JsonGenerator gen, SerializerProvider arg2) throws IOException, JsonProcessingException {		
 		gen.writeStartObject();
 		if(entity.isHalLink() 
-				&& entity.getTotal() != null
-				&& entity.getLimit() != null
-				&& entity.getPage() != null){
+				&& entity.getTotalElements() != null
+				&& entity.getElementsPerPage() != null
+				&& entity.getCurrentPage() != null
+				&& entity.getTotalPages() != null){
 			
-			gen.writeObjectField("page", entity.getPage());
-			gen.writeObjectField("limit", entity.getLimit());
-			gen.writeObjectField("total", entity.getTotal());
+			gen.writeObjectField("currentPage", entity.getCurrentPage());
+			gen.writeObjectField("elementsPerPage", entity.getElementsPerPage());
+			gen.writeObjectField("totalElements", entity.getTotalElements());
+			gen.writeObjectField("totalPages", entity.getTotalPages());
 		}
 		
 		if(entity.getEmbedded() instanceof Collection<?>){
@@ -51,7 +56,12 @@ public class JsonCollectionLinkEntitySerializer extends JsonSerializer<JsonColle
 		}
 		gen.writeEndObject();
 	}
-	
+	/**
+	 * 
+	 * @param listLink
+	 * @param gen
+	 * @throws IOException
+	 */
 	private void serializeHalLink(List<LinkEntity> listLink, JsonGenerator gen) throws IOException{
 		gen.writeObjectFieldStart("_links");
 		for(LinkEntity le : listLink){
@@ -61,7 +71,12 @@ public class JsonCollectionLinkEntitySerializer extends JsonSerializer<JsonColle
 		}
 		gen.writeEndObject();
 	}
-	
+	/**
+	 * 
+	 * @param listLink
+	 * @param gen
+	 * @throws IOException
+	 */
 	private void serializeLink(List<LinkEntity> listLink, JsonGenerator gen) throws IOException{
 		gen.writeArrayFieldStart("_links");
 		for(LinkEntity le : listLink){

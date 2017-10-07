@@ -1,3 +1,16 @@
+/*
+ * Copyright 2017 Jurandir C. Goncalves
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *      
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package br.com.jgon.canary.jee.persistence;
 
 import java.lang.reflect.Field;
@@ -42,7 +55,10 @@ import br.com.jgon.canary.jee.util.ReflectionUtil;
 
 /**
  * Classe responsavel por criar a JPA Criteria e realizar as configuracoes e conversoes para realizar as consultas
- * @author jurandir
+ * 
+ * @author Jurandir C. Goncalves
+ * 
+ * @version 1.0
  *
  * @param <T>
  */
@@ -345,7 +361,6 @@ class CriteriaManager<T> {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
-	//@SuppressWarnings("unchecked")
 	private <E> List<Predicate> configPredicates(E obj, String attributeParent, From<?, ?> pathEntry) throws IllegalArgumentException, IllegalAccessException{
 		List<Predicate> predicates = new ArrayList<Predicate>();
 		
@@ -458,6 +473,15 @@ class CriteriaManager<T> {
 		return predicates;
 	}
 	
+	/**
+	 * 
+	 * @param pathEntry
+	 * @param predicates
+	 * @param attributeName
+	 * @param attributeClass
+	 * @param operation
+	 * @param value
+	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private <E> void applyPredicate(From<?, ?> pathEntry, List<Predicate> predicates, String attributeName, Class<?> attributeClass, Where operation, E value){
 		boolean isStringType = attributeClass.equals(String.class);
@@ -721,7 +745,6 @@ class CriteriaManager<T> {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
-	//@SuppressWarnings("unchecked")
 	private <E> List<Predicate> configComplexPredicates(Class<E> obj, String attributeParent, From<?, ?> pathEntry) throws IllegalArgumentException, IllegalAccessException{
 		List<Predicate> predicates = new ArrayList<Predicate>();
 		
@@ -787,13 +810,20 @@ class CriteriaManager<T> {
 		
 		return predicates;
 	}
-	
+	/**
+	 * 
+	 * @return
+	 */
 	public Map<String, CriteriaFilterImpl<?>> getListCollectionRelation() {
 		return listCollectionRelation;
 	}
 
 	/**
 	 * Classe responsável por organizar os relacionamentos entre as entidades
+	 *
+	 * @author Jurandir C. Goncalves
+	 * 
+	 * @version 1.0
 	 *
 	 */
 	public class CriteriaAssociations {
@@ -808,7 +838,11 @@ class CriteriaManager<T> {
 		public boolean exists(String field){
 			return listAssociation.containsKey(field);
 		}
-		
+		/**
+		 * 
+		 * @param field
+		 * @return
+		 */
 		public From<?, ?> getAssociation(String field){
 			return listAssociation.get(field);
 		}
