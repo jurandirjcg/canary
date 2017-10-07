@@ -14,7 +14,6 @@ public abstract class CanaryRestResources {
 	
 	static{
 		resources.add(RestFilter.class);
-		resources.add(RestExceptionMapper.class);
 		resources.add(DateFormatter.class);
 		resources.add(WsFieldsParamFormatter.class);
 		resources.add(WsOrderParamFormatter.class);
@@ -22,7 +21,23 @@ public abstract class CanaryRestResources {
 		resources.add(RestValidationParameterFilter.class);
 	}
 
-	public static Set<Class<?>> getClasses(){
+	/**
+	 * Adiciona classes de tratamento de chamadas REST
+	 * @param checkException: adicionar tratamento de exceções
+	 * @return
+	 */
+	public static Set<Class<?>> getClasses(boolean checkException){
+		if(checkException){
+			resources.add(RestExceptionMapper.class);
+		}
 		return resources;
+	}
+	
+	/**
+	 * Adiciona classes de tratamento de chamadas REST, adiciona inclusive o tratamento de exceções
+	 * @return
+	 */
+	public static Set<Class<?>> getClasses(){
+		return getClasses(true);
 	}
 }
