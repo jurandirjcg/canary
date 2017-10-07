@@ -1,3 +1,16 @@
+/*
+ * Copyright 2017 Jurandir C. Goncalves
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *      
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package br.com.jgon.canary.jee.ws.rest.validation;
 
 import java.io.IOException;
@@ -57,6 +70,14 @@ import br.com.jgon.canary.jee.ws.rest.validation.annotation.RequiredValue;
 import br.com.jgon.canary.jee.ws.rest.validation.annotation.RequiredXOR;
 import br.com.jgon.canary.jee.ws.rest.validation.enumerator.ParameterTypeEnum;
 
+/**
+ * 
+ * @author Alexandre O. Pereira
+ * @author Jurandir C. Goncalves
+ * 
+ * @version 1.0
+ *
+ */
 @Provider
 public class RestValidationParameterFilter implements ContainerRequestFilter{
 	private final String VALOR_OCULTO = "[VALOR NAO EXIBIDO]";
@@ -123,7 +144,14 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 			validaParametros(parametros);
 		}
 	}
-	
+	/**
+	 * 
+	 * @param apiAnnotations
+	 * @param wsAnnotation
+	 * @param parameterType
+	 * @param requestContext
+	 * @return
+	 */
 	private RestValidationUnit getParameterMap(
 			List<Annotation> apiAnnotations, 
 			Annotation wsAnnotation, 
@@ -203,7 +231,11 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 		
 		return retorno;
 	}
-	
+	/**
+	 * 
+	 * @param parametros
+	 * @throws ValidationException
+	 */
 	private void validaParametros(Map<String, RestValidationUnit> parametros) throws ValidationException{
 		ValidatorFactory validatorFactory = ValidatorFactory.getInstance();
 		
@@ -248,25 +280,6 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 					
 					validatorFactory.requiredIfAnyNull(v.getValue(), v.getName(), listTest);
 					
-					/*boolean parametroNulo = false;
-					
-					List<String> parametrosConsiderados = new ArrayList<String>();
-					
-					for(int i = 0; i < aux.length; i++){
-					
-						vu = parametros.get(aux[i]);
-						
-						parametrosConsiderados.add(vu.getName());
-						
-						if(StringUtils.isBlank(vu.getValue())){
-							parametroNulo = true;
-						}
-					}
-					
-					if(parametroNulo && StringUtils.isBlank(v.getValue())){
-						throw new ValidationException("message.erro.requiredIfAnyNull", new String[]{v.getName(), 
-								Util.montaListaParametrosStringException(parametrosConsiderados, "ou")});
-					}*/
 				}else if(a instanceof RequiredIfAllNotNull){
 					RequiredIfAllNotNull riann = (RequiredIfAllNotNull) a;
 					
@@ -455,7 +468,11 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 		}
 		validatorFactory.check();
 	}
-	
+	/**
+	 * 
+	 * @param requestContext
+	 * @return
+	 */
 	private MultivaluedMap<String, String> getFormParams(ContainerRequestContext requestContext){
 		MultivaluedMap<String, String> retorno = new MultivaluedMapImpl<String, String>();
 		
@@ -530,8 +547,13 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 		
 		return retorno;
 	}
-	
-public static String montaListaParametrosStringException(List<String> parametros, String ultimoDivisorParametros){
+	/**
+	 * 
+	 * @param parametros
+	 * @param ultimoDivisorParametros
+	 * @return
+	 */
+	public static String montaListaParametrosStringException(List<String> parametros, String ultimoDivisorParametros){
 		
 		StringBuilder retorno = new StringBuilder();
 		
@@ -560,21 +582,35 @@ public static String montaListaParametrosStringException(List<String> parametros
 		
 		return retorno.toString();
 	}
-	
+	/**
+	 * 
+	 * @param parametros
+	 * @param ultimoDivisorParametros
+	 * @return
+	 */
 	public static String montaListaParametrosIntegerException(List<Integer> parametros, String ultimoDivisorParametros){
 		
 		List<String> lista = integerListToSortedStringList(parametros);
 		
 		return montaListaParametrosStringException(lista, ultimoDivisorParametros);
 	}
-	
+	/**
+	 * 
+	 * @param parametros
+	 * @param ultimoDivisorParametros
+	 * @return
+	 */
 	public static String montaListaParametrosLongException(List<Long> parametros, String ultimoDivisorParametros){
 		
 		List<String> lista = longListToSortedStringList(parametros);
 		
 		return montaListaParametrosStringException(lista, ultimoDivisorParametros);
 	}
-	
+	/**
+	 * 
+	 * @param lista
+	 * @return
+	 */
 	public static List<String> integerListToSortedStringList(List<Integer> lista){
 		
 		List<String> sortedList = null;
@@ -593,7 +629,11 @@ public static String montaListaParametrosStringException(List<String> parametros
 		
 		return sortedList;
 	}
-	
+	/**
+	 * 
+	 * @param lista
+	 * @return
+	 */
 	public static List<String> longListToSortedStringList(List<Long> lista){
 		
 		List<String> sortedList = null;

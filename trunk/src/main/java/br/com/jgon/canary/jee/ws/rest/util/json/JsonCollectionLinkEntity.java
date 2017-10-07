@@ -1,3 +1,16 @@
+/*
+ * Copyright 2017 Jurandir C. Goncalves
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *      
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package br.com.jgon.canary.jee.ws.rest.util.json;
 
 import java.util.ArrayList;
@@ -12,7 +25,10 @@ import br.com.jgon.canary.jee.ws.rest.util.link.LinkEntity;
 
 /**
  * Prepara a colecao para serializacao
- * @author jurandir
+ *
+ * @author Jurandir C. Goncalves
+ * 
+ * @version 1.0
  *
  */
 @JsonSerialize(using=JsonCollectionLinkEntitySerializer.class)
@@ -22,9 +38,10 @@ public class JsonCollectionLinkEntity {
 	private String itemsName;
 	private Collection<Object> embedded;
 	private List<LinkEntity> listLink = new ArrayList<LinkEntity>();
-	private Long total;
-	private Long limit;
-	private Integer page;
+	private Long totalElements;
+	private Integer elementsPerPage;
+	private Integer currentPage;
+	private Integer totalPages;
 	
 	public JsonCollectionLinkEntity(){
 		
@@ -36,28 +53,36 @@ public class JsonCollectionLinkEntity {
 		this.listLink = listLink;
 	}
 
-	public Long getTotal() {
-		return total;
+	public Long getTotalElements() {
+		return totalElements;
 	}
 
-	public void setTotal(Long total) {
-		this.total = total;
+	public void setTotalElements(Long totalElements) {
+		this.totalElements = totalElements;
 	}
 
-	public Long getLimit() {
-		return limit;
+	public Integer getElementsPerPage() {
+		return elementsPerPage;
 	}
 
-	public void setLimit(Long limit) {
-		this.limit = limit;
+	public void setElementsPerPage(Integer elementsPerPage) {
+		this.elementsPerPage = elementsPerPage;
 	}
 
-	public Integer getPage() {
-		return page;
+	public Integer getCurrentPage() {
+		return currentPage;
 	}
 
-	public void setPage(Integer page) {
-		this.page = page;
+	public void setCurrentPage(Integer currentPage) {
+		this.currentPage = currentPage;
+	}
+
+	public Integer getTotalPages() {
+		return totalPages;
+	}
+
+	public void setTotalPages(Integer totalPages) {
+		this.totalPages = totalPages;
 	}
 
 	public String getItemsName() {
@@ -91,7 +116,11 @@ public class JsonCollectionLinkEntity {
 	public void setListLink(List<LinkEntity> listLink) {
 		this.listLink = listLink;
 	}
-	
+	/**
+	 * 
+	 * @param link
+	 * @return
+	 */
 	public boolean addLink(Link link){
 		String templated = null;
 		if(link.getParams().containsKey("templated")){
@@ -100,7 +129,10 @@ public class JsonCollectionLinkEntity {
 		LinkEntity linkEntity = new LinkEntity(link.getUri().toString(), link.getRel(), link.getTitle(), link.getType(), templated);
 		return this.listLink.add(linkEntity);
 	}
-	
+	/**
+	 * 
+	 * @param links
+	 */
 	public void addAllLink(List<Link> links){
 		for(Link lnk: links){
 			addLink(lnk);

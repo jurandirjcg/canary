@@ -1,94 +1,109 @@
+/*
+ * Copyright 2017 Jurandir C. Goncalves
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *      
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package br.com.jgon.canary.jee.util;
 
 import java.util.Collection;
+
 /**
  * 
- * @author jurandir
+ * @author Jurandir C. Goncalves
+ * 
+ * @version 1.0
  *
  * @param <T>
  */
 public class Pagination<T> {
-	private Long totalRegistros;
-	private Integer qtdeRegistrosPagina;
-	private Integer paginaAtual;
-	private Integer numeroTotalPaginas;
-	private Collection<T> registros;
+	private Long totalElements;
+	private Integer elementsPerPage;
+	private Integer currentPage;
+	private Long totalPages;
+	private Collection<T> elements;
 	
 	public Pagination(){
-		totalRegistros = 0L;
+		totalElements = 0L;
 	}
 	
-	public Pagination(Collection<T> registros){
+	public Pagination(Collection<T> elements){
 		super();
-		this.registros = registros;
+		this.elements = elements;
 	}
 	
-	public Pagination(Integer paginaAtual, Integer qtdeRegistrosPagina){
+	public Pagination(Integer currentPage, Integer elementsPerPage){
 		super();
-		this.paginaAtual = paginaAtual;
-		this.qtdeRegistrosPagina = qtdeRegistrosPagina;
+		this.currentPage = currentPage;
+		this.elementsPerPage = elementsPerPage;
 	}
 	
-	public Pagination(Collection<T> registros, Pagination<?> paginacao) {
+	public Pagination(Collection<T> elements, Pagination<T> pagination) {
 		super();
-		this.registros = registros;
-		this.totalRegistros = paginacao.getQtdeTotalRegistros();
-		this.qtdeRegistrosPagina = paginacao.getQtdeRegistrosPagina();
-		this.paginaAtual = paginacao.getPaginaAtual();
-		this.numeroTotalPaginas = paginacao.getNumeroTotalPaginas();
+		this.elements = elements;
+		this.totalElements = pagination.getTotalElements();
+		this.elementsPerPage = pagination.getElementsPerPage();
+		this.currentPage = pagination.getCurrentPage();
+		this.totalPages = pagination.getTotalPages();
 	}
 	
-	
-
-	public Pagination(Long totalRegistros, Integer qtdeRegistrosPagina, Integer paginaAtual) {
+	public Pagination(Long totalElementes, Integer elementsPerPage, Integer currentPage) {
 		super();
-		this.totalRegistros = totalRegistros;
-		this.qtdeRegistrosPagina = qtdeRegistrosPagina;
-		this.paginaAtual = paginaAtual;
+		this.totalElements = totalElementes;
+		this.elementsPerPage = elementsPerPage;
+		this.currentPage = currentPage;
 	}
 
-	public Collection<T> getRegistros() {
-		return registros;
+	public Long getTotalElements() {
+		return totalElements;
 	}
 
-	public void setRegistros(Collection<T> registros) {
-		this.registros = registros;
+	public void setTotalElements(Long totalElements) {
+		this.totalElements = totalElements;
 	}
 
-	public Long getQtdeTotalRegistros() {
-		return totalRegistros;
+	public Integer getElementsPerPage() {
+		return elementsPerPage;
 	}
 
-	public void setTotalRegistros(Long totalRegistros) {
-		this.totalRegistros = totalRegistros;
+	public void setElementsPerPage(Integer elementsPerPage) {
+		this.elementsPerPage = elementsPerPage;
 	}
 
-	public Integer getPaginaAtual() {
-		return paginaAtual;
+	public Integer getCurrentPage() {
+		return currentPage;
 	}
 
-	public void setPaginaAtual(Integer paginaAtual) {
-		this.paginaAtual = paginaAtual;
+	public void setCurrentPage(Integer currentPage) {
+		this.currentPage = currentPage;
 	}
 
-	public Integer getQtdeRegistrosPagina() {
-		return qtdeRegistrosPagina;
+	public Collection<T> getElements() {
+		return elements;
 	}
 
-	public void setQtdeRegistrosPagina(Integer qtdeRegistrosPagina) {
-		this.qtdeRegistrosPagina = qtdeRegistrosPagina;
+	public void setElements(Collection<T> elements) {
+		this.elements = elements;
 	}
 
-	public Integer getNumeroTotalPaginas() {
-		if(numeroTotalPaginas == null && qtdeRegistrosPagina != null && totalRegistros != null && qtdeRegistrosPagina > 0){
-			Long parteInteira = totalRegistros / qtdeRegistrosPagina;
-			double parteFracionada = totalRegistros % qtdeRegistrosPagina;
-			numeroTotalPaginas = Long.valueOf(parteInteira + (parteFracionada == 0 ? 0 : 1)).intValue();
+	public Long getTotalPages() {
+		if(totalPages == null && elementsPerPage != null && totalElements != null && elementsPerPage > 0){
+			Long parteInteira = totalElements / elementsPerPage;
+			double parteFracionada = totalElements % elementsPerPage;
+			totalPages = Long.valueOf(parteInteira + (parteFracionada == 0 ? 0 : 1));
 		}
-		return numeroTotalPaginas;
+		return totalPages;
+	}
+	
+	public void setTotalPages(Long totalPages) {
+		this.totalPages = totalPages;
 	}
 
-	public void setNumeroTotalPaginas(Integer numeroTotalPaginas) {
-		this.numeroTotalPaginas = numeroTotalPaginas;
-	}
 }

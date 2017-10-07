@@ -1,3 +1,16 @@
+/*
+ * Copyright 2017 Jurandir C. Goncalves
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *      
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package br.com.jgon.canary.jee.persistence;
 
 import java.lang.reflect.Field;
@@ -27,7 +40,9 @@ import br.com.jgon.canary.jee.util.ReflectionUtil;
 /**
  * Realiza o mapeamento dos atributos da Classe de retorno para construção das consultas de seleção e ordenação dos atributos das entidades
  * 
- * @author jurandir
+ * @author Jurandir C. Goncalves
+ * 
+ * @version 1.0
  *
  */
 abstract class QueryMapper {
@@ -44,7 +59,6 @@ abstract class QueryMapper {
 	 * @return
 	 * @throws ApplicationException
 	 */
-	//Campo, Alias
 	protected List<SimpleEntry<String, String>> getCamposAjustados(String campos, String expression) throws ApplicationException{
 		if(StringUtils.isNotBlank(campos)){
 			String fieldsAjustados = ajustaCampos(campos.replace(" ", ""), expression);
@@ -86,7 +100,13 @@ abstract class QueryMapper {
 		}
 		return null;
 	}
-	
+	/**
+	 * 
+	 * @param fldCheck
+	 * @param fNome
+	 * @return
+	 * @throws ApplicationException
+	 */
 	private List<SimpleEntry<String, String>> verificaCampoObject(Field fldCheck, String fNome) throws ApplicationException{
 		QueryAttributeMapper queryMapperAttribute = null;
 		if(fldCheck.isAnnotationPresent(QueryAttributeMapper.class)){
@@ -220,56 +240,6 @@ abstract class QueryMapper {
 
 		return null;
 	}
-	
-	/*public List<WSAttributeJoin> listJoin(String ini){
-		List<WSAttributeJoin> joins = new ArrayList<WSAttributeJoin>(0);
-		
-		String exp = "[a-zA-Z]+:((join)|(inner)|(left)|(right))(_fetch)?";
-		Pattern pattern = Pattern.compile(exp);
-		Matcher m = pattern.matcher(ini);
-		
-		//"profissao:left_fetch"
-		
-		WSAttributeJoin join;
-		String[] aj;
-		while(m.find()){
-			aj = m.group().split(":");
-			join = new WSAttributeJoin();
-			join.setAttribute(aj[0]);	
-						
-			if(aj[1].equalsIgnoreCase("right")){
-				join.setJoinType(JoinType.RIGHT);
-				join.setFetch(false);
-			}else if(aj[1].equalsIgnoreCase("right_fetch")){
-				join.setJoinType(JoinType.RIGHT);
-				join.setFetch(true);
-			}else if(aj[1].equalsIgnoreCase("left")){
-				join.setJoinType(JoinType.LEFT);
-				join.setFetch(false);
-			}else if(aj[1].equalsIgnoreCase("left_fetch")){
-				join.setJoinType(JoinType.LEFT);
-				join.setFetch(true);
-			}else if(aj[1].equalsIgnoreCase("inner")){
-				join.setJoinType(JoinType.INNER);
-				join.setFetch(false);
-			}else if(aj[1].equalsIgnoreCase("inner_fetch")){
-				join.setJoinType(JoinType.INNER);
-				join.setFetch(true);
-			}
-		}
-		
-		return joins;
-	}*/
-	
-	/*public static void main(String[] args){
-		QueryMapper a = new QueryMapper(ResponsePaciente.class);
-		try {
-			System.out.println(a.getOrder("nome:asc,nomeMae:desc,profissao{id:asc,descricao:desc},id:asc").toString());
-		} catch (ApplicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}//a.ajustaCampos("nome:asc,idade:desc,profissao{nome:asc,id:desc,medico{nome:asc,idade:desc},teste:asc},id:asc", expOrder));
-	}*/
 	
 	/**
 	 * Ajusta os campos, caso tenham vindo com o caractere especial "{"

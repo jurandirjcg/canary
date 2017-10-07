@@ -1,3 +1,16 @@
+/*
+ * Copyright 2017 Jurandir C. Goncalves
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *      
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package br.com.jgon.canary.jee.persistence;
 
 import java.time.LocalDate;
@@ -21,7 +34,10 @@ import br.com.jgon.canary.jee.persistence.filter.CriteriaFilter;
 
 /**
  * Define os filtros que serao utilizados para construir a criteria 
- * @author jurandir
+ *
+ * @author Jurandir C. Goncalves
+ * 
+ * @version 1.0
  *
  * @param <T>
  */
@@ -29,7 +45,10 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	
 	/**
 	 * Filtro de restricao
-	 * @author jurandir
+	 *
+	 * @author Jurandir C. Goncalves
+	 * 
+	 * @version 1.0
 	 *
 	 */
 	enum Where{
@@ -166,7 +185,10 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	public List<SimpleEntry<Where, ?>> getWhereRestriction(String fieldName){
 		return this.whereRestriction.getRestrictions(fieldName);
 	}
-	
+	/**
+	 * 
+	 * @return
+	 */
 	public WhereRestriction getWhereRestriction(){
 		return this.whereRestriction;
 	}
@@ -405,26 +427,6 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	public CriteriaFilter<T> addSelect(Attribute<?, ?> attribute){
 		return addSelect(attribute.getName(), SelectAggregate.FIELD, attribute.getName());
 	}
-	/*
-	@Override
-	public CriteriaFilterImpl<T> addSelect(String... fields){
-		if(fields != null){
-			for(String f : fields){
-				addSelect(f);
-			}
-		}
-		return this;
-	}*/
-	/*
-	@Override
-	public CriteriaFilterImpl<T> addSelect(List<String> fields){
-		if(fields != null){
-			for(String f : fields){
-				addSelect(f);
-			}
-		}
-		return this;
-	}*/
 	
 	@Override
 	public CriteriaFilter<T> addOrder(Class<?> returnType, String... order) throws ApplicationException{
@@ -653,16 +655,6 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 		return this;
 	}
 	
-	/*@SuppressWarnings("unchecked")
-	public <E> CriteriaFilter<T> addWhereBetween(String field, Class<E> typeValue, E startValue, E endValue){
-		E[] betweenArray = (E[]) Array.newInstance(typeValue, 2);
-		betweenArray[0] = startValue;
-		betweenArray[1] = endValue;
-		
-		listWhereComplex.put(field, new SimpleEntry<CriteriaFilter.Where, E[]>(Where.BETWEEN, betweenArray));
-		return this;
-	}*/
-	
 	@Override
 	public CriteriaFilter<T> addWhereBetween(String field, Integer startValue, Integer endValue){
 		this.whereRestriction.add(field, Where.BETWEEN, new Integer[] {startValue, endValue});
@@ -856,27 +848,6 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	public CriteriaFilter<T> addWhereLessThanOrEqualTo(Attribute<?, ?> attribute){
 		return addWhereLessThanOrEqualTo(attribute.getName());
 	}
-	/*
-	public CriteriaFilter<T> addWhereLessThan(String field, Number value){
-		this.listWhereComplex.put(field, new SimpleEntry<CriteriaFilter.Where, Number>(Where.LESS_THAN, value));
-		return this;
-	}
-	
-	public CriteriaFilter<T> addWhereLessThan(String field, Date value){
-		this.listWhereComplex.put(field, new SimpleEntry<CriteriaFilter.Where, Date>(Where.LESS_THAN, value));
-		return this;
-	}
-	
-	public CriteriaFilter<T> addWhereGreaterThan(String field, Number value){
-		this.listWhereComplex.put(field, new SimpleEntry<CriteriaFilter.Where, Number>(Where.GREATER_THAN, value));
-		return this;
-	}
-	
-	public CriteriaFilter<T> addWhereGreaterThan(String field, Date value){
-		this.listWhereComplex.put(field, new SimpleEntry<CriteriaFilter.Where, Date>(Where.GREATER_THAN, value));
-		return this;
-	}
-	*/
 	
 	@Override
 	public CriteriaFilter<T> addWhereLike(String field){
@@ -1238,22 +1209,4 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	public CriteriaFilter<T> addWhereILikeAnyBeforeAfter(Attribute<?, ?> attribute, String value) {
 		return addWhereILikeAnyBefore(attribute.getName(), value);
 	}
-
-	/*
-	private static List<String> checkFields(List<String> fields, String... defaultFields){
-		List<String> ret = fields;
-		if(fields == null || fields.isEmpty()){
-			ret = Arrays.asList(defaultFields);
-		}
-		
-		return ret;
-	}
-	
-	private static List<String> checkFields(String[] fields, String... defaultFields){
-		if(fields == null){
-			return Arrays.asList(defaultFields);
-		}
-		return Arrays.asList(fields);
-	}*/
-
 }

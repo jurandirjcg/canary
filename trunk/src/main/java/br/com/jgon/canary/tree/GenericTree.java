@@ -1,3 +1,16 @@
+/*
+ * Copyright 2017 Jurandir C. Goncalves
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *      
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package br.com.jgon.canary.tree;
 
 import java.io.Serializable;
@@ -7,14 +20,18 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import br.com.jgon.canary.jee.exception.ApplicationException;
+import br.com.jgon.canary.jee.exception.MessageSeverity;
 import br.com.jgon.canary.jee.util.ReflectionUtil;
 
 
 /**
  * Árvore de conteúdos
- * @author jurandir
  * 
- * @version 1.0 - 31/07/2011
+ * @author Jurandir C. Goncalves
+ * 
+ * @version 1.0
+ * 
  * @param <T> - Tipo do conteúdo da árvore
  */
 public class GenericTree<T extends GenericConteudoTree> implements Serializable{
@@ -52,7 +69,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 		this.parent = parent;
 	}
 	
-	private String configNodesConteudo(T conteudo, String[] nodes){
+	private String configNodesConteudo(T conteudo, String[] nodes) throws ApplicationException{
 		String nodeResAux = "";
 
 		if(nodes == null)
@@ -65,8 +82,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 					nodeResAux += (k == 0 ? "" : SEPARATOR_NODE_NULL) + String.valueOf(resAux);
 			}
 		}catch (Exception e) {
-			//FIXME LOGGER
-			//AndorinhaLogManager.loggerAdd(GenericTree.class, LogType.ERROR, e.getMessage(), e);
+			throw new ApplicationException(MessageSeverity.ERROR, "error.tree.node", e);
 		}
 		//Remove Formacacao
 		return StringUtils.stripAccents(StringUtils.replacePattern(nodeResAux, "[.-\\s/\\]", ""));
@@ -79,7 +95,6 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	 * @param dados - lista de dados
 	 * @param alteraConteudo - Indica se forca a alteracao de conteudo caso ja exista em um node
 	 */
-	
 	public GenericTree(String rootNode, LinkedList<GenericTreeNodes> subNodes, List<T> dados, boolean alteraConteudo){
 		
 		this.nodesFilhos = new LinkedList<GenericTree<T>>();
