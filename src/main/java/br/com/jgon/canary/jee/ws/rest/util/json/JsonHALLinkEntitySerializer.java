@@ -27,7 +27,7 @@ import br.com.jgon.canary.jee.ws.rest.util.link.LinkEntity;
  *
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 public class JsonHALLinkEntitySerializer extends JsonSerializer<List<LinkEntity>>{

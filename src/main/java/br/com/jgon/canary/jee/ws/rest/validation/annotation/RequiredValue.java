@@ -24,14 +24,14 @@ import java.lang.annotation.Target;
  * 
  * @author Alexandre O. Pereira
  * 
- * @version 1.0.0
+ * @version 1.0
  * 
- * @parameter
- * 		<strong>inStringValues</strong> - Lista de String a ser comparada <br/>
- * 		<strong>inIntValues</strong> - Lista de números int a ser comparados <br/>
- * 		<strong>inLongValues</strong> - Lista de números long a ser comparados <br/>
- * 		<strong>hideListInErrorMessages</strong> - Oculta a lista de valores válidos na mensagem de erro <br/>
- * 		<strong>hideFieldValueInErrorMessage</strong> - Oculta o valor do parâmetro na mensagem de erro <br/> <br/>
+ * <p>
+ * 		<strong>inStringValues</strong> - Lista de String a ser comparada <br>
+ * 		<strong>inIntValues</strong> - Lista de números int a ser comparados <br>
+ * 		<strong>inLongValues</strong> - Lista de números long a ser comparados <br>
+ * 		<strong>hideListInErrorMessages</strong> - Oculta a lista de valores válidos na mensagem de erro <br>
+ * 		<strong>hideFieldValueInErrorMessage</strong> - Oculta o valor do parâmetro na mensagem de erro <br> <br>
  * Uso: <pre> @RequiredValue(inStringValues={"value1","value2","value3"},hideListInErrorMessages=true) @PathParam("foo") String foo</pre>
  * No caso acima, será obrigatório que o valor de "foo" seja um dos listados
  * ("value1", "value2" ou "value3")

@@ -14,6 +14,7 @@
 package br.com.jgon.canary.jee.persistence;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EmbeddedId;
@@ -29,15 +30,15 @@ import br.com.jgon.canary.jee.util.ReflectionUtil;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 public class DAOUtil {
 
 	/**
 	 * 
-	 * @param entityClass
-	 * @return
+	 * @param entityClass - Class with @Entity annotation 
+	 * @return {@link Field}
 	 */
 	public static Field getFieldId(Class<?> entityClass){
 		List<Field> flds = ReflectionUtil.listAttributesByAnnotation(entityClass, Id.class);
@@ -51,13 +52,14 @@ public class DAOUtil {
 		return flds.isEmpty() ? null :  flds.get(0);
 	}
 	/**
-	 * 
-	 * @param fld
-	 * @return
+	 * Retorna o tipo de coleção do attributo
+	 * @param fld - Attributo a ser verificado 
+	 * @return Classe da colecao
 	 */
-	public static Class<?> getCollectionClass(Field fld){
+	@SuppressWarnings("unchecked")
+	public static Class<? extends Collection<?>> getCollectionClass(Field fld){
 		if(fld.getAnnotation(QueryAttributeMapper.class) != null && !fld.getAnnotation(QueryAttributeMapper.class).collectionTarget().equals(void.class)){
-			return fld.getAnnotation(QueryAttributeMapper.class).collectionTarget();
+			return (Class<? extends Collection<?>>) fld.getAnnotation(QueryAttributeMapper.class).collectionTarget();
 		}else if (fld.getAnnotation(OneToMany.class) != null && !fld.getAnnotation(OneToMany.class).targetEntity().equals(void.class)){
 			return fld.getAnnotation(OneToMany.class).targetEntity();
 		}else if(fld.getAnnotation(ManyToMany.class) != null && !fld.getAnnotation(ManyToMany.class).targetEntity().equals(void.class)){
@@ -65,6 +67,6 @@ public class DAOUtil {
 		}else if(fld.getAnnotation(ManyToOne.class) != null && !fld.getAnnotation(ManyToOne.class).targetEntity().equals(void.class)){
 			return fld.getAnnotation(ManyToOne.class).targetEntity();
 		}
-		return fld.getType();
+		return (Class<? extends Collection<?>>) fld.getType();
 	}
 }

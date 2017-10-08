@@ -26,7 +26,7 @@ import br.com.jgon.canary.jee.ws.rest.validation.exception.RestExceptionMapper;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 public abstract class CanaryRestResources {

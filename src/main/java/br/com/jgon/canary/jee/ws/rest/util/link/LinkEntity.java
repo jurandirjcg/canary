@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  *
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)

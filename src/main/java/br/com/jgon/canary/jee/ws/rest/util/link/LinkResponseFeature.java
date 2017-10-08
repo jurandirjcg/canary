@@ -25,7 +25,7 @@ import javax.ws.rs.core.FeatureContext;
  *
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 public class LinkResponseFeature implements DynamicFeature{

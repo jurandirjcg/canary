@@ -24,9 +24,9 @@ import java.lang.annotation.Target;
  * 
  * @author Alexandre O. Pereira
  * 
- * @version 1.0.0
+ * @version 1.0
  * 
- * @parameter String (nome do outro parâmetro a considerar) <br/>
+ * <p> String (nome do outro parâmetro a considerar) <br>
  * Uso: <pre>@PathParam("foo") String foo,</pre><br>
  * 		<pre>@RequiredIfNull("foo") @PathParam("bar") String bar</pre>
  * No caso acima, o parâmetro "bar" será obrigatório caso o parâmetro "foo" for nulo ou vazio

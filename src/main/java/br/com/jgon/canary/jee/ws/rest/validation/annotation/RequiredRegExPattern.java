@@ -24,11 +24,11 @@ import java.lang.annotation.Target;
  * 
  * @author Alexandre O. Pereira
  * 
- * @version 1.0.0
+ * @version 1.0
  * 
- * @parameter String contendo uma expressão regular válida.
- * 		<strong>hideRegExPatternFromErrorMessages</strong> - Oculta a expressão regular de validação na mensagem de erro <br/>
- * 		<strong>hideFieldValueInErrorMessage</strong> - Oculta o valor do parâmetro na mensagem de erro <br/> <br/>
+ * <p> String contendo uma expressão regular válida.
+ * 		<strong>hideRegExPatternFromErrorMessages</strong> - Oculta a expressão regular de validação na mensagem de erro <br>
+ * 		<strong>hideFieldValueInErrorMessage</strong> - Oculta o valor do parâmetro na mensagem de erro <br> <br>
  * Uso: <pre> @RequiredRegExPattern("^([0-9]{3}.){2}([0-9]{3}-)([0-9]{2})$") @PathParam("cpf") String cpf,</pre>
  * No caso acima, o parâmetro "cpf", obrigatoriamente, deve atender ao formato 999.999.999-99 (formato cpf)
  */

@@ -24,7 +24,7 @@ import br.com.jgon.canary.jee.validation.ValidateMessage;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 @ApplicationException(rollback=true)

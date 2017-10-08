@@ -24,12 +24,12 @@ import java.lang.annotation.Target;
  * 
  * @author Alexandre O. Pereira
  * 
- * @version 1.0.0
+ * @version 1.0
  * 
- * @parameter 
- * 		<strong>minSize</strong> - Valor mínimo <br/>
- * 		<strong>maxSize</strong> - Valor máximo <br/>
- * 		<strong>hideFieldValueInErrorMessage</strong> - Oculta o valor do parâmetro na mensagem de erro <br/> <br/>
+ * <p> 
+ * 		<strong>minSize</strong> - Valor mínimo <br>
+ * 		<strong>maxSize</strong> - Valor máximo <br>
+ * 		<strong>hideFieldValueInErrorMessage</strong> - Oculta o valor do parâmetro na mensagem de erro <br> <br>
  * Uso: <pre>@RequiredSize(minSize=10, maxSize=20) @PathParam("foo") String foo</pre>
  * No caso acima, o parãmetro "foo", deverá ter o tamanho entre 10 e 20 caracteres (se o tipo do parâmetro for numérico, 
  * será exigido o valor entre 10 e 20)

@@ -20,7 +20,7 @@ import java.util.List;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 public enum EstadoCivil{
@@ -45,19 +45,10 @@ public enum EstadoCivil{
 		return descricao;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public static List<EstadoCivil> list() {
 		return Arrays.asList(values());
 	}
 
-	/**
-	 * 
-	 * @param chave
-	 * @return
-	 */
 	public static EstadoCivil valueOf(Integer chave) {
 		for(EstadoCivil tp: values()){
 			if(tp.getChave().equals(chave)){

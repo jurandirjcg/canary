@@ -30,7 +30,7 @@ import br.com.jgon.canary.jee.util.ReflectionUtil;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  * 
  * @param <T> - Tipo do conteúdo da árvore
  */
@@ -234,7 +234,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	/**
 	 * Retorna o ultimo valor adicionado ao node
 	 * Ex: root_node1_node2_node3 - retorna o node3
-	 * @param ultimoNode
+	 * @param ultimoNodeName
 	 * @return
 	 */
 	public String getNodeName(boolean ultimoNodeName) {

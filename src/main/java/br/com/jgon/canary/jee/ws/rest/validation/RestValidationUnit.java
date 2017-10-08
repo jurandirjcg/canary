@@ -24,7 +24,7 @@ import br.com.jgon.canary.jee.ws.rest.validation.enumerator.ParameterTypeEnum;
  * @author Alexandre O. Pereira
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 public class RestValidationUnit {
