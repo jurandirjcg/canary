@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * 
  * @author Alexandre O. Pereira
  * 
- * @version 1.0
+ * @version 1.0.0
  * 
  * @parameter
  * 		<strong>inStringValues</strong> - Lista de String a ser comparada <br/>

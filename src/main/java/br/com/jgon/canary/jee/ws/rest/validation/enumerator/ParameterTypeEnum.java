@@ -17,7 +17,7 @@ package br.com.jgon.canary.jee.ws.rest.validation.enumerator;
  * 
  * @author Alexandre O. Pereira
  * 
- * @version 1.0
+ * @version 1.0.0
  *
  */
 public enum ParameterTypeEnum {

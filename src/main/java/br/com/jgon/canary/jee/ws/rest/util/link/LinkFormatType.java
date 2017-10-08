@@ -17,7 +17,7 @@ package br.com.jgon.canary.jee.ws.rest.util.link;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0
+ * @version 1.0.0
  *
  */
 public enum LinkFormatType {
