@@ -30,7 +30,7 @@ import br.com.jgon.canary.jee.util.ReflectionUtil;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0
+ * @version 1.0.0
  * 
  * @param <T> - Tipo do conteúdo da árvore
  */

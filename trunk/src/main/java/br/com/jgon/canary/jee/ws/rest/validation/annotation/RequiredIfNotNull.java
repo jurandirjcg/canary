@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * 
  * @author Alexandre O. Pereira
  * 
- * @version 1.0
+ * @version 1.0.0
  * 
  * @parameter String (nome do outro parâmetro a considerar) <br/>
  * Uso: <pre>@PathParam("foo") String foo,</pre><br>

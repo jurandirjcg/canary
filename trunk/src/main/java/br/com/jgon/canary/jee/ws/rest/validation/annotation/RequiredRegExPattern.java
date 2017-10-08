@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * 
  * @author Alexandre O. Pereira
  * 
- * @version 1.0
+ * @version 1.0.0
  * 
  * @parameter String contendo uma expressão regular válida.
  * 		<strong>hideRegExPatternFromErrorMessages</strong> - Oculta a expressão regular de validação na mensagem de erro <br/>

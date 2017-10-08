@@ -19,7 +19,7 @@ import javax.persistence.criteria.JoinType;
  *
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0
+ * @version 1.0.0
  *
  */
 public class WSAttributeJoin{

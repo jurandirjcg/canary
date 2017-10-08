@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * 
  * @author Alexandre O. Pereira
  *  
- * @version 1.0
+ * @version 1.0.0
  *
  * @parameter Lista de String (nomes dos parametros a ser comparados) <br/> <br/>
  * Uso: <pre> @RequiredXOR({"paramName1","paramName2","paramName3"}) @PathParam("foo") String foo {@code}</pre>

@@ -30,7 +30,7 @@ import br.com.jgon.canary.jee.util.ReflectionUtil;
  * Realiza a conversao e comparacao dos campos recebidos para correta utilizacao do JPA Criteria
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0
+ * @version 1.0.0
  *
  */
 class SelectMapper extends QueryMapper {

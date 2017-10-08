@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
  *
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0
+ * @version 1.0.0
  *
  */
 public class JsonDateTimeDeserializer extends JsonDeserializer<Date> implements ContextualDeserializer{

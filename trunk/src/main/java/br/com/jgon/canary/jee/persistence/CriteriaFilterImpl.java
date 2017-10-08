@@ -37,7 +37,7 @@ import br.com.jgon.canary.jee.persistence.filter.CriteriaFilter;
  *
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0
+ * @version 1.0.0
  *
  * @param <T>
  */
@@ -48,7 +48,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 *
 	 * @author Jurandir C. Goncalves
 	 * 
-	 * @version 1.0
+	 * @version 1.0.0
 	 *
 	 */
 	enum Where{
