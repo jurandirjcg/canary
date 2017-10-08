@@ -20,7 +20,7 @@ import java.util.List;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 public enum Sexo{
@@ -49,19 +49,10 @@ public enum Sexo{
 		return sigla;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public static List<Sexo> list() {
 		return Arrays.asList(values());
 	}
 
-	/**
-	 * 
-	 * @param chave
-	 * @return
-	 */
 	public static Sexo valueOf(Integer chave) {
 		for(Sexo tp: values()){
 			if(tp.getChave().equals(chave)){

@@ -29,7 +29,7 @@ import br.com.jgon.canary.jee.exception.ApplicationException;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  * @param <T>
  */
@@ -284,7 +284,7 @@ public interface CriteriaFilter<T> {
 	/**
 	 * 
 	 * @param field
-	 * @param values
+	 * @param value
 	 * @return
 	 */
 	public <E> CriteriaFilter<T> addWhereEqual(String field, E value);

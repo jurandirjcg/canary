@@ -17,7 +17,7 @@ package br.com.jgon.canary.jee.exception;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 @javax.ejb.ApplicationException(rollback=true)

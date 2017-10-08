@@ -26,7 +26,7 @@ import br.com.jgon.canary.jee.persistence.CriteriaFilterImpl.Where;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 class WhereRestriction {

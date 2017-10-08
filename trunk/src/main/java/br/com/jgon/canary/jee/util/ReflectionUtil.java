@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringUtils;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 public class ReflectionUtil {
@@ -42,7 +42,7 @@ public class ReflectionUtil {
 	
 	/**
 	 * Lista os métodos get de um objeto passado como parâmetro.
-	 * @param Object - objeto a ser verificado
+	 * @param o - objeto a ser verificado
 	 * @return List - lista de métodos da classe
 	 */
 	public static List<Method> listMethodsGet(Object o) {
@@ -51,7 +51,7 @@ public class ReflectionUtil {
         
 	/**
 	 * Lista os métodos set de um objeto passado como parametro
-	 * @param Object - objeto a ser verificado
+	 * @param o - objeto a ser verificado
 	 * @return List - lista de matodos da classe
 	 */
 	public static List<Method> listMethodsSet(Object o) {
@@ -60,7 +60,7 @@ public class ReflectionUtil {
 
 	/**
 	 * Lista os todos os metodos declarados de um objeto passado como parametro
-	 * @param Object - objeto a ser verificado
+	 * @param o - objeto a ser verificado
 	 * @return List - lista de metodos da classe
 	 */
 	public static List<Method> listMethods(Object o) {
@@ -101,7 +101,7 @@ public class ReflectionUtil {
 	}
 	/**
 	 * Lista os todos os atributos declarados de um objeto passado como parametro.
-	 * @param Object - objeto a ser verificado
+	 * @param o - objeto a ser verificado
 	 * @return List - lista de atributos da classe Method 
 	 */
 	public static List<Field> listAttributes(Object o) {
@@ -148,7 +148,7 @@ public class ReflectionUtil {
 	/**
 	 * Retorna lista de atributos que contenham o tipo especificado e a annotation
 	 * @param klass - Classe de pesquisa
-	 * @param fieldKlass - Tipo do atributo pesquisado
+	 * @param fieldClass - Tipo do atributo pesquisado
 	 * @param annotationClass - Tipo de annotation a ser localizada
 	 * @return
 	 */
@@ -283,7 +283,7 @@ public class ReflectionUtil {
 	/**
 	 * Verifica se existe Annotation no atributo ou metodo Get
 	 * @param klass - Classe de pesquisa
-	 * @param atributo
+	 * @param atributoNome
 	 * @param annotationClass - annotations a ser pesquisada
 	 * @return
 	 */
@@ -298,7 +298,6 @@ public class ReflectionUtil {
 	
 	/**
 	 * Verifica se existe Annotation no atributo ou metodo Get
-	 * @param klass - Classe de pesquisa
 	 * @param atributo
 	 * @param annotationClass - annotations a ser pesquisada
 	 * @return
@@ -309,7 +308,6 @@ public class ReflectionUtil {
 	/**
 	 * Retorna annotation tanto do field quanto do method do tipo GET, null caso nao encontre
 	 * @param <T>
-	 * @param klass
 	 * @param field
 	 * @param annotationClass
 	 * @return
@@ -436,12 +434,13 @@ public class ReflectionUtil {
 	}
 	/**
 	 * Retorna o metodo do tipo get do atributo
+	 * 
 	 * @param klass
-	 * @param atributoNome
+	 * @param atributeName
 	 * @param objParams
 	 * @return
+	 * @throws Exception
 	 */
-	
 	public static Method getMethodGet(Class<?> klass, String atributeName, Object... objParams) throws Exception{
 		String nomeGetter = "get" + StringUtils.capitalize(atributeName);
 		Method method = null;
@@ -690,7 +689,7 @@ public class ReflectionUtil {
 	/**
 	 * Instancia novo objeto com os valores do Map
 	 * @param obj
-	 * @param fieldValue - Map<String, Object[]> - Map<atributo, valores>
+	 * @param fieldValue
 	 * @return
 	 * @throws Exception 
 	 */
@@ -717,8 +716,8 @@ public class ReflectionUtil {
 	
 	/**
 	 * Compara as classes, inclusive interface
-	 * @param klass1
-	 * @param klass2
+	 * @param class1
+	 * @param class2
 	 * @return
 	 */
 	public static boolean compareClass(Class<?> class1, Class<?> class2){
@@ -825,10 +824,10 @@ public class ReflectionUtil {
 	 * Retorna valor do atributo, verifica o objeto recursivamente.
 	 * Ex: campo.campo1.campo2 - retorna o valor do campo2 da hierarquia de objetos
 	 * Retorna null se null ou não encontrado 
+	 * 
 	 * @param obj
 	 * @param field
 	 * @return
-	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getAttributteValue(Object obj, String field){
@@ -887,7 +886,7 @@ public class ReflectionUtil {
 	/**
 	 * Seta o valor para nulo, com cascade (quando encontra ".")
 	 * @param obj
-	 * @param attributeName
+	 * @param listAttributeName
 	 * @throws IllegalAccessException 
 	 * @throws IllegalArgumentException 
 	 */

@@ -39,7 +39,7 @@ import br.com.jgon.canary.jee.util.ReflectionUtil;
  *
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 @RequestScoped

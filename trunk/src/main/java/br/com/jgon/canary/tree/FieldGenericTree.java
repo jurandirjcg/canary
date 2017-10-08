@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 @Retention (RetentionPolicy.RUNTIME)
@@ -37,7 +37,7 @@ public @interface FieldGenericTree {
 	 * @author jurandirjcg
 	 * 
 	 *  04/01/2012
-	 * @version 1.0.0
+	 * @version 1.0
 	 */
 	public enum PositionTree{
 		ROW,

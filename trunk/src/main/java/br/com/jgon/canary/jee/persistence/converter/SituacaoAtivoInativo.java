@@ -20,7 +20,7 @@ import java.util.List;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 public enum SituacaoAtivoInativo{
@@ -50,19 +50,11 @@ public enum SituacaoAtivoInativo{
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
-	/**
-	 * 
-	 * @return
-	 */
+	
 	public static List<SituacaoAtivoInativo> list() {
 		return Arrays.asList(values());
 	}
 
-	/**
-	 * 
-	 * @param chave
-	 * @return
-	 */
 	public static SituacaoAtivoInativo valueOf(Integer chave) {
 		for(SituacaoAtivoInativo tp: values()){
 			if(tp.getChave() == chave.shortValue()){

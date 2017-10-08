@@ -20,7 +20,7 @@ import java.io.Serializable;
  * 
  * @author Jurandir C. Goncalves
  * 
- * @version 1.0.0
+ * @version 1.0
  *
  */
 public abstract class GenericConteudoTree implements Serializable{
