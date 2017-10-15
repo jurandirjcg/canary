@@ -29,6 +29,7 @@ import org.jboss.resteasy.spi.StringParameterUnmarshaller;
 import org.jboss.resteasy.util.FindAnnotation;
 
 import br.com.jgon.canary.jee.exception.ApplicationException;
+import br.com.jgon.canary.jee.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.jee.util.CollectionUtil;
 import br.com.jgon.canary.jee.util.ReflectionUtil;
 import br.com.jgon.canary.jee.ws.rest.util.link.LinkPaginate;
@@ -77,9 +78,7 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
 			String fieldsReconfig = configRequiredParam(resourceInfo.getResourceMethod(), sb.toString());
 			return new WSFieldParam(returnType, fieldsReconfig);
 		}catch (ApplicationException e){
-			RuntimeException r = new RuntimeException(e);
-			r.addSuppressed(e);
-			throw r;
+			throw new ApplicationRuntimeException(e);
 		}
 	}
 	/**

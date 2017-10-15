@@ -16,6 +16,9 @@ package br.com.jgon.canary.jee.ws.rest;
 import java.util.List;
 
 import br.com.jgon.canary.jee.exception.ApplicationException;
+import br.com.jgon.canary.jee.exception.ApplicationRuntimeException;
+import br.com.jgon.canary.jee.exception.MessageSeverity;
+import br.com.jgon.canary.jee.util.MessageFactory;
 import br.com.jgon.canary.jee.ws.rest.util.WSMapper;
 /**
  * Configura os campos vindos da requisicao
@@ -37,7 +40,7 @@ public class WSFieldParam{
 	 * @param fields
 	 */
 	public WSFieldParam(String fields){
-		throw new RuntimeException("Construtor somente para compatibilidade com QueryParam REST");
+		throw new ApplicationRuntimeException(MessageSeverity.ERROR, null, MessageFactory.getMessage("message","Construtor somente para compatibilidade com QueryParam REST"));
 	}
 	
 	public WSFieldParam(Class<?> returnType, String fields) throws ApplicationException{

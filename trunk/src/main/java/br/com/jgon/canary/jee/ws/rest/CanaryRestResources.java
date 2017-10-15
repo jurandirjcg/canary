@@ -16,10 +16,15 @@ package br.com.jgon.canary.jee.ws.rest;
 import java.util.HashSet;
 import java.util.Set;
 
+import br.com.jgon.canary.jee.exception.ApplicationException;
+import br.com.jgon.canary.jee.exception.ApplicationRuntimeException;
+import br.com.jgon.canary.jee.validation.exception.ValidationException;
 import br.com.jgon.canary.jee.ws.rest.util.RestFilter;
 import br.com.jgon.canary.jee.ws.rest.util.link.LinkResponseFeature;
 import br.com.jgon.canary.jee.ws.rest.validation.RestValidationParameterFilter;
-import br.com.jgon.canary.jee.ws.rest.validation.exception.RestExceptionMapper;
+import br.com.jgon.canary.jee.ws.rest.validation.exception.RestApplicationExceptionMapper;
+import br.com.jgon.canary.jee.ws.rest.validation.exception.RestApplicationRuntimeExceptionMapper;
+import br.com.jgon.canary.jee.ws.rest.validation.exception.RestValidationExceptionMapper;
 
 /**
  * Mapeamento manual dos resources
@@ -44,12 +49,14 @@ public abstract class CanaryRestResources {
 
 	/**
 	 * Adiciona classes de tratamento de chamadas REST
-	 * @param checkException: adicionar tratamento de exceções
+	 * @param checkException: adicionar tratamento de excecoes ({@link ApplicationException} {@link ApplicationRuntimeException} {@link ValidationException}
 	 * @return
 	 */
 	public static Set<Class<?>> getClasses(boolean checkException){
 		if(checkException){
-			resources.add(RestExceptionMapper.class);
+			resources.add(RestApplicationExceptionMapper.class);
+			resources.add(RestApplicationRuntimeExceptionMapper.class);
+			resources.add(RestValidationExceptionMapper.class);
 		}
 		return resources;
 	}

@@ -1,7 +1,6 @@
 package br.com.jgon.canary.jee.ws.rest.util.link;
 
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleEntry;
@@ -36,6 +35,7 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 //import com.google.common.base.CaseFormat;
 
 import br.com.jgon.canary.jee.exception.ApplicationException;
+import br.com.jgon.canary.jee.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.jee.exception.MessageSeverity;
 import br.com.jgon.canary.jee.util.CollectionUtil;
 import br.com.jgon.canary.jee.util.Pagination;
@@ -84,7 +84,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 	 * Intercepta a response para configrar os links
 	 */
 	@Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     	if(responseContext.getEntityAnnotations() != null 
     			&& (responseContext.getEntityClass() == null 
     			|| !responseContext.getEntityClass().equals(ResponseError.class))){
@@ -92,9 +92,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     		try{
     			configLinks(requestContext.getUriInfo(), responseContext);
 			} catch (ApplicationException e) {
-				IOException ioe = new IOException(e);
-				ioe.addSuppressed(e);
-				throw ioe;
+				throw new ApplicationRuntimeException(e);
 			}
     	}
     }

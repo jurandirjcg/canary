@@ -19,6 +19,7 @@ import org.jboss.resteasy.spi.StringParameterUnmarshaller;
 import org.jboss.resteasy.util.FindAnnotation;
 
 import br.com.jgon.canary.jee.exception.ApplicationException;
+import br.com.jgon.canary.jee.exception.ApplicationRuntimeException;
 
 /**
  * Intercepta a requisicao para tratamento da ordenacao
@@ -42,7 +43,7 @@ public class WsOrderParamFormatter implements StringParameterUnmarshaller<WSSort
 		try{
 			return new WSSortParam(returnType, str);
 		}catch (ApplicationException e){
-			throw new RuntimeException(e);
+			throw new ApplicationRuntimeException(e);
 		}
 	}
 }

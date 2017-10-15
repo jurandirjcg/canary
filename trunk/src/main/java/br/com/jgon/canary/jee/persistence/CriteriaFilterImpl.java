@@ -25,12 +25,20 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.Attribute;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.time.DateUtils;
+
 import br.com.jgon.canary.jee.exception.ApplicationException;
+import br.com.jgon.canary.jee.exception.MessageSeverity;
 import br.com.jgon.canary.jee.persistence.filter.CriteriaFilter;
+import br.com.jgon.canary.jee.util.DateUtil;
 
 /**
  * Define os filtros que serao utilizados para construir a criteria 
@@ -43,6 +51,11 @@ import br.com.jgon.canary.jee.persistence.filter.CriteriaFilter;
  */
 class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	
+	private static final String regexPatternAlpha = "[a-zA-Z0-9\u00C0-\u00FF\\s_-]+";
+	private static final String regexPatternDate = "(((0?[1-9]|[12][0-9]|3[01])[/-](0[1-9]|1[0-2])[/-]((19|20)\\d\\d))|((19|20)\\d\\d[-/](0[1-9]|1[012])[-/](0[1-9]|[12][0-9]|3[01])))";
+	private static final String regexPatternDateTime =  regexPatternDate +"(([\\s]?(0\\d|1\\d|2[0-3]):[0-5]\\d)?(:[0-5]\\d)?)?";
+	private static final String regexPatternDateTimeOrNumber = "((" + regexPatternDateTime + ")|[0-9]+)";
+	private static final String regexPatternMultiDateTimeOrNumber = "(([a-zA-Z0-9,\\s_-\u00C0-\u00FF]+)|[" + regexPatternDateTime + ",]+)";
 	/**
 	 * Filtro de restricao
 	 *
@@ -52,45 +65,46 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	 *
 	 */
 	enum Where{
-		IGNORE (null),
-		EQUAL ("="),
-		LESS_THAN ("<"),
-		LESS_THAN_OR_EQUAL_TO ("<="),
-		GREATER_THAN (">"),
-		GREATER_THAN_OR_EQUAL_TO (">="),
-		NOT_EQUAL ("!="),
-		IN (null),
-		NOT_IN (null),
-		LIKE (null),
-		NOT_LIKE (null),
-		LIKE_ANY_BEFORE_AND_AFTER (null),
-		LIKE_ANY_BEFORE (null),
-		LIKE_ANY_AFTER (null),
-		ILIKE (null),
-		NOT_ILIKE (null),
-		ILIKE_ANY_BEFORE_AND_AFTER (null),
-		ILIKE_ANY_BEFORE (null),
-		ILIKE_ANY_AFTER (null),
-		IS_NULL (null),
-		IS_NOT_NULL (null),
-		BETWEEN (null),
-		EQUAL_OTHER_FIELD (null),
-		LESS_THAN_OTHER_FIELD (null),
-		GREATER_THAN_OTHER_FIELD (null),
-		LESS_THAN_OR_EQUAL_TO_OTHER_FIELD (null),
-		GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD (null),
-		NOT_EQUAL_OTHER_FIELD (null);
+		IGNORE (null, null),
+		EQUAL (RegexWhere.EQUAL, "(?<=^\\=)" + regexPatternAlpha + "$"),
+		LESS_THAN (RegexWhere.LESS_THAN, "(?<=^\\<)" + regexPatternDateTimeOrNumber + "$"),
+		LESS_THAN_OR_EQUAL_TO (RegexWhere.LESS_THAN_OR_EQUAL_TO, "(?<=^\\<\\=)" + regexPatternDateTimeOrNumber + "$"),
+		GREATER_THAN (RegexWhere.GREATER_THAN, "(?<=^\\>)" + regexPatternDateTimeOrNumber + "$"),
+		GREATER_THAN_OR_EQUAL_TO (RegexWhere.GREATER_THAN_OR_EQUAL_TO, "(?<=^\\>\\=)" + regexPatternDateTimeOrNumber + "$"),
+		NOT_EQUAL (RegexWhere.NOT_EQUAL, "(?<=^\\!\\=)" + regexPatternAlpha + "$"),
+		IN (RegexWhere.IN, "(?<=^\\()" + regexPatternMultiDateTimeOrNumber + "(?=\\)$)"),
+		NOT_IN (RegexWhere.NOT_IN, "(?<=^!\\()" + regexPatternMultiDateTimeOrNumber + "(?=\\)$)"),
+		LIKE (RegexWhere.LIKE, "(?<=^\\=\\%)" + regexPatternAlpha + "(?!\\%)"),
+		NOT_LIKE (RegexWhere.NOT_LIKE, "(?<=^\\!\\%)" + regexPatternAlpha + "(?!\\%)"),
+		LIKE_ANY_BEFORE_AND_AFTER (RegexWhere.LIKE_ANY_BEFORE_AND_AFTER, "(?<=^\\%)" + regexPatternAlpha + "(?=\\%$)"),
+		LIKE_ANY_BEFORE (RegexWhere.LIKE_ANY_BEFORE, "(?<=^\\%)" +  regexPatternAlpha + "(?!\\%$)"),
+		LIKE_ANY_AFTER (RegexWhere.LIKE_ANY_AFTER, "(?<!^\\%)" +  regexPatternAlpha + "(?=\\%$)"),
+		ILIKE (RegexWhere.ILIKE, "(?<=^\\=\\*)" + regexPatternAlpha + "(?!\\*)"),
+		NOT_ILIKE (RegexWhere.NOT_ILIKE, "(?<=^\\!\\*)" + regexPatternAlpha + "(?!\\*)"),
+		ILIKE_ANY_BEFORE_AND_AFTER (RegexWhere.ILIKE_ANY_BEFORE_AND_AFTER, "(?<=^\\*)" +  regexPatternAlpha + "(?=\\*$)"),
+		ILIKE_ANY_BEFORE (RegexWhere.ILIKE_ANY_BEFORE, "(?<=^\\*)" +  regexPatternAlpha + "(?!\\*$)"),
+		ILIKE_ANY_AFTER (RegexWhere.ILIKE_ANY_AFTER, "(?<!^\\*)" +  regexPatternAlpha + "(?=\\*$)"),
+		IS_NULL (RegexWhere.IS_NULL, "^null$"),
+		IS_NOT_NULL (RegexWhere.IS_NOT_NULL, "^not null$"),
+		BETWEEN (RegexWhere.BETWEEN,"(?<=^\\()" + regexPatternDateTimeOrNumber + "(\\s&\\s)" + regexPatternDateTimeOrNumber + "(?=\\)$)"),
+		EQUAL_OTHER_FIELD (null, null),
+		LESS_THAN_OTHER_FIELD (null, null),
+		GREATER_THAN_OTHER_FIELD (null ,null),
+		LESS_THAN_OR_EQUAL_TO_OTHER_FIELD (null, null),
+		GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD (null, null),
+		NOT_EQUAL_OTHER_FIELD (null, null);
 		
 		public String exp;
+		public RegexWhere regexWhere;
 		
-		private Where(String exp) {
+		private Where(RegexWhere regexWhere, String exp) {
 			this.exp = exp;
+			this.regexWhere = regexWhere;
 		}
 	}
-	
+			
 	/**
 	 * Filtro de ordenacao
-	 * @author jurandir
 	 *
 	 */
 	enum Order{
@@ -100,8 +114,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	
 	/**
 	 * Filtro de selecao
-	 * @author jurandir
-	 *
+	 * 
 	 */
 	enum SelectAggregate{
 		FIELD,
@@ -543,6 +556,155 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 		return addWhereListValues(field, Where.IN, values);
 	}
 	
+	/**
+	 * 
+	 * @param regexToAnalyse
+	 * @param search
+	 * @return
+	 */
+	private boolean containsRegex(RegexWhere[] regexToAnalyse, RegexWhere rgxSearch){
+		for(RegexWhere rgx : regexToAnalyse){
+			if(rgx.equals(rgxSearch)){
+				return true;
+			}
+		}
+		return false;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereRegex(String field, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
+		boolean added = configWhereRegex(field, value, regexToAnalyse, defaultIfNotMatch);
+		if(!added && defaultIfNotMatch != null){
+			throw new ApplicationException(MessageSeverity.ERROR, "error.regex-config", value, field);
+		}
+		return this;
+	}
+	
+	public boolean configWhereRegex(String field, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
+		Where where = null;
+		for(Where wh : Where.values()){
+			if(wh.exp != null && (regexToAnalyse == null || containsRegex(regexToAnalyse, wh.regexWhere)) && checkRegex(value, wh.exp)){
+				where = wh;
+				break;
+			}
+		}
+		if(where != null){
+			Pattern p = Pattern.compile(where.exp);
+			Matcher m = p.matcher(value);
+			
+			if(m.find()){
+				if(where.equals(Where.IS_NULL)){
+					this.addWhereIsNull(field);
+				}else if(where.equals(Where.IS_NOT_NULL)){
+					this.addWhereIsNotNull(field);
+				}else if(where.equals(Where.BETWEEN)){
+					String[] val = m.group().replace(" ", "").split("&");
+					if(NumberUtils.isCreatable(val[0])){
+						this.whereRestriction.add(field, Where.BETWEEN, new Number[] {NumberUtils.createNumber(val[0]), NumberUtils.createNumber(val[1])});
+						return true;
+					}else{
+						Date dt1, dt2;
+						dt1 = DateUtil.parseDate(val[0]);
+						dt2 = DateUtil.parseDate(val[1]);
+						if(val[1].matches(regexPatternDate)){
+								DateUtils.setHours(dt2, 23);
+								DateUtils.setMinutes(dt2, 59);
+								DateUtils.setSeconds(dt2, 59);
+								DateUtils.setMilliseconds(dt2, 999);
+						}
+						addWhereBetween(field, dt1, dt2);
+						return true;
+					}
+				}else if(where.equals(Where.IN) || where.equals(Where.NOT_IN)){
+					String[] val = m.group().replace(" ", "").split("\\,");
+					if(val[0] != null && val[0].matches(regexPatternDateTime)){
+						Date[] dates = new Date[val.length];
+						for(int i=0; i < val.length; i++){
+							dates[i] = DateUtil.parseDate(val[i]);
+						}
+						if(where.equals(Where.IN)){
+							addWhereIn(field, dates);
+							return true;
+						}else{
+							addWhereNotIn(field, dates);
+							return true;
+						}
+					}else{
+						if(where.equals(Where.IN)){
+							addWhereIn(field, val);
+							return true;
+						}else{
+							addWhereNotIn(field, val);
+							return true;
+						}
+					}
+				}else{
+					String val = m.group();
+					Date dt = DateUtil.parseDate(m.group());
+					if(val.matches(regexPatternDateTime)){
+						if(val.matches(regexPatternDate) && (where.equals(Where.LESS_THAN) || where.equals(Where.LESS_THAN_OR_EQUAL_TO))){
+							DateUtils.setHours(dt, 23);
+							DateUtils.setMinutes(dt, 59);
+							DateUtils.setSeconds(dt, 59);
+							DateUtils.setMilliseconds(dt, 999);
+						}
+						this.whereRestriction.add(field, where, dt);
+						return true;
+					}else{
+						this.whereRestriction.add(field, where, val);
+						return true;
+					}
+				}
+			}
+		}else{
+			boolean found = false;
+			if(ArrayUtils.contains(regexToAnalyse, RegexWhere.MULTI)){
+				final String multiWhere = "^(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber +  "(;\\s?(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber + "){1,}$";
+				Pattern p = Pattern.compile(multiWhere);
+				Matcher m = p.matcher(value);
+
+				if(m.find()){
+					found= true;
+					String[] val = m.group().split(";");
+
+					for(String v: val){
+						boolean add = configWhereRegex(field, v, new RegexWhere[] {
+								RegexWhere.LESS_THAN, 
+								RegexWhere.LESS_THAN_OR_EQUAL_TO, 
+								RegexWhere.EQUAL, 
+								RegexWhere.NOT_EQUAL,
+								RegexWhere.GREATER_THAN,
+								RegexWhere.GREATER_THAN_OR_EQUAL_TO}, defaultIfNotMatch);
+						
+						if(!add){
+							return false;
+						}
+					}
+					return true;
+				}
+			}
+
+			if(!found && defaultIfNotMatch != null){
+				if(defaultIfNotMatch.equals(RegexWhere.EQUAL) && value.matches("^[a-zA-Z0-9]" + regexPatternAlpha + "$")){
+					this.whereRestriction.add(field, Where.EQUAL, value);
+					return true;
+				}else{
+					return configWhereRegex(field, value, new RegexWhere[] {defaultIfNotMatch}, null);
+				}
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public CriteriaFilter<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
+		return addWhereRegex(attribute.getName(), value, regexToAnalyse, defaultIfNotMatch);
+	}
+	private boolean checkRegex(String value, String regex){
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(value);
+		return m.find();
+	}
+		
 	@Override
 	public <E> CriteriaFilter<T> addWhereIn(Attribute<?, ?> attribute, List<E> values){
 		return this.addWhereIn(attribute.getName(), values);
@@ -658,6 +820,11 @@ class CriteriaFilterImpl<T> implements CriteriaFilter<T> {
 	@Override
 	public CriteriaFilter<T> addWhereBetween(String field, Integer startValue, Integer endValue){
 		this.whereRestriction.add(field, Where.BETWEEN, new Integer[] {startValue, endValue});
+		return this;
+	}
+	@Override
+	public CriteriaFilter<T> addWhereBetween(String field, Double startValue, Double endValue){
+		this.whereRestriction.add(field, Where.BETWEEN, new Double[] {startValue, endValue});
 		return this;
 	}
 	@Override

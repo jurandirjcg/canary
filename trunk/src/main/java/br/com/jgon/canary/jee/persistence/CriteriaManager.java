@@ -15,6 +15,7 @@ package br.com.jgon.canary.jee.persistence;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.math.BigInteger;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -622,6 +623,9 @@ class CriteriaManager<T> {
 				}else if(attributeClass.equals(Date.class)){
 					Date[] between = (Date[]) value;
 					predicates.add(criteriaBuilder.between(((Expression<Date>) pathExpression), between[0], between[1]));
+				}else if(attributeClass.equals(BigInteger.class)){
+					BigInteger[] between = (BigInteger[]) value;
+					predicates.add(criteriaBuilder.between(((Expression<BigInteger>) pathExpression), between[0], between[1]));
 				}
 				break;
 			case LESS_THAN:

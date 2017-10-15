@@ -713,6 +713,8 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			}
 		} catch (NoResultException nre){
 			return null;
+		} catch (IllegalArgumentException e) {
+			throw new ApplicationException(MessageSeverity.ERROR, "message", e, new String[] { e.getMessage() });
 		} catch (Exception e) {
 			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
 		}

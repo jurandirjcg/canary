@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 
 /**
- * Utilizar a annotation {@link JsonFormat} parametro pattern para definir o pattern de retorno - default: yyyy-MM-dd HH:mm:ss
+ * Utilizar a annotation {@link JsonFormat} parametro pattern para definir o pattern de retorno - default: yyyy-MM-dd'T'HH:mm:ssZ
  *
  * @author Jurandir C. Goncalves
  * 
@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
  */
 public class JsonDateTimeDeserializer extends JsonDeserializer<Date> implements ContextualDeserializer{
 
-	private String pattern = "yyyy-MM-dd HH:mm:ss";
+	private String pattern = "yyyy-MM-dd'T'HH:mm:ssZ";
 	
 	public JsonDateTimeDeserializer() {
 		
