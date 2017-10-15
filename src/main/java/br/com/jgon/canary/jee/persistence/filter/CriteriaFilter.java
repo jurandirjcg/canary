@@ -36,6 +36,105 @@ import br.com.jgon.canary.jee.exception.ApplicationException;
 public interface CriteriaFilter<T> {
 	
 	/**
+	 * Regex de consulta
+	 * 
+	 * @author Jurandir C. Goncalves
+	 * 
+	 * @version 1.0
+	 * 
+	 */
+	public enum RegexWhere{
+		/**
+		 * Ex: =10
+		 */
+		EQUAL,
+		/**
+		 * Ex: (10 & 20)
+		 */
+		BETWEEN,
+		/**
+		 * Ex: <10
+		 */
+		LESS_THAN,
+		/**
+		 * Ex: <=10
+		 */
+		LESS_THAN_OR_EQUAL_TO,
+		/**
+		 * Ex: >10
+		 */
+		GREATER_THAN,
+		/**
+		 * Ex: >=10
+		 */
+		GREATER_THAN_OR_EQUAL_TO,
+		/**
+		 * Ex: !=10
+		 */
+		NOT_EQUAL,
+		/**
+		 * Ex: (10,15,20)
+		 */
+		IN,
+		/**
+		 * Ex: !(10,12,15,20)
+		 */
+		NOT_IN,
+		/**
+		 * Ex: =%nome
+		 */
+		LIKE,
+		/**
+		 * Ex: !%nome
+		 */
+		NOT_LIKE,
+		/**
+		 * Ex: %nome%
+		 */
+		LIKE_ANY_BEFORE_AND_AFTER,
+		/**
+		 * Ex: %nome
+		 */
+		LIKE_ANY_BEFORE,
+		/**
+		 * Ex: nome%
+		 */
+		LIKE_ANY_AFTER,
+		/**
+		 * Ex: =*nome
+		 */
+		ILIKE,
+		/**
+		 * Ex: !*nome
+		 */
+		NOT_ILIKE,
+		/**
+		 * Ex: *nome*
+		 */
+		ILIKE_ANY_BEFORE_AND_AFTER,
+		/**
+		 * Ex: *nome
+		 */
+		ILIKE_ANY_BEFORE,
+		/**
+		 * Ex: nome*
+		 */
+		ILIKE_ANY_AFTER,
+		/**
+		 * Ex: null
+		 */
+		IS_NULL,
+		/**
+		 * Ex: not null
+		 */
+		IS_NOT_NULL,
+		/**
+		 * Ex: <=100;>10;!=50
+		 */
+		MULTI
+	}
+	
+	/**
 	 * 
 	 * @return
 	 */
@@ -1236,5 +1335,88 @@ public interface CriteriaFilter<T> {
 	 * @return
 	 */
 	public CriteriaFilter<T> addWhereILikeAnyBeforeAfter(Attribute<?, ?> attribute, String value);
+
+	/**
+	 * Verifica a condicao recebida junto com o valor
+	 * 
+	 * Ex: <b>equal</b> =10<br>
+	 * <b>not equal</b> !=10<br>
+	 * <b>less than</b> <10<br>
+	 * <b>less than or equal</b> <=10<br>
+	 * <b>greater than</b> >10<br>
+	 * <b>greater than or equal to</b> >=10<br>
+	 * <b>in</b> (10,15,20)<br>
+	 * <b>not in</b> !(10,15,20)<br>
+	 * <b>is null</b> null<br>
+	 * <b>not equal</b> not null<br>
+	 * <b>between</b> (10 & 20)<br>
+	 * <b>multi</b> <=100;>10;!=50<br>
+	 * <b>like</b> =%nome<br>
+	 * <b>not like</b> !%nome
+	 * <b>like after</b> nome%<br>
+	 * <b>like before</b> %nome<br>
+	 * <b>like both</b> %nome%<br>
+	 * <b>ilike</b> =*nome<br>
+	 * <b>not ilike</b> !*nome
+	 * <b>ilike after</b> nome*<br>
+	 * <b>ilike before</b> *nome<br>
+	 * <b>ilike both</b> *nome*<br>
+	 * 
+	 * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam valores com formato data/hora. Ex: <=2000-10-20
+	 * 
+	 * @param field
+	 * @param value regex com valor. Ex: >10 
+	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
+	 * @param defaultIfNotMatch padrao caso nao encontre referencia
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public CriteriaFilter<T> addWhereRegex(String field, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+
+	/**
+	 * 
+	 * @param field
+	 * @param startValue
+	 * @param endValue
+	 * @return
+	 */
+	public CriteriaFilter<T> addWhereBetween(String field, Double startValue, Double endValue);
+
+	/**
+	 * Verifica a condicao recebida junto com o valor
+	 * 
+	 * Ex: <b>equal</b> =10<br>
+	 * <b>not equal</b> !=10<br>
+	 * <b>less than</b> <10<br>
+	 * <b>less than or equal</b> <=10<br>
+	 * <b>greater than</b> >10<br>
+	 * <b>greater than or equal to</b> >=10<br>
+	 * <b>in</b> (10,15,20)<br>
+	 * <b>not in</b> !(10,15,20)<br>
+	 * <b>is null</b> null<br>
+	 * <b>not equal</b> not null<br>
+	 * <b>between</b> (10 & 20)<br>
+	 * <b>multi</b> <=100;>10;!=50<br>
+	 * <b>like</b> =%nome<br>
+	 * <b>not like</b> !%nome
+	 * <b>like after</b> nome%<br>
+	 * <b>like before</b> %nome<br>
+	 * <b>like both</b> %nome%<br>
+	 * <b>ilike</b> =*nome<br>
+	 * <b>not ilike</b> !*nome
+	 * <b>ilike after</b> nome*<br>
+	 * <b>ilike before</b> *nome<br>
+	 * <b>ilike both</b> *nome*<br>
+	 * 
+	 * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam valores com formato data/hora. Ex: <=2000-10-20
+	 * 
+	 * @param attribute
+	 * @param value regex com valor. Ex: >10 
+	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
+	 * @param defaultIfNotMatch padrao caso nao encontre referencia
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public CriteriaFilter<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
 		
 }

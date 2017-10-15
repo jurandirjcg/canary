@@ -20,6 +20,10 @@ import java.util.Date;
 
 import org.jboss.resteasy.spi.StringParameterUnmarshaller;
 import org.jboss.resteasy.util.FindAnnotation;
+
+import br.com.jgon.canary.jee.exception.ApplicationRuntimeException;
+import br.com.jgon.canary.jee.exception.MessageSeverity;
+import br.com.jgon.canary.jee.util.MessageFactory;
 /**
  * Intercepta requisicao para configuracao do campo data
  *
@@ -47,7 +51,7 @@ public class DateFormatter implements StringParameterUnmarshaller<Date> {
 		 try{
             return formatter.parse(str);
          }catch (ParseException e){
-        	throw new RuntimeException(e);
+        	throw new ApplicationRuntimeException(MessageSeverity.ERROR, e, MessageFactory.getMessage("error.parse-date", str));
          }
 	}
 }

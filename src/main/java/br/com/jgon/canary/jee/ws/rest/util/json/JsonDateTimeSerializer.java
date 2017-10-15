@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 
 /**
- * Utilizar a annotation {@link JsonFormat} parametro pattern para definir o pattern de retorno - default: yyyy-MM-dd HH:mm:ss
+ * Utilizar a annotation {@link JsonFormat} parametro pattern para definir o pattern de retorno - default: yyyy-MM-dd'T'HH:mm:ssZ
  *
  * @author Jurandir C. Goncalves
  * 
@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.ser.ContextualSerializer;
  */
 public class JsonDateTimeSerializer extends JsonSerializer<Date> implements ContextualSerializer{
 
-	private String pattern = "yyyy-MM-dd HH:mm:ss";
+	private String pattern = "yyyy-MM-dd'T'HH:mm:ssZ";
 	
 	public JsonDateTimeSerializer() {
 		
@@ -66,5 +66,4 @@ public class JsonDateTimeSerializer extends JsonSerializer<Date> implements Cont
 		
 		return new JsonDateTimeSerializer();
 	}
-
 }
