@@ -17,8 +17,8 @@ import java.util.List;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
-import br.com.jgon.canary.exception.MessageSeverity;
 import br.com.jgon.canary.util.MessageFactory;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.ws.rest.util.WSMapper;
 /**
  * Configura os atributos de ordenacao vindos na requisicao

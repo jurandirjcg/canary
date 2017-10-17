@@ -50,8 +50,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 
-import br.com.jgon.canary.exception.MessageSeverity;
 import br.com.jgon.canary.util.MessageFactory;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.validation.ValidateMessage;
 import br.com.jgon.canary.validation.ValidatorFactory;
 import br.com.jgon.canary.validation.exception.ValidationException;

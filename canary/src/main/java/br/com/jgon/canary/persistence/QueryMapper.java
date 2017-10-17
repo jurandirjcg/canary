@@ -33,8 +33,8 @@ import javax.persistence.Transient;
 import org.apache.commons.lang3.StringUtils;
 
 import br.com.jgon.canary.exception.ApplicationException;
-import br.com.jgon.canary.exception.MessageSeverity;
 import br.com.jgon.canary.persistence.filter.QueryAttributeMapper;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
 
 /**

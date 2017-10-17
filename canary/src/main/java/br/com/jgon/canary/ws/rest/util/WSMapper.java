@@ -31,7 +31,7 @@ import javax.enterprise.context.RequestScoped;
 import org.apache.commons.lang3.StringUtils;
 
 import br.com.jgon.canary.exception.ApplicationException;
-import br.com.jgon.canary.exception.MessageSeverity;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
 
 /**

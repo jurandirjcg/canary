@@ -14,6 +14,7 @@
 package br.com.jgon.canary.exception;
 
 import br.com.jgon.canary.util.MessageFactory;
+import br.com.jgon.canary.util.MessageSeverity;
 
 /**
  * 

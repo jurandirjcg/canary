@@ -14,7 +14,7 @@
 package br.com.jgon.canary.persistence.exception;
 
 import br.com.jgon.canary.exception.ApplicationException;
-import br.com.jgon.canary.exception.MessageSeverity;
+import br.com.jgon.canary.util.MessageSeverity;
 
 /**
  * 

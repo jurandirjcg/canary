@@ -36,9 +36,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
 import br.com.jgon.canary.exception.ApplicationException;
-import br.com.jgon.canary.exception.MessageSeverity;
 import br.com.jgon.canary.persistence.filter.CriteriaFilter;
 import br.com.jgon.canary.util.DateUtil;
+import br.com.jgon.canary.util.MessageSeverity;
 
 /**
  * Define os filtros que serao utilizados para construir a criteria 

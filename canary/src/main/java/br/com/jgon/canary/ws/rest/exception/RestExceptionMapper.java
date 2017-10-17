@@ -24,7 +24,7 @@ import javax.ws.rs.ext.Provider;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
-import br.com.jgon.canary.exception.MessageSeverity;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.validation.exception.ValidationException;
 import br.com.jgon.canary.ws.rest.util.ResponseError;
 

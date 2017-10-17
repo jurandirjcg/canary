@@ -7,7 +7,6 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
 import br.com.jgon.canary.exception.ApplicationException;
-import br.com.jgon.canary.exception.MessageSeverity;
 
 public abstract class DateUtil {
 

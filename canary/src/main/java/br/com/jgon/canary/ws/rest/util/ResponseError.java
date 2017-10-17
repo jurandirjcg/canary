@@ -15,7 +15,7 @@ package br.com.jgon.canary.ws.rest.util;
 
 import javax.ws.rs.core.Response.Status;
 
-import br.com.jgon.canary.exception.MessageSeverity;
+import br.com.jgon.canary.util.MessageSeverity;
 
 /**
  * Padronizacao das mensagens de erro do WebService

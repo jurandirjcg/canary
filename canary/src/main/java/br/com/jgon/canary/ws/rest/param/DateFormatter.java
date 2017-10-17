@@ -22,8 +22,8 @@ import org.jboss.resteasy.spi.StringParameterUnmarshaller;
 import org.jboss.resteasy.util.FindAnnotation;
 
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
-import br.com.jgon.canary.exception.MessageSeverity;
 import br.com.jgon.canary.util.MessageFactory;
+import br.com.jgon.canary.util.MessageSeverity;
 /**
  * Intercepta requisicao para configuracao do campo data
  *

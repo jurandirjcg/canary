@@ -21,8 +21,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import br.com.jgon.canary.exception.MessageSeverity;
 import br.com.jgon.canary.util.MessageFactory;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.validation.exception.ValidationException;
 
 /**

@@ -47,13 +47,13 @@ import javax.persistence.metamodel.Metamodel;
 import org.apache.commons.lang3.ArrayUtils;
 
 import br.com.jgon.canary.exception.ApplicationException;
-import br.com.jgon.canary.exception.MessageSeverity;
 import br.com.jgon.canary.persistence.exception.RemoveEntityException;
 import br.com.jgon.canary.persistence.exception.SaveEntityException;
 import br.com.jgon.canary.persistence.exception.UpdateEntityException;
 import br.com.jgon.canary.persistence.filter.CriteriaFilter;
 import br.com.jgon.canary.persistence.filter.QueryAttributeMapper;
 import br.com.jgon.canary.util.CollectionUtil;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.Pagination;
 import br.com.jgon.canary.util.ReflectionUtil;
 

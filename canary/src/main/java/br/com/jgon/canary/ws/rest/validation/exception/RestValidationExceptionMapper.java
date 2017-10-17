@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import br.com.jgon.canary.exception.MessageSeverity;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.validation.exception.ValidationException;
 import br.com.jgon.canary.ws.rest.util.ResponseError;
 

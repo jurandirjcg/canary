@@ -36,8 +36,8 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
-import br.com.jgon.canary.exception.MessageSeverity;
 import br.com.jgon.canary.util.CollectionUtil;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.Pagination;
 import br.com.jgon.canary.util.ReflectionUtil;
 import br.com.jgon.canary.ws.rest.param.WSFieldParam;

@@ -13,8 +13,8 @@
  */
 package br.com.jgon.canary.validation;
 
-import br.com.jgon.canary.exception.MessageSeverity;
 import br.com.jgon.canary.util.MessageFactory;
+import br.com.jgon.canary.util.MessageSeverity;
 
 /**
  * 
