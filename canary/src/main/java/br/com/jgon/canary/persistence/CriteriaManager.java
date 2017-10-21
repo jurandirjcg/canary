@@ -16,6 +16,8 @@ package br.com.jgon.canary.persistence;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -511,116 +513,52 @@ class CriteriaManager<T> {
 				}
 				break;
 			case LIKE_EXACT:
-				if(isStringType){
-					predicates.add(criteriaBuilder.like((Expression<String>) pathExpression, (String) value));
-				}else{
-					predicates.add(criteriaBuilder.like(pathExpression.as(String.class), value.toString()));
-				}
+				predicates.add(criteriaBuilder.like((Expression<String>) pathExpression, stringValue));
 				break;
 			case LIKE_NOT_EXACT:
-				if(isStringType){
-					predicates.add(criteriaBuilder.notLike((Expression<String>) pathExpression, (String) value));
-				}else{
-					predicates.add(criteriaBuilder.notLike(pathExpression.as(String.class), value.toString()));
-				}
+				predicates.add(criteriaBuilder.notLike((Expression<String>) pathExpression, stringValue));
 				break;
 			case LIKE_MATCH_END:
-				if(isStringType){
-					predicates.add(criteriaBuilder.like((Expression<String>) pathExpression, "%".concat(stringValue)));
-				}else{
-					predicates.add(criteriaBuilder.like(pathExpression.as(String.class), "%".concat(stringValue)));
-				}
+				predicates.add(criteriaBuilder.like((Expression<String>) pathExpression, "%".concat(stringValue)));
 				break;
 			case LIKE_MATCH_START:
-				if(isStringType){
-					predicates.add(criteriaBuilder.like((Expression<String>) pathExpression, stringValue .concat("%")));
-				}else{
-					predicates.add(criteriaBuilder.like(pathExpression.as(String.class), stringValue.concat("%")));
-				}
+				predicates.add(criteriaBuilder.like((Expression<String>) pathExpression, stringValue .concat("%")));
 				break;
 			case LIKE_MATCH_ANYWHERE:
-				if(isStringType){
-					predicates.add(criteriaBuilder.like((Expression<String>) pathExpression, "%".concat(stringValue).concat("%")));
-				}else{
-					predicates.add(criteriaBuilder.like(pathExpression.as(String.class), "%".concat(stringValue).concat("%")));
-				}
+				predicates.add(criteriaBuilder.like((Expression<String>) pathExpression, "%".concat(stringValue).concat("%")));
 				break;
 			case LIKE_NOT_MATCH_END:
-				if(isStringType){
-					predicates.add(criteriaBuilder.notLike((Expression<String>) pathExpression, "%".concat(stringValue)));
-				}else{
-					predicates.add(criteriaBuilder.notLike(pathExpression.as(String.class), "%".concat(stringValue)));
-				}
+				predicates.add(criteriaBuilder.notLike((Expression<String>) pathExpression, "%".concat(stringValue)));
 				break;
 			case LIKE_NOT_MATCH_START:
-				if(isStringType){
-					predicates.add(criteriaBuilder.notLike((Expression<String>) pathExpression, stringValue .concat("%")));
-				}else{
-					predicates.add(criteriaBuilder.notLike(pathExpression.as(String.class), stringValue.concat("%")));
-				}
+				predicates.add(criteriaBuilder.notLike((Expression<String>) pathExpression, stringValue .concat("%")));
 				break;
 			case LIKE_NOT_MATCH_ANYWHERE:
-				if(isStringType){
-					predicates.add(criteriaBuilder.notLike((Expression<String>) pathExpression, "%".concat(stringValue).concat("%")));
-				}else{
-					predicates.add(criteriaBuilder.notLike(pathExpression.as(String.class), "%".concat(stringValue).concat("%")));
-				}
+				predicates.add(criteriaBuilder.notLike((Expression<String>) pathExpression, "%".concat(stringValue).concat("%")));
 				break;
 			case ILIKE_EXACT:
-				if(isStringType){
-					predicates.add(criteriaBuilder.like(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal(stringValue))));
-				}else{
-					predicates.add(criteriaBuilder.like(criteriaBuilder.upper(pathExpression.as(String.class)), criteriaBuilder.upper(criteriaBuilder.literal(stringValue))));
-				}
+				predicates.add(criteriaBuilder.like(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal(stringValue))));
 				break;
 			case ILIKE_NOT_EXACT:
-				if(isStringType){
-					predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal(stringValue))));
-				}else{
-					predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper(pathExpression.as(String.class)), criteriaBuilder.upper(criteriaBuilder.literal(stringValue))));
-				}
+				predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal(stringValue))));
 				break;
 			case ILIKE_MATCH_END:
-				if(isStringType){
-					predicates.add(criteriaBuilder.like(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue.toUpperCase())))));
-				}else{
-					predicates.add(criteriaBuilder.like(criteriaBuilder.upper(pathExpression.as(String.class)), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue.toUpperCase())))));
-				}
+				predicates.add(criteriaBuilder.like(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue)))));
 				break;
 			case ILIKE_MATCH_START:
-				if(isStringType){
-					predicates.add(criteriaBuilder.like(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal(stringValue.toUpperCase().concat("%")))));
-				}else{
-					predicates.add(criteriaBuilder.like(criteriaBuilder.upper(pathExpression.as(String.class)), criteriaBuilder.upper(criteriaBuilder.literal(stringValue.toUpperCase().concat("%")))));
-				}
+				predicates.add(criteriaBuilder.like(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal(stringValue.concat("%")))));
 				break;
 			case ILIKE_MATCH_ANYWHERE:
-				if(isStringType){
-					predicates.add(criteriaBuilder.like(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue.toUpperCase()).concat("%")))));
-				}else{
-					predicates.add(criteriaBuilder.like(criteriaBuilder.upper(pathExpression.as(String.class)), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue.toUpperCase()).concat("%")))));
-				}
+				predicates.add(criteriaBuilder.like(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue).concat("%")))));
 				break;
 			case ILIKE_NOT_MATCH_END:
-				if(isStringType){
-					predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue.toUpperCase())))));
-				}else{
-					predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper(pathExpression.as(String.class)), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue.toUpperCase())))));
-				}
+				predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue)))));
 				break;
 			case ILIKE_NOT_MATCH_START:
-				if(isStringType){
-					predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal(stringValue.toUpperCase().concat("%")))));
-				}else{
-					predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper(pathExpression.as(String.class)), criteriaBuilder.upper(criteriaBuilder.literal(stringValue.toUpperCase().concat("%")))));
-				}
+				predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal(stringValue.concat("%")))));
 				break;
 			case ILIKE_NOT_MATCH_ANYWHERE:
-				if(isStringType){
-					predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue.toUpperCase()).concat("%")))));
-				}else{
-					predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper(pathExpression.as(String.class)), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue.toUpperCase()).concat("%")))));
-				}
+				predicates.add(criteriaBuilder.notLike(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal("%".concat(stringValue.concat("%"))))));
 				break;
 			case IN:
 				predicates.add(pathExpression.in((Collection<?>) value));
@@ -633,7 +571,7 @@ class CriteriaManager<T> {
 					Collection<?> listNe = (Collection<?>) value;
 					for(Object wValue: listNe){
 						if(isStringType){
-							predicates.add(criteriaBuilder.notEqual(criteriaBuilder.upper((Expression<String>) pathExpression), wValue.toString().toUpperCase()));
+							predicates.add(criteriaBuilder.notEqual(criteriaBuilder.upper((Expression<String>) pathExpression), criteriaBuilder.upper(criteriaBuilder.literal(wValue.toString()))));
 						}else{
 							predicates.add(criteriaBuilder.notEqual(pathExpression, wValue));
 						}
@@ -665,6 +603,12 @@ class CriteriaManager<T> {
 				}else if(attributeClass.equals(Date.class)){
 					Date[] between = (Date[]) value;
 					predicates.add(criteriaBuilder.between(((Expression<Date>) pathExpression), between[0], between[1]));
+				}else if(attributeClass.equals(LocalDate.class)){
+					LocalDate[] between = (LocalDate[]) value;
+					predicates.add(criteriaBuilder.between(((Expression<LocalDate>) pathExpression), between[0], between[1]));
+				}else if(attributeClass.equals(LocalDateTime.class)){
+					LocalDateTime[] between = (LocalDateTime[]) value;
+					predicates.add(criteriaBuilder.between(((Expression<LocalDateTime>) pathExpression), between[0], between[1]));
 				}else if(attributeClass.equals(BigInteger.class)){
 					BigInteger[] between = (BigInteger[]) value;
 					predicates.add(criteriaBuilder.between(((Expression<BigInteger>) pathExpression), between[0], between[1]));
