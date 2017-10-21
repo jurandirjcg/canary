@@ -41,8 +41,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Selection;
-import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.Metamodel;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -51,6 +49,7 @@ import br.com.jgon.canary.persistence.exception.RemoveEntityException;
 import br.com.jgon.canary.persistence.exception.SaveEntityException;
 import br.com.jgon.canary.persistence.exception.UpdateEntityException;
 import br.com.jgon.canary.persistence.filter.CriteriaFilter;
+import br.com.jgon.canary.persistence.filter.CriteriaFilterMetamodel;
 import br.com.jgon.canary.persistence.filter.QueryAttributeMapper;
 import br.com.jgon.canary.util.CollectionUtil;
 import br.com.jgon.canary.util.MessageSeverity;
@@ -979,6 +978,26 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	}
 	
 	/**
+	 * 
+	 * @param objRef  objeto de referencia da pesquisa
+	 * @return filtro da pesquisa
+	 */
+	protected CriteriaFilterMetamodel<T> getCriteriaFilterMetamodel(T objRef){
+		if(objRef == null){
+			return getCriteriaFilterMetamodel();
+		}
+		return new CriteriaFilterImpl<T>(objRef, getPrimaryClass());
+	}
+	
+	/**
+	 * 
+	 * @return filtro da pesquisa
+	 */
+	protected CriteriaFilterMetamodel<T> getCriteriaFilterMetamodel(){
+		return new CriteriaFilterImpl<T>(getPrimaryClass());
+	}
+	
+	/**
 	 * Retorna lista paginada com a mesma assinatura da entidade 
 	 * @param criteriaFilter  filtro da pesquisa {@link CriteriaFilter}
 	 * @param page  numero da pagina
@@ -1324,21 +1343,5 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 			}			
 		}		
 		return paginacao;
-	}
-	
-	/**
-	 * Concatena os atributos para consulta
-	 * @param attributes {@link  Metamodel}
-	 * @return atributos concatenados
-	 */
-	protected static String concatMetamodelAttribute(Attribute<?, ?>... attributes){
-		StringBuilder f = new StringBuilder();
-		for(int i=0; i < attributes.length; i++){
-			if(i > 0){
-				f.append(".");
-			}
-			f.append(attributes[i].getName());
-		}
-		return f.toString();
 	}
 }
