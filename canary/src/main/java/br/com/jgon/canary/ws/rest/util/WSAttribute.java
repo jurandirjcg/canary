@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 @Retention (RetentionPolicy.RUNTIME)
 @Target ({ElementType.FIELD, })
 @Inherited
-public @interface WSAttributeMapper {
+public @interface WSAttribute {
 	
 	/**
 	 * Nome do atributo na base
@@ -40,8 +40,13 @@ public @interface WSAttributeMapper {
 	 * Indica se o atributo e enum
 	 * @return
 	 */
-	boolean isEnum() default false;
+	//boolean isEnum() default false;
 	
+	/**
+	 * Quando true não mapeia o objeto complexo 
+	 * @return
+	 */
+	boolean fixed() default false;
 	/**
 	 * Utilizado em campos do tipo Collection, pois não é possível realizar reflection (Java generics)
 	 */

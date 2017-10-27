@@ -308,7 +308,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	@SuppressWarnings("unchecked")
 	protected Class<T> getPrimaryClass() {
 		ParameterizedType type = (ParameterizedType) getClass().getGenericSuperclass();
-		return (Class<T>) (type).getActualTypeArguments()[0];
+		return (Class<T>) type.getActualTypeArguments()[0];
 	}
 
 	/**

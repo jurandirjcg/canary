@@ -94,8 +94,14 @@ public class WSMapper {
 						}while(idxStr >= 0);
 					}
 					
-					fldCheck = fldCheck != null ? fldCheck :  ReflectionUtil.getAttribute(responseClass, fNome);
-					if(fldCheck != null && !isPrimitive(fldCheck.getType())){
+					fldCheck = fldCheck != null ? fldCheck :  ReflectionUtil.getAttribute(responseClass, fNome.contains(":") ? fNome.substring(0, fNome.indexOf(":")) : fNome);
+					
+					WSAttribute wsMapperAttribute = null;
+					if(fldCheck != null && fldCheck.isAnnotationPresent(WSAttribute.class)){
+						wsMapperAttribute = fldCheck.getAnnotation(WSAttribute.class);
+					}
+					
+					if(fldCheck != null && !isPrimitive(fldCheck.getType()) && (wsMapperAttribute == null || !wsMapperAttribute.fixed())){
 						retorno.addAll(verificaCampoObject(fldCheck, fNome.contains(".") ? fNome.substring(0, fNome.lastIndexOf(".")) : fNome));
 					}else{
 						String campoVerificado = verificaCampo(responseClass, fNome); 
@@ -126,9 +132,9 @@ public class WSMapper {
 	 */
 	private List<String> verificaCampoObject(Field fldCheck, String fNome) throws ApplicationException{
 
-		WSAttributeMapper wsMapperAttribute = null;
-		if(fldCheck.isAnnotationPresent(WSAttributeMapper.class)){
-			wsMapperAttribute = fldCheck.getAnnotation(WSAttributeMapper.class);
+		WSAttribute wsMapperAttribute = null;
+		if(fldCheck.isAnnotationPresent(WSAttribute.class)){
+			wsMapperAttribute = fldCheck.getAnnotation(WSAttribute.class);
 		}
 		
 		List<String> retorno = new ArrayList<String>(0);
@@ -205,17 +211,17 @@ public class WSMapper {
 			if(fl.isAnnotationPresent(WSTransient.class)){
 				continue;
 			}
-			WSAttributeMapper wsMapperAttribute = null;
-			if(fl.isAnnotationPresent(WSAttributeMapper.class)){
-				wsMapperAttribute = fl.getAnnotation(WSAttributeMapper.class);
+			WSAttribute wsMapperAttribute = null;
+			if(fl.isAnnotationPresent(WSAttribute.class)){
+				wsMapperAttribute = fl.getAnnotation(WSAttribute.class);
 			}
 			
-			boolean isEnum = fl.getClass().isEnum() || (wsMapperAttribute != null && wsMapperAttribute.isEnum());
+			//boolean isEnum = fl.getClass().isEnum() || (wsMapperAttribute != null && wsMapperAttribute.isEnum());
 			
 			if(fl.getName().equals(partField)){
 				boolean add = true;
 				String campoMultiLevel = null;
-				if(!isEnum && multiLevel){
+				if(/*!isEnum && */multiLevel){
 					Class<?> attrType = wsMapperAttribute != null && !wsMapperAttribute.collectionType().equals(void.class) ? wsMapperAttribute.collectionType() : fl.getType(); 
 							
 					campoMultiLevel = verificaCampo(attrType, fieldName.substring(fieldName.indexOf(".") + 1));
@@ -230,9 +236,9 @@ public class WSMapper {
 					}
 					
 					//Para a execucao pois e um campo enum
-					if(isEnum){
+					/*if(isEnum){
 						break;
-					}
+					}*/
 					
 					if(StringUtils.isNotBlank(campoMultiLevel)){
 						sb.append(".").append(campoMultiLevel);

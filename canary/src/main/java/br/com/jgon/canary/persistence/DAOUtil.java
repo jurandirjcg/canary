@@ -14,6 +14,8 @@
 package br.com.jgon.canary.persistence;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,7 +25,10 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.filter.QueryAttributeMapper;
+import br.com.jgon.canary.util.MessageFactory;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
 
 /**
@@ -58,6 +63,20 @@ public class DAOUtil {
 	 */
 	@SuppressWarnings("unchecked")
 	public static Class<? extends Collection<?>> getCollectionClass(Field fld){
+		if(!ReflectionUtil.isCollection(fld.getType())){
+			throw new ApplicationRuntimeException(MessageSeverity.ERROR, null, MessageFactory.getMessage("daoutil-collection", fld.getName()));
+		}
+		
+		Type genericFieldType = fld.getGenericType();
+
+		if(genericFieldType instanceof ParameterizedType){
+		    ParameterizedType aType = (ParameterizedType) genericFieldType;
+		    Type fieldArgTypes = aType.getActualTypeArguments()[0];
+		    if(fieldArgTypes != null){
+		    	return (Class<? extends Collection<?>>) fieldArgTypes;
+		    }
+		}
+		
 		if(fld.getAnnotation(QueryAttributeMapper.class) != null && !fld.getAnnotation(QueryAttributeMapper.class).collectionTarget().equals(void.class)){
 			return (Class<? extends Collection<?>>) fld.getAnnotation(QueryAttributeMapper.class).collectionTarget();
 		}else if (fld.getAnnotation(OneToMany.class) != null && !fld.getAnnotation(OneToMany.class).targetEntity().equals(void.class)){
