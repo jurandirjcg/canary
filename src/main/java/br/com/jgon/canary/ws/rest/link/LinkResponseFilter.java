@@ -516,7 +516,11 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     					test = false;
     					values.add("");
     				}else if(linkPathParameters[i].matches(REGEX_PATH_PARAMETERS_REQ) && uriInfo.getPathParameters(false).get(rpAux) != null){
-    					values.add(uriInfo.getPathParameters(false).get(rpAux));
+    					if(uriInfo.getPathParameters(false).get(rpAux).size() > 1){
+    						values.add(uriInfo.getPathParameters(false).get(rpAux));
+    					}else{
+    						values.add(uriInfo.getPathParameters(false).getFirst(rpAux));
+    					}
     				}else{
     					test = false;
     					if(linkPathParameters[i].matches(REGEX_LINK_TEMPLATE)){
@@ -529,8 +533,10 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     		}
     		if(test){
     			if(uriInfo.getPathParameters(false).get(rpAux) != null){
-    				for(String p : uriInfo.getPathParameters(false).get(rpAux)) {
-    					values.add(p);
+    				if(uriInfo.getPathParameters(false).get(rpAux).size() > 1){
+    					values.add(uriInfo.getPathParameters(false).get(rpAux));
+    				}else{
+    					values.add(uriInfo.getPathParameters(false).getFirst(rpAux));
     				}
     			}else{
     				throw new ApplicationException(MessageSeverity.ERROR, "link-response.field-not-found", rpAux);
