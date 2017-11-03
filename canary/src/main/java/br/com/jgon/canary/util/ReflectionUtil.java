@@ -798,6 +798,17 @@ public class ReflectionUtil {
 	}
 	
 	/**
+	 * Verifica se o atributo da classe é do tipo primitivo
+	 * @param klass
+	 * @param name
+	 * @return
+	 */
+	public static boolean isPrimitiveField(Class<?> klass, String name) {
+		Field field = getAttribute(klass, name);
+		return isPrimitive(field.getType());
+	}
+	
+	/**
 	 * Verifica se é instancia de Collection, List, ou Set
 	 * @param klass
 	 * @return

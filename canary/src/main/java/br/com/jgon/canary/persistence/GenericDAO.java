@@ -762,6 +762,9 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 		
 		for(TupleElement<?> te : tuple.getElements()){
 			if(te.getAlias().contains(".")){
+				if(tuple.get(te) == null) {
+					continue;
+				}
 				String[] subObj = te.getAlias().split("\\.");
 				Object objAux = objReturn;
 				for(int i=0; i < subObj.length; i++){
@@ -792,7 +795,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 							if(!((Collection<?>) objTemp).isEmpty()){
 								objInCollection = ((Collection<?>) objTemp).toArray()[	((Collection<?>) objTemp).size() -1 ];
 							}else{
-								objInCollection = getObjectCollectionInstance(fldAux); //DAOUtil.getCollectionClass(fldAux).newInstance();
+								objInCollection = getObjectCollectionInstance(fldAux);
 								if(objInCollection != null){
 									((Collection<Object>) objTemp).add(objInCollection);
 								}

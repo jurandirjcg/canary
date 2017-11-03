@@ -320,10 +320,17 @@ class CriteriaManager<T> {
 				lastFrom = configAssociation(assAux[i], lastAttribute, lastFrom);
 				lastAttribute = StringUtils.isBlank(lastAttribute) ? assAux[i] : lastAttribute.concat(".").concat(assAux[i]);
 			}
-			
-			lastAttribute = assAux[assAux.length - 1];
+			int idx = assAux.length - 1;
+			if(lastFrom.get(assAux[idx]).getJavaType().isAnnotationPresent(Entity.class)) {
+				lastAttribute = StringUtils.isBlank(lastAttribute) ? assAux[idx] : lastAttribute.concat(".").concat(assAux[idx]);
+			}else {
+				lastAttribute = assAux[idx];
+			}
+		} else {
+			if(lastFrom.get(key).getJavaType().isAnnotationPresent(Entity.class)) {
+				lastFrom = configAssociation(key, null, lastFrom);
+			}
 		}
-		
 		return new SimpleEntry<String, From<?, ?>>(lastAttribute, lastFrom);
 	}
 	
@@ -745,7 +752,7 @@ class CriteriaManager<T> {
 		List<Field> listFields = ReflectionUtil.listAttributes(obj);
 		
 		for (Field field : listFields) {
-			// Verifiando se o metodo não é transiente
+			// Verificando se o metodo não é transiente
 			if (checkField(field) && !ReflectionUtil.existAnnotation(field, Transient.class)) {
 				field.setAccessible(true);
 				
