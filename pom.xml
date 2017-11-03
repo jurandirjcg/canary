@@ -3,8 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>br.com.jgon</groupId>
   <artifactId>canary</artifactId>
-  <version>1.0.0-RC9-SNAPSHOT</version>
+  <version>1.0.0-RC10-SNAPSHOT</version>
   <packaging>jar</packaging>
+  
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
   
   <properties>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,14 +34,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Postgres -->
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.4.1208</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- LOG -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -49,6 +49,7 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- RESTEASY -->
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>jaxrs-api</artifactId>
@@ -67,6 +68,7 @@
 			<version>3.1.1.Final</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- COMMONS -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
