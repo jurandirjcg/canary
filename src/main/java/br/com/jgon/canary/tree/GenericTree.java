@@ -20,9 +20,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import br.com.jgon.canary.jee.exception.ApplicationException;
-import br.com.jgon.canary.jee.exception.MessageSeverity;
-import br.com.jgon.canary.jee.util.ReflectionUtil;
+import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.util.MessageSeverity;
+import br.com.jgon.canary.util.ReflectionUtil;
 
 
 /**
