@@ -48,7 +48,7 @@ public interface CriteriaFilter<T> {
 		 */
 		EQUAL,
 		/**
-		 * Ex: (10 & 20)
+		 * Ex: (10 btwn 20)
 		 */
 		BETWEEN,
 		/**

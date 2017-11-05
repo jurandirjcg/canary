@@ -91,7 +91,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 		ILIKE_NOT_MATCH_START (RegexWhere.ILIKE_NOT_MATCH_START, "(?<!^\\*)" +  regexPatternAlpha + "(?=\\!\\*$)"),
 		IS_NULL (RegexWhere.IS_NULL, "^null$"),
 		IS_NOT_NULL (RegexWhere.IS_NOT_NULL, "^not null$"),
-		BETWEEN (RegexWhere.BETWEEN,"(?<=^\\()" + regexPatternDateTimeOrNumber + "(\\s&\\s)" + regexPatternDateTimeOrNumber + "(?=\\)$)"),
+		BETWEEN (RegexWhere.BETWEEN,"(?<=^\\()" + regexPatternDateTimeOrNumber + "(\\sbtwn\\s)" + regexPatternDateTimeOrNumber + "(?=\\)$)"),
 		EQUAL_OTHER_FIELD (null, null),
 		LESS_THAN_OTHER_FIELD (null, null),
 		GREATER_THAN_OTHER_FIELD (null ,null),
@@ -135,7 +135,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	private boolean collectionSelectionControl = true;
 	
 	private Map<String, Where> listWhere = new LinkedHashMap<String, Where>(0);
-	private WhereRestriction whereRestriction = new WhereRestriction();// Map<String, SimpleEntry<Where, ?>> listWhereComplex = new LinkedHashMap<String, SimpleEntry<Where,?>>();
+	private WhereRestriction whereRestriction = new WhereRestriction();
 	private Map<String, SimpleEntry<SelectAggregate, String>> listSelection = new LinkedHashMap<String, SimpleEntry<SelectAggregate, String>>(0);
 	private Map<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>> collectionSelection = new LinkedHashMap<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>>();
 	private Map<String, Order> listOrder = new LinkedHashMap<String, Order>(0);
@@ -681,7 +681,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 		}else{
 			boolean found = false;
 			if(ArrayUtils.contains(regexToAnalyse, RegexWhere.MULTI)){
-				final String multiWhere = "^(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber +  "(;\\s?(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber + "){1,}$";
+				final String multiWhere = "^(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber +  "(\\s?&\\s?(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber + "){1,}$";
 				Pattern p = Pattern.compile(multiWhere);
 				Matcher m = p.matcher(value);
 
