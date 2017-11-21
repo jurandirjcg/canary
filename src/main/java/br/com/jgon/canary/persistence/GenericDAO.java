@@ -66,18 +66,13 @@ import br.com.jgon.canary.util.ReflectionUtil;
  * @param <T>
  * @param <K>
  */
-public abstract class GenericDAO<T, K extends Serializable> implements Serializable{
+public abstract class GenericDAO<T, K extends Serializable>{
 
 	protected static final String ERROR_FIND_KEY = "error.find";
 	protected static final String ERROR_FIND_LIST_KEY = "error.find-list";
 	protected static final String ERROR_CRITERIA = "error.criteria";
 	protected static final String ERROR_FIELD_DOES_NOT_EXIST = "error.field-does-not-exist";
-		
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6642196262998558242L;
-	
+			
 	/**
 	 * 
 	 */
@@ -602,6 +597,8 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 				}
 				return listReturn;
 			}
+		} catch (ApplicationException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
 		}
@@ -710,6 +707,8 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 				TypedQuery<E> tQuery = getSearchEntityManager().createQuery(query);
 				return new SimpleEntry<Object, E>(null, tQuery.getSingleResult());
 			}
+		} catch (ApplicationException e) {
+			throw e;
 		} catch (NoResultException nre){
 			return null;
 		} catch (IllegalArgumentException e) {

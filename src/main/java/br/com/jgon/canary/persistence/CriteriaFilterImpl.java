@@ -91,7 +91,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 		ILIKE_NOT_MATCH_START (RegexWhere.ILIKE_NOT_MATCH_START, "(?<!^\\*)" +  regexPatternAlpha + "(?=\\!\\*$)"),
 		IS_NULL (RegexWhere.IS_NULL, "^null$"),
 		IS_NOT_NULL (RegexWhere.IS_NOT_NULL, "^not null$"),
-		BETWEEN (RegexWhere.BETWEEN,"(?<=^\\()" + regexPatternDateTimeOrNumber + "(\\sbtwn\\s)" + regexPatternDateTimeOrNumber + "(?=\\)$)"),
+		BETWEEN (RegexWhere.BETWEEN,"(?<=^)" + regexPatternDateTimeOrNumber + "(\\sbtwn\\s)" + regexPatternDateTimeOrNumber + "(?=$)"),
 		EQUAL_OTHER_FIELD (null, null),
 		LESS_THAN_OTHER_FIELD (null, null),
 		GREATER_THAN_OTHER_FIELD (null ,null),
@@ -620,7 +620,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 				}else if(where.equals(Where.IS_NOT_NULL)){
 					this.addWhereIsNotNull(field);
 				}else if(where.equals(Where.BETWEEN)){
-					String[] val = m.group().replace(" ", "").split("&");
+					String[] val = m.group().replace(" ", "").split("btwn");
 					if(NumberUtils.isCreatable(val[0])){
 						this.whereRestriction.add(field, Where.BETWEEN, new Number[] {NumberUtils.createNumber(val[0]), NumberUtils.createNumber(val[1])});
 						return true;

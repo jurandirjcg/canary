@@ -31,6 +31,7 @@ import javax.enterprise.context.RequestScoped;
 import org.apache.commons.lang3.StringUtils;
 
 import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.persistence.DAOUtil;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
 
@@ -137,10 +138,17 @@ public class WSMapper {
 			wsMapperAttribute = fldCheck.getAnnotation(WSAttribute.class);
 		}
 		
+		Class<?> type;
+		if(!ReflectionUtil.isCollection(fldCheck.getType())){
+			type = fldCheck.getType();
+		}else {
+			type = wsMapperAttribute.collectionType().equals(Void.class) ? DAOUtil.getCollectionClass(fldCheck) : wsMapperAttribute.collectionType();
+		}
+		
 		List<String> retorno = new ArrayList<String>(0);
-		for(Field fldCheckAux : ReflectionUtil.listAttributes(fldCheck.getType())){
+		for(Field fldCheckAux : ReflectionUtil.listAttributes(type)){
 			if(isModifierValid(fldCheckAux)){
-				String campoVerificado = verificaCampo(fldCheck.getType(), fldCheckAux.getName()); 
+				String campoVerificado = verificaCampo(type, fldCheckAux.getName()); 
 				if(StringUtils.isNotBlank(campoVerificado)){
 					if(wsMapperAttribute != null && StringUtils.isNotBlank(wsMapperAttribute.value())){
 						retorno.add(wsMapperAttribute.value().concat(".").concat(campoVerificado));
