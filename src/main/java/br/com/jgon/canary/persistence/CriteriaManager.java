@@ -215,19 +215,22 @@ class CriteriaManager<T> {
 				if(field != null && ReflectionUtil.isCollection(field.getType()) && criteriaFilter.isCollectionSelectionControl()) {
 					SimpleEntry<SelectAggregate, String> selectionAux = criteriaFilter.getListSelection().get(key);
 
+					int idxDot = selectionAux.getValue().indexOf(".");
 					boolean addCollection = true;
-					if(!entityClass.equals(resultClass)){
-						int idxDot = selectionAux.getValue().indexOf(".");
+					if(!entityClass.equals(resultClass)){						
 						Field fldResult = ReflectionUtil.getAttribute(resultClass, idxDot >= 0 ? selectionAux.getValue().substring(0, idxDot) : selectionAux.getValue());
 						addCollection = ReflectionUtil.isCollection(fldResult.getType());
 					}
 					
 					if(addCollection){
+						selectionAux.setValue(idxDot >= 0 ? selectionAux.getValue().substring(idxDot + 1) : selectionAux.getValue());
+						
 						if(listCollectionRelation.containsKey(field.getName())){
 							listCollectionRelation.get(field.getName()).getListSelection().put(key, selectionAux);
 						}else{
 							Class<?> entityClass = DAOUtil.getCollectionClass(field);
 							CriteriaFilterImpl<?> criteriaFilterCollectionRelation = new CriteriaFilterImpl(entityClass);
+														
 							criteriaFilterCollectionRelation.getListSelection().put(key, selectionAux);
 							criteriaFilterCollectionRelation.setCollectionSelectionControl(false);
 							listCollectionRelation.put(field.getName(), criteriaFilterCollectionRelation);

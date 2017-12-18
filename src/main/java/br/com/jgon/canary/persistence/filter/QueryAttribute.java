@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 @Retention (RetentionPolicy.RUNTIME)
 @Target (ElementType.FIELD)
 @Inherited
-public @interface QueryAttributeMapper {
+public @interface QueryAttribute {
 	
 	/**
 	 * Nome do atributo na base

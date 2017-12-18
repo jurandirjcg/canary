@@ -24,6 +24,7 @@ import javax.ws.rs.ext.Provider;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
+import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.validation.exception.ValidationException;
 import br.com.jgon.canary.ws.rest.util.ResponseError;
@@ -48,32 +49,48 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 		
 		ResponseError retorno = null;
 		if(exception instanceof ValidationException){
-			retorno = new ResponseError(Response.Status.BAD_REQUEST, ((ValidationException) exception).getMessage(), MessageSeverity.WARN);
+			retorno = configValidationException((ValidationException) exception);
 		}else if(exception instanceof ApplicationException){
-			ApplicationException ae = (ApplicationException) exception;
-			retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, ae.getMessage(), ae.getMessageSeverity());
-			if(ae.getMessageSeverity().equals(MessageSeverity.ERROR) || ae.getMessageSeverity().equals(MessageSeverity.FATAL)){
-				LOG.severe(exception.getMessage());
-			}
+			retorno = configApplicationException((ApplicationException) exception);
 		}else if(exception instanceof ApplicationRuntimeException){
-			ApplicationRuntimeException ae = (ApplicationRuntimeException) exception;
-			retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, ae.getMessage(), ae.getMessageSeverity());
-			if(ae.getMessageSeverity().equals(MessageSeverity.ERROR) || ae.getMessageSeverity().equals(MessageSeverity.FATAL)){
-				LOG.severe(exception.getMessage());
-			}
+			retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception);
 		}else if(exception.getCause() instanceof ApplicationRuntimeException){
-			ApplicationRuntimeException ae = (ApplicationRuntimeException) exception.getCause();
-			retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, ae.getMessage(), ae.getMessageSeverity());
-			if(ae.getMessageSeverity().equals(MessageSeverity.ERROR) || ae.getMessageSeverity().equals(MessageSeverity.FATAL)){
-				LOG.severe(exception.getMessage());
-			}
+			retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception);
 		}else if(exception instanceof WebApplicationException){
-			WebApplicationException wa = (WebApplicationException) exception;
-			return wa.getResponse();
+			return configWebApplicationException((WebApplicationException) exception);
 		}else{
-			retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, exception.getMessage(), MessageSeverity.ERROR);
+			retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, MessageFactory.getMessage("default.message"), MessageSeverity.ERROR);
 			LOG.severe(exception.getMessage());
 		}
 		return Response.status(retorno.getStatus()).entity(retorno).header("Content-type", "application/json").build();
+	}
+		
+	public ResponseError configApplicationException(ApplicationException exception) {
+		ResponseError retorno = null;
+		ApplicationException ae = exception;
+		retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, ae.getMessage(), ae.getMessageSeverity());
+		if(ae.getMessageSeverity().equals(MessageSeverity.ERROR) || ae.getMessageSeverity().equals(MessageSeverity.FATAL)){
+			LOG.severe(exception.getMessage());
+		}
+		return retorno;
+	}
+	
+	public ResponseError configValidationException(ValidationException exception) {
+		return new ResponseError(Response.Status.BAD_REQUEST, ((ValidationException) exception).getMessage(), MessageSeverity.WARN);
+	}
+	
+	public ResponseError configApplicationRuntimeException(ApplicationRuntimeException exception) {
+		ResponseError retorno = null;
+		ApplicationRuntimeException ae = (ApplicationRuntimeException) exception.getCause();
+		retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, ae.getMessage(), ae.getMessageSeverity());
+		if(ae.getMessageSeverity().equals(MessageSeverity.ERROR) || ae.getMessageSeverity().equals(MessageSeverity.FATAL)){
+			LOG.severe(exception.getMessage());
+		}
+		return retorno;
+	}
+	
+	public Response configWebApplicationException(WebApplicationException exception) {
+		WebApplicationException wa = (WebApplicationException) exception;
+		return wa.getResponse();
 	}
 }

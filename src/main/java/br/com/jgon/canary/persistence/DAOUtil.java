@@ -26,7 +26,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
-import br.com.jgon.canary.persistence.filter.QueryAttributeMapper;
+import br.com.jgon.canary.persistence.filter.QueryAttribute;
 import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
@@ -77,8 +77,8 @@ public class DAOUtil {
 		    }
 		}
 		
-		if(fld.getAnnotation(QueryAttributeMapper.class) != null && !fld.getAnnotation(QueryAttributeMapper.class).collectionTarget().equals(void.class)){
-			return (Class<? extends Collection<?>>) fld.getAnnotation(QueryAttributeMapper.class).collectionTarget();
+		if(fld.getAnnotation(QueryAttribute.class) != null && !fld.getAnnotation(QueryAttribute.class).collectionTarget().equals(void.class)){
+			return (Class<? extends Collection<?>>) fld.getAnnotation(QueryAttribute.class).collectionTarget();
 		}else if (fld.getAnnotation(OneToMany.class) != null && !fld.getAnnotation(OneToMany.class).targetEntity().equals(void.class)){
 			return fld.getAnnotation(OneToMany.class).targetEntity();
 		}else if(fld.getAnnotation(ManyToMany.class) != null && !fld.getAnnotation(ManyToMany.class).targetEntity().equals(void.class)){

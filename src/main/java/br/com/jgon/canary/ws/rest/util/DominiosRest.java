@@ -23,9 +23,10 @@ package br.com.jgon.canary.ws.rest.util;
 public abstract class DominiosRest {
 
 	public static final String X_PAGINATION_TOTAL_ELEMENTS 		= "X-Pagination-Total-Count";
-	public static final String X_PAGINATION_CURRENT_PAGE 		= "X-Pagitaion-Current-Page";
+	public static final String X_PAGINATION_CURRENT_PAGE 		= "X-Pagination-Current-Page";
 	public static final String X_PAGINATION_ELEMENTS_PER_PAGE 	= "X-Pagination-Per-Page";
 	public static final String X_PAGINATION_TOTAL_PAGE 			= "X-Pagination-Page-Count";
+	public static final String LINK_HEADER = "Link";
 	
 	/**
 	 * Content-Type application/hal+json

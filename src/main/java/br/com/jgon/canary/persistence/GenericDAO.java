@@ -50,7 +50,7 @@ import br.com.jgon.canary.persistence.exception.SaveEntityException;
 import br.com.jgon.canary.persistence.exception.UpdateEntityException;
 import br.com.jgon.canary.persistence.filter.CriteriaFilter;
 import br.com.jgon.canary.persistence.filter.CriteriaFilterMetamodel;
-import br.com.jgon.canary.persistence.filter.QueryAttributeMapper;
+import br.com.jgon.canary.persistence.filter.QueryAttribute;
 import br.com.jgon.canary.util.CollectionUtil;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.Pagination;
@@ -66,18 +66,13 @@ import br.com.jgon.canary.util.ReflectionUtil;
  * @param <T>
  * @param <K>
  */
-public abstract class GenericDAO<T, K extends Serializable> implements Serializable{
+public abstract class GenericDAO<T, K extends Serializable>{
 
 	protected static final String ERROR_FIND_KEY = "error.find";
 	protected static final String ERROR_FIND_LIST_KEY = "error.find-list";
 	protected static final String ERROR_CRITERIA = "error.criteria";
 	protected static final String ERROR_FIELD_DOES_NOT_EXIST = "error.field-does-not-exist";
-		
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6642196262998558242L;
-	
+			
 	/**
 	 * 
 	 */
@@ -602,6 +597,8 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 				}
 				return listReturn;
 			}
+		} catch (ApplicationException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
 		}
@@ -710,6 +707,8 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 				TypedQuery<E> tQuery = getSearchEntityManager().createQuery(query);
 				return new SimpleEntry<Object, E>(null, tQuery.getSingleResult());
 			}
+		} catch (ApplicationException e) {
+			throw e;
 		} catch (NoResultException nre){
 			return null;
 		} catch (IllegalArgumentException e) {
@@ -787,7 +786,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 							fldAux.set(objAux, objTemp);
 						}
 						if(objTemp instanceof Collection 
-								&& (fldAux.isAnnotationPresent(QueryAttributeMapper.class) 
+								&& (fldAux.isAnnotationPresent(QueryAttribute.class) 
 										|| fldAux.isAnnotationPresent(OneToMany.class)
 										|| fldAux.isAnnotationPresent(ManyToMany.class))){
 							
@@ -836,7 +835,7 @@ public abstract class GenericDAO<T, K extends Serializable> implements Serializa
 	 */
 	private Object getObjectCollectionInstance(Field fld) throws ApplicationException, InstantiationException, IllegalAccessException{
 		Class<?> classAux = DAOUtil.getCollectionClass(fld);
-		if(!ReflectionUtil.isCollection(classAux)){
+		if(classAux == null){
 			throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-collection-not-definied", fld.getDeclaringClass().getName() + "." + fld.getName());
 		}else{
 			return classAux.newInstance();

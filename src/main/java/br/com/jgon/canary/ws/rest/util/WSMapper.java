@@ -31,6 +31,7 @@ import javax.enterprise.context.RequestScoped;
 import org.apache.commons.lang3.StringUtils;
 
 import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.persistence.DAOUtil;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
 
@@ -77,19 +78,23 @@ public class WSMapper {
 				String[] fldAux = fieldsAjustados.split(",");
 				List<String> retorno = new LinkedList<String>();
 
+				boolean subObject = false;
 				for(String fNome: fldAux){
 					Field fldCheck=null;
 					if(fNome.contains(".")){
-						int idxStr = 0;
+						int idxStr = -1;
 						int idxEnd;
 						Class<?> testClass = responseClass;
 						do{
+							idxStr++;
 							idxEnd = fNome.indexOf(".", idxStr);
-							fldCheck = ReflectionUtil.getAttribute(testClass, fNome.substring(idxStr, idxEnd < 0 ? fNome.length() - idxStr : idxEnd));
+							fldCheck = ReflectionUtil.getAttribute(testClass, fNome.substring(idxStr, idxEnd < 0 ? fNome.length() : idxEnd));
 							if(fldCheck == null){
+								subObject = false;
 								break;
 							}
-							idxStr = fNome.indexOf(".", idxStr + 1);
+							subObject = true;
+							idxStr = fNome.indexOf(".", idxStr);
 							testClass = fldCheck.getType();
 						}while(idxStr >= 0);
 					}
@@ -102,7 +107,7 @@ public class WSMapper {
 					}
 					
 					if(fldCheck != null && !isPrimitive(fldCheck.getType()) && (wsMapperAttribute == null || !wsMapperAttribute.fixed())){
-						retorno.addAll(verificaCampoObject(fldCheck, fNome.contains(".") ? fNome.substring(0, fNome.lastIndexOf(".")) : fNome));
+						retorno.addAll(verificaCampoObject(fldCheck, !subObject && fNome.contains(".") ? fNome.substring(0, fNome.lastIndexOf(".")) : fNome));
 					}else{
 						String campoVerificado = verificaCampo(responseClass, fNome); 
 						if(StringUtils.isNotBlank(campoVerificado)){
@@ -137,18 +142,35 @@ public class WSMapper {
 			wsMapperAttribute = fldCheck.getAnnotation(WSAttribute.class);
 		}
 		
+		Class<?> type;
+		if(!ReflectionUtil.isCollection(fldCheck.getType())){
+			type = fldCheck.getType();
+		}else {
+			type = wsMapperAttribute.collectionType().equals(Void.class) ? DAOUtil.getCollectionClass(fldCheck) : wsMapperAttribute.collectionType();
+		}
+		
 		List<String> retorno = new ArrayList<String>(0);
-		for(Field fldCheckAux : ReflectionUtil.listAttributes(fldCheck.getType())){
+		for(Field fldCheckAux : ReflectionUtil.listAttributes(type)){
 			if(isModifierValid(fldCheckAux)){
-				String campoVerificado = verificaCampo(fldCheck.getType(), fldCheckAux.getName()); 
-				if(StringUtils.isNotBlank(campoVerificado)){
-					if(wsMapperAttribute != null && StringUtils.isNotBlank(wsMapperAttribute.value())){
-						retorno.add(wsMapperAttribute.value().concat(".").concat(campoVerificado));
+				WSAttribute wsMapperAttributeFieldAux = null;
+				if(fldCheckAux.isAnnotationPresent(WSAttribute.class)){
+					wsMapperAttributeFieldAux = fldCheckAux.getAnnotation(WSAttribute.class);
+				}
+				
+				if(!isPrimitive(fldCheckAux.getType()) && (wsMapperAttributeFieldAux == null || !wsMapperAttributeFieldAux.fixed())){
+					retorno.addAll(verificaCampoObject(fldCheckAux, fNome.concat(".").concat(fldCheckAux.getName())));
+				}else {
+					String campoVerificado = verificaCampo(type, fldCheckAux.getName()); 
+					if(StringUtils.isNotBlank(campoVerificado)){
+						if(wsMapperAttribute != null && StringUtils.isNotBlank(wsMapperAttribute.value())){
+							String prefix = fNome.contains(".") ? fNome.substring(0, fNome.indexOf('.') + 1) : "";
+							retorno.add(prefix.concat(wsMapperAttribute.value()).concat(".").concat(campoVerificado));
+						}else{
+							retorno.add(fNome.concat(".").concat(campoVerificado));
+						}
 					}else{
-						retorno.add(fNome.concat(".").concat(campoVerificado));
+						throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
 					}
-				}else{
-					throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
 				}
 			}
 		}

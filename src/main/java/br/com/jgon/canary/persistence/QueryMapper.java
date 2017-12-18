@@ -33,7 +33,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang3.StringUtils;
 
 import br.com.jgon.canary.exception.ApplicationException;
-import br.com.jgon.canary.persistence.filter.QueryAttributeMapper;
+import br.com.jgon.canary.persistence.filter.QueryAttribute;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
 
@@ -108,9 +108,9 @@ abstract class QueryMapper {
 	 * @throws ApplicationException
 	 */
 	private List<SimpleEntry<String, String>> verificaCampoObject(Field fldCheck, String fNome) throws ApplicationException{
-		QueryAttributeMapper queryMapperAttribute = null;
-		if(fldCheck.isAnnotationPresent(QueryAttributeMapper.class)){
-			queryMapperAttribute = fldCheck.getAnnotation(QueryAttributeMapper.class);
+		QueryAttribute queryMapperAttribute = null;
+		if(fldCheck.isAnnotationPresent(QueryAttribute.class)){
+			queryMapperAttribute = fldCheck.getAnnotation(QueryAttribute.class);
 		}
 		
 		List<SimpleEntry<String, String>> retorno = new ArrayList<SimpleEntry<String, String>>(0);
@@ -186,9 +186,9 @@ abstract class QueryMapper {
 				continue;
 			}
 			
-			QueryAttributeMapper queryMapperAttribute = null;
-			if(fl.isAnnotationPresent(QueryAttributeMapper.class)){
-				queryMapperAttribute = fl.getAnnotation(QueryAttributeMapper.class);
+			QueryAttribute queryMapperAttribute = null;
+			if(fl.isAnnotationPresent(QueryAttribute.class)){
+				queryMapperAttribute = fl.getAnnotation(QueryAttribute.class);
 			}
 			
 			boolean isEnum = fl.getClass().isEnum() || (queryMapperAttribute != null && queryMapperAttribute.isEnum());

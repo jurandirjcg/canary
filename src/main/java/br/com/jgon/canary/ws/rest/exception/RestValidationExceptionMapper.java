@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package br.com.jgon.canary.ws.rest.validation.exception;
+package br.com.jgon.canary.ws.rest.exception;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -26,7 +26,6 @@ import br.com.jgon.canary.ws.rest.util.ResponseError;
 /**
  * Realiza o tratamento de execoes lancadas durante a execucao dos servicos
  *
- * @author Alexandre O. Pereira
  * @author Jurandir C. Goncalves
  * 
  * @version 1.0
@@ -38,9 +37,7 @@ public class RestValidationExceptionMapper implements ExceptionMapper<Validation
 	@Override
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response toResponse(ValidationException exception) {
-		
-		ResponseError retorno = new ResponseError(Response.Status.BAD_REQUEST, ((ValidationException) exception).getMessage(), MessageSeverity.WARN);
-		
-		return Response.status(retorno.getStatus()).entity(retorno).header("Content-type", "application/json").build();
+		ResponseError responseError =  new ResponseError(Response.Status.BAD_REQUEST, ((ValidationException) exception).getMessage(), MessageSeverity.WARN);
+		return Response.status(responseError.getStatus()).entity(responseError).header("Content-type", "application/json").build();
 	}
 }

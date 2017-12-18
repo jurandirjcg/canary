@@ -23,7 +23,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang3.StringUtils;
 
 import br.com.jgon.canary.exception.ApplicationException;
-import br.com.jgon.canary.persistence.filter.QueryAttributeMapper;
+import br.com.jgon.canary.persistence.filter.QueryAttribute;
 import br.com.jgon.canary.util.ReflectionUtil;
 
 /**
@@ -69,15 +69,15 @@ class SelectMapper extends QueryMapper {
 	 */
 	private List<SimpleEntry<String, String>> getAllFields() throws ApplicationException{
 		List<SimpleEntry<String, String>> campos = new ArrayList<SimpleEntry<String, String>>(0);
-		QueryAttributeMapper queryMapperAttribute;
+		QueryAttribute queryMapperAttribute;
 		for(Field fld : ReflectionUtil.listAttributes(responseClass)){
 			
 			if(fld.isAnnotationPresent(Transient.class)){
 				continue;
 			}
 			
-			if(fld.isAnnotationPresent(QueryAttributeMapper.class)){
-				queryMapperAttribute = fld.getAnnotation(QueryAttributeMapper.class);
+			if(fld.isAnnotationPresent(QueryAttribute.class)){
+				queryMapperAttribute = fld.getAnnotation(QueryAttribute.class);
 				campos.add(new SimpleEntry<String, String>(StringUtils.isNotBlank(queryMapperAttribute.value()) ? queryMapperAttribute.value() : fld.getName(), fld.getName()));
 			}else{
 				campos.add(new SimpleEntry<String, String>(fld.getName(), fld.getName()));
