@@ -3,17 +3,36 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>br.com.jgon</groupId>
   <artifactId>canary</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
     </license>
   </licenses>
-  
+  <developers>
+    <developer>
+      <name>Jurandir C. Gonçalves</name>
+      <email>juragoncalves@gmail.com</email>
+    </developer>
+  </developers>
+  <scm>
+  <connection>scm:git:git://github.com/jurandirjcg/canary.git</connection>
+  <developerConnection>scm:git:ssh://github.com:jurandirjcg/canary.git</developerConnection>
+  <url>http://github.com/jurandirjcg/canary/tree/master</url>
+ </scm>
+ <distributionManagement>
+  <snapshotRepository>
+   <id>ossrh</id>
+   <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+  </snapshotRepository>
+  <repository>
+   <id>ossrh</id>
+   <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+  </repository>
+ </distributionManagement>
   <properties>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -139,4 +158,6 @@
 			</build>
 		</profile></profiles>
 	<name>Canary</name>
+	<description>Utils for Java JPA 2.1 and REST WebServices</description>
+	<url>https://github.com/jurandirjcg/canary</url>
 </project>

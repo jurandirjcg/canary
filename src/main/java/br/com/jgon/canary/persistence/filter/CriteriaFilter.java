@@ -52,19 +52,19 @@ public interface CriteriaFilter<T> {
 		 */
 		BETWEEN,
 		/**
-		 * Ex: <10
+		 * Ex: &lt;10
 		 */
 		LESS_THAN,
 		/**
-		 * Ex: <=10
+		 * Ex: &lt;=10
 		 */
 		LESS_THAN_OR_EQUAL_TO,
 		/**
-		 * Ex: >10
+		 * Ex: &gt;10
 		 */
 		GREATER_THAN,
 		/**
-		 * Ex: >=10
+		 * Ex: &gt;=10
 		 */
 		GREATER_THAN_OR_EQUAL_TO,
 		/**
@@ -152,7 +152,7 @@ public interface CriteriaFilter<T> {
 		 */
 		IS_NOT_NULL,
 		/**
-		 * Ex: <=100;>10;!=50
+		 * Ex: &lt;=100;&gt;10;!=50
 		 */
 		MULTI
 	}
@@ -697,16 +697,16 @@ public interface CriteriaFilter<T> {
 	 * 
 	 * Ex: <b>equal</b> =10<br>
 	 * <b>not equal</b> !=10<br>
-	 * <b>less than</b> <10<br>
-	 * <b>less than or equal</b> <=10<br>
-	 * <b>greater than</b> >10<br>
-	 * <b>greater than or equal to</b> >=10<br>
+	 * <b>less than</b> &lt;10<br>
+	 * <b>less than or equal</b> &lt;=10<br>
+	 * <b>greater than</b> &gt;10<br>
+	 * <b>greater than or equal to</b> &gt;=10<br>
 	 * <b>in</b> (10,15,20)<br>
 	 * <b>not in</b> !(10,15,20)<br>
 	 * <b>is null</b> null<br>
 	 * <b>not equal</b> not null<br>
-	 * <b>between</b> (10 & 20)<br>
-	 * <b>multi</b> <=100;>10;!=50<br>
+	 * <b>between</b> (10 &amp; 20)<br>
+	 * <b>multi</b> &lt;=100;&gt;10;!=50<br>
 	 * <b>like</b> =%nome<br>
 	 * <b>not like</b> !%nome
 	 * <b>like after</b> nome%<br>
@@ -718,10 +718,10 @@ public interface CriteriaFilter<T> {
 	 * <b>ilike before</b> *nome<br>
 	 * <b>ilike both</b> *nome*<br>
 	 * 
-	 * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam valores com formato data/hora. Ex: <=2000-10-20
+	 * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam valores com formato data/hora. Ex: &lt;=2000-10-20
 	 * 
 	 * @param field
-	 * @param value regex com valor. Ex: >10 
+	 * @param value regex com valor. Ex: &gt;10 
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
