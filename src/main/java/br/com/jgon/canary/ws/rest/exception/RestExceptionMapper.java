@@ -55,7 +55,7 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 		}else if(exception instanceof ApplicationRuntimeException){
 			retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception);
 		}else if(exception.getCause() instanceof ApplicationRuntimeException){
-			retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception);
+			retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception.getCause());
 		}else if(exception instanceof WebApplicationException){
 			return configWebApplicationException((WebApplicationException) exception);
 		}else{
@@ -67,9 +67,8 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 		
 	public ResponseError configApplicationException(ApplicationException exception) {
 		ResponseError retorno = null;
-		ApplicationException ae = exception;
-		retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, ae.getMessage(), ae.getMessageSeverity());
-		if(ae.getMessageSeverity().equals(MessageSeverity.ERROR) || ae.getMessageSeverity().equals(MessageSeverity.FATAL)){
+		retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, exception.getMessage(), exception.getMessageSeverity());
+		if(exception.getMessageSeverity().equals(MessageSeverity.ERROR) || exception.getMessageSeverity().equals(MessageSeverity.FATAL)){
 			LOG.severe(exception.getMessage());
 		}
 		return retorno;
@@ -81,9 +80,8 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 	
 	public ResponseError configApplicationRuntimeException(ApplicationRuntimeException exception) {
 		ResponseError retorno = null;
-		ApplicationRuntimeException ae = (ApplicationRuntimeException) exception.getCause();
-		retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, ae.getMessage(), ae.getMessageSeverity());
-		if(ae.getMessageSeverity().equals(MessageSeverity.ERROR) || ae.getMessageSeverity().equals(MessageSeverity.FATAL)){
+		retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, exception.getMessage(), exception.getMessageSeverity());
+		if(exception.getMessageSeverity().equals(MessageSeverity.ERROR) || exception.getMessageSeverity().equals(MessageSeverity.FATAL)){
 			LOG.severe(exception.getMessage());
 		}
 		return retorno;
