@@ -48,4 +48,8 @@ public class ComplexAttribute {
 		}
 		return f.toString();
 	}
+	
+	public static ComplexAttribute instance(Attribute<?, ?>... attributes){
+		return new ComplexAttribute(attributes);
+	}
 }

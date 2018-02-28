@@ -721,13 +721,14 @@ public interface CriteriaFilter<T> {
 	 * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam valores com formato data/hora. Ex: &lt;=2000-10-20
 	 * 
 	 * @param field
+	 * @param fieldType
 	 * @param value regex com valor. Ex: &gt;10 
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
 	 * @throws ApplicationException
 	 */
-	public CriteriaFilter<T> addWhereRegex(String field, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilter<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
 	/**
 	 * 
 	 * @param field

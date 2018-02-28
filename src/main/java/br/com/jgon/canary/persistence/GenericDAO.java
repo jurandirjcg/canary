@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -73,6 +74,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	protected static final String ERROR_CRITERIA = "error.criteria";
 	protected static final String ERROR_FIELD_DOES_NOT_EXIST = "error.field-does-not-exist";
 			
+	private Logger LOG = Logger.getLogger(GenericDAO.class.getName());
 	/**
 	 * 
 	 */
@@ -542,6 +544,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 		}catch (ApplicationException e){
 			throw e;
 		}catch (Exception e) {
+			LOG.severe(e.getMessage());
 			throw new ApplicationException(MessageSeverity.ERROR, ERROR_CRITERIA, e, new String[] { getPrimaryClass().getSimpleName() });
 		}
 	}

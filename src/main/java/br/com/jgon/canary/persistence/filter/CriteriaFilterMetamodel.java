@@ -656,6 +656,7 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam valores com formato data/hora. Ex: &lt;=2000-10-20
 	 * 
 	 * @param field
+	 * @param fieldType
 	 * @param value regex com valor. Ex: &gt;10 
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
@@ -663,7 +664,7 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @throws ApplicationException
 	 */
 	@Override
-	public CriteriaFilterMetamodel<T> addWhereRegex(String field, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
 	/**
 	 * 
 	 * @param field
@@ -1667,13 +1668,14 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam valores com formato data/hora. Ex: &lt;=2000-10-20
 	 * 
 	 * @param attribute
+	 * @param fieldType
 	 * @param value regex com valor. Ex: &gt;10 
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
 	 * @throws ApplicationException
 	 */
-	public CriteriaFilterMetamodel<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addWhereRegex(Attribute<?, ?> attribute, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
 	/**
 	 * Verifica a condicao recebida junto com o valor
 	 * 
@@ -1703,12 +1705,13 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam valores com formato data/hora. Ex: &lt;=2000-10-20
 	 * 
 	 * @param attribute
+	 * @param fieldType
 	 * @param value regex com valor. Ex: &gt;10 
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
 	 * @throws ApplicationException
 	 */
-	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
 	
 }

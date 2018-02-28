@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -594,15 +595,15 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 		return false;
 	}
 	@Override
-	public CriteriaFilterMetamodel<T> addWhereRegex(String field, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
-		boolean added = configWhereRegex(field, value, regexToAnalyse, defaultIfNotMatch);
+	public CriteriaFilterMetamodel<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
+		boolean added = configWhereRegex(field, fieldType, value, regexToAnalyse, defaultIfNotMatch);
 		if(!added && defaultIfNotMatch != null){
 			throw new ApplicationException(MessageSeverity.ERROR, "error.regex-config", value, field);
 		}
 		return this;
 	}
 	
-	private boolean configWhereRegex(String field, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
+	private boolean configWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
 		Where where = null;
 		for(Where wh : Where.values()){
 			if(wh.exp != null && (regexToAnalyse == null || containsRegex(regexToAnalyse, wh.regexWhere)) && checkRegex(value, wh.exp)){
@@ -639,7 +640,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 					}
 				}else if(where.equals(Where.IN) || where.equals(Where.NOT_IN)){
 					String[] val = m.group().replace(" ", "").split("\\,");
-					if(val[0] != null && val[0].matches(regexPatternDateTime)){
+					if(val[0] != null && (fieldType.equals(Date.class) || fieldType.equals(Calendar.class))){// || fieldType.equals(Temporal.class) || val[0].matches(regexPatternDateTime))){
 						Date[] dates = new Date[val.length];
 						for(int i=0; i < val.length; i++){
 							dates[i] = DateUtil.parseDate(val[i]);
@@ -662,7 +663,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 					}
 				}else{
 					String val = m.group();
-					if(val.matches(regexPatternDateTime)){
+					if(fieldType.equals(Date.class) || fieldType.equals(Calendar.class)){// val.matches(regexPatternDateTime)){
 						Date dt = DateUtil.parseDate(m.group());
 						if(val.matches(regexPatternDate) && (where.equals(Where.LESS_THAN) || where.equals(Where.LESS_THAN_OR_EQUAL_TO))){
 							DateUtils.setHours(dt, 23);
@@ -671,6 +672,9 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 							DateUtils.setMilliseconds(dt, 999);
 						}
 						this.whereRestriction.add(field, where, dt);
+						return true;
+					}else if (fieldType.equals(Number.class)){
+						this.whereRestriction.add(field, where, NumberUtils.createNumber(val));
 						return true;
 					}else{
 						this.whereRestriction.add(field, where, val);
@@ -690,7 +694,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 					String[] val = m.group().split(";");
 
 					for(String v: val){
-						boolean add = configWhereRegex(field, v, new RegexWhere[] {
+						boolean add = configWhereRegex(field, fieldType, v, new RegexWhere[] {
 								RegexWhere.LESS_THAN, 
 								RegexWhere.LESS_THAN_OR_EQUAL_TO, 
 								RegexWhere.EQUAL, 
@@ -714,7 +718,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 					this.whereRestriction.add(field, Where.EQUAL, value);
 					return true;
 				}else{
-					return configWhereRegex(field, value, new RegexWhere[] {defaultIfNotMatch}, null);
+					return configWhereRegex(field, fieldType, value, new RegexWhere[] {defaultIfNotMatch}, null);
 				}
 			}
 		}
@@ -722,8 +726,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	}
 	
 	@Override
-	public CriteriaFilterMetamodel<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
-		boolean added = configWhereRegex(attribute.getName(), value, regexToAnalyse, defaultIfNotMatch);
+	public CriteriaFilterMetamodel<T> addWhereRegex(Attribute<?, ?> attribute, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
+		boolean added = configWhereRegex(attribute.getName(), fieldType, value, regexToAnalyse, defaultIfNotMatch);
 		if(!added && defaultIfNotMatch != null){
 			throw new ApplicationException(MessageSeverity.ERROR, "error.regex-config", value, attribute.getName());
 		}
@@ -1866,8 +1870,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	}
 
 	@Override
-	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, 	String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException {
-		addWhereRegex(attribute.getMetamodelAttribute(), value, regexToAnalyse, defaultIfNotMatch);
+	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException {
+		addWhereRegex(attribute.getMetamodelAttribute(), fieldType, value, regexToAnalyse, defaultIfNotMatch);
 		return this;
 	}
 
