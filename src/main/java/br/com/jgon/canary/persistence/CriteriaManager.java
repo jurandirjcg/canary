@@ -223,7 +223,10 @@ class CriteriaManager<T> {
 					}
 					
 					if(addCollection){
-						selectionAux.setValue(idxDot >= 0 ? selectionAux.getValue().substring(idxDot + 1) : selectionAux.getValue());
+						//Verficar se com objeto diferente da entity funciona
+						if(!entityClass.equals(resultClass)){
+							selectionAux.setValue(idxDot >= 0 ? selectionAux.getValue().substring(idxDot + 1) : selectionAux.getValue());
+						}
 						
 						if(listCollectionRelation.containsKey(field.getName())){
 							listCollectionRelation.get(field.getName()).getListSelection().put(key, selectionAux);

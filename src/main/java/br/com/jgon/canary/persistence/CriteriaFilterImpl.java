@@ -66,33 +66,33 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	 */
 	enum Where{
 		IGNORE (null, null),
-		EQUAL (RegexWhere.EQUAL, "(?<=^\\=)" + regexPatternAlpha + "$"),
-		LESS_THAN (RegexWhere.LESS_THAN, "(?<=^\\<)" + regexPatternDateTimeOrNumber + "$"),
-		LESS_THAN_OR_EQUAL_TO (RegexWhere.LESS_THAN_OR_EQUAL_TO, "(?<=^\\<\\=)" + regexPatternDateTimeOrNumber + "$"),
-		GREATER_THAN (RegexWhere.GREATER_THAN, "(?<=^\\>)" + regexPatternDateTimeOrNumber + "$"),
-		GREATER_THAN_OR_EQUAL_TO (RegexWhere.GREATER_THAN_OR_EQUAL_TO, "(?<=^\\>\\=)" + regexPatternDateTimeOrNumber + "$"),
-		NOT_EQUAL (RegexWhere.NOT_EQUAL, "(?<=^\\!\\=)" + regexPatternAlpha + "$"),
-		IN (RegexWhere.IN, "(?<=^\\()" + regexPatternMultiDateTimeOrNumber + "(?=\\)$)"),
-		NOT_IN (RegexWhere.NOT_IN, "(?<=^!\\()" + regexPatternMultiDateTimeOrNumber + "(?=\\)$)"),
-		LIKE_EXACT (RegexWhere.LIKE_EXACT, "(?<=^\\=\\%)" + regexPatternAlpha + "(?!\\%$)"),
-		LIKE_NOT_EXACT (RegexWhere.LIKE_NOT_EXACT, "(?<=^\\!\\=\\%)" + regexPatternAlpha + "(?!\\%$)"),
-		LIKE_MATCH_ANYWHERE (RegexWhere.LIKE_MATCH_ANYWHERE, "(?<=^\\%)" + regexPatternAlpha + "(?=(\\!)?\\%$)"),
-		LIKE_MATCH_END (RegexWhere.LIKE_MATCH_END, "(?<=^\\%)" +  regexPatternAlpha + "(?!\\%$)"),
-		LIKE_MATCH_START (RegexWhere.LIKE_MATCH_START, "(?<!^\\%)" +  regexPatternAlpha + "(?=\\%$)"),
-		LIKE_NOT_MATCH_ANYWHERE (RegexWhere.LIKE_NOT_MATCH_ANYWHERE, "(?<=^\\!\\%)" + regexPatternAlpha + "(?=\\!\\%$)"),
-		LIKE_NOT_MATCH_END (RegexWhere.LIKE_NOT_MATCH_END, "(?<=^\\!\\%)" +  regexPatternAlpha + "(?!\\%$)"),
-		LIKE_NOT_MATCH_START (RegexWhere.LIKE_NOT_MATCH_START, "(?<!^\\%)" +  regexPatternAlpha + "(?=\\!\\%$)"),
-		ILIKE_EXACT (RegexWhere.ILIKE_EXACT, "(?<=^\\=\\*)" + regexPatternAlpha + "(?!\\*$)"),
-		ILIKE_NOT_EXACT (RegexWhere.ILIKE_NOT_EXACT, "(?<=^\\!\\=\\*)" + regexPatternAlpha + "(?!\\*$)"),
-		ILIKE_MATCH_ANYWHERE (RegexWhere.ILIKE_MATCH_ANYWHERE, "(?<=^\\*)" +  regexPatternAlpha + "(?=\\*$)"),
-		ILIKE_MATCH_END (RegexWhere.ILIKE_MATCH_END, "(?<=^\\*)" +  regexPatternAlpha + "(?!\\*$)"),
-		ILIKE_MATCH_START (RegexWhere.ILIKE_MATCH_START, "(?<!^\\*)" +  regexPatternAlpha + "(?=\\*$)"),
-		ILIKE_NOT_MATCH_ANYWHERE (RegexWhere.ILIKE_NOT_MATCH_ANYWHERE, "(?<=^\\!\\*)" +  regexPatternAlpha + "(?=\\!\\*$)"),
-		ILIKE_NOT_MATCH_END (RegexWhere.ILIKE_NOT_MATCH_END, "(?<=^\\!\\*)" +  regexPatternAlpha + "(?!\\*$)"),
-		ILIKE_NOT_MATCH_START (RegexWhere.ILIKE_NOT_MATCH_START, "(?<!^\\*)" +  regexPatternAlpha + "(?=\\!\\*$)"),
-		IS_NULL (RegexWhere.IS_NULL, "^null$"),
-		IS_NOT_NULL (RegexWhere.IS_NOT_NULL, "^not null$"),
-		BETWEEN (RegexWhere.BETWEEN,"(?<=^)" + regexPatternDateTimeOrNumber + "(\\sbtwn\\s)" + regexPatternDateTimeOrNumber + "(?=$)"),
+		EQUAL (														RegexWhere.EQUAL, 														"(?<=^\\=)"			 		+ regexPatternAlpha 											+ "$"),
+		LESS_THAN (												RegexWhere.LESS_THAN, 											"(?<=^\\<)"			 		+ regexPatternDateTimeOrNumber 			+ "$"),
+		LESS_THAN_OR_EQUAL_TO (			RegexWhere.LESS_THAN_OR_EQUAL_TO, 			"(?<=^\\<\\=)" 			+ regexPatternDateTimeOrNumber 			+ "$"),
+		GREATER_THAN (									RegexWhere.GREATER_THAN,		 							"(?<=^\\>)"					+ regexPatternDateTimeOrNumber 			+ "$"),
+		GREATER_THAN_OR_EQUAL_TO (	RegexWhere.GREATER_THAN_OR_EQUAL_TO, "(?<=^\\>\\=)" 			+ regexPatternDateTimeOrNumber 			+ "$"),
+		NOT_EQUAL (											RegexWhere.NOT_EQUAL, 											"(?<=^\\!\\=)" 			+ regexPatternAlpha 											+ "$"),
+		IN (																	RegexWhere.IN, 																"(?<=^\\()"				 	+ regexPatternMultiDateTimeOrNumber 	+ "(?=\\)$)"),
+		NOT_IN (														RegexWhere.NOT_IN, 													"(?<=^!\\()"					+ regexPatternMultiDateTimeOrNumber	+ "(?=\\)$)"),
+		LIKE_EXACT (												RegexWhere.LIKE_EXACT, 											"(?<=^\\=\\%)" 			+ regexPatternAlpha 											+ "(?!\\%$)"),
+		LIKE_NOT_EXACT (									RegexWhere.LIKE_NOT_EXACT, 								"(?<=^\\!\\=\\%)" 	+ regexPatternAlpha 											+ "(?!\\%$)"),
+		LIKE_MATCH_ANYWHERE (					RegexWhere.LIKE_MATCH_ANYWHERE, 				"(?<=^\\%)" 				+ regexPatternAlpha											+ "(?=(\\!)?\\%$)"),
+		LIKE_MATCH_END (								RegexWhere.LIKE_MATCH_END, 								"(?<=^\\%)" 				+  regexPatternAlpha										 	+ "(?!\\%$)"),
+		LIKE_MATCH_START (							RegexWhere.LIKE_MATCH_START, 							"(?<!^\\%)" 				+  regexPatternAlpha											+ "(?=\\%$)"),
+		LIKE_NOT_MATCH_ANYWHERE (		RegexWhere.LIKE_NOT_MATCH_ANYWHERE, 	"(?<=^\\!\\%)" 			+ regexPatternAlpha											+ "(?=\\!\\%$)"),
+		LIKE_NOT_MATCH_END (						RegexWhere.LIKE_NOT_MATCH_END, 					"(?<=^\\!\\%)" 			+  regexPatternAlpha 										+ "(?!\\%$)"),
+		LIKE_NOT_MATCH_START (					RegexWhere.LIKE_NOT_MATCH_START,	 			"(?<!^\\%)" 				+  regexPatternAlpha 										+ "(?=\\!\\%$)"),
+		ILIKE_EXACT (											RegexWhere.ILIKE_EXACT, 											"(?<=^\\=\\*)" 			+ regexPatternAlpha 											+ "(?!\\*$)"),
+		ILIKE_NOT_EXACT (								RegexWhere.ILIKE_NOT_EXACT, 								"(?<=^\\!\\=\\*)" 		+ regexPatternAlpha 											+ "(?!\\*$)"),
+		ILIKE_MATCH_ANYWHERE (				RegexWhere.ILIKE_MATCH_ANYWHERE, 				"(?<=^\\*)" 					+  regexPatternAlpha 										+ "(?=\\*$)"),
+		ILIKE_MATCH_END (								RegexWhere.ILIKE_MATCH_END, 								"(?<=^\\*)" 					+  regexPatternAlpha 										+ "(?!\\*$)"),
+		ILIKE_MATCH_START (							RegexWhere.ILIKE_MATCH_START, 							"(?<!^\\*)" 					+  regexPatternAlpha					 						+ "(?=\\*$)"),
+		ILIKE_NOT_MATCH_ANYWHERE (	RegexWhere.ILIKE_NOT_MATCH_ANYWHERE, 	"(?<=^\\!\\*)" 			+  regexPatternAlpha 										+ "(?=\\!\\*$)"),
+		ILIKE_NOT_MATCH_END (					RegexWhere.ILIKE_NOT_MATCH_END, 					"(?<=^\\!\\*)" 			+  regexPatternAlpha											+ "(?!\\*$)"),
+		ILIKE_NOT_MATCH_START (				RegexWhere.ILIKE_NOT_MATCH_START, 				"(?<!^\\*)" 					+  regexPatternAlpha 										+ "(?=\\!\\*$)"),
+		IS_NULL (														RegexWhere.IS_NULL, 													"^null$"),
+		IS_NOT_NULL (											RegexWhere.IS_NOT_NULL,	 										"^not null$"),
+		BETWEEN (													RegexWhere.BETWEEN,												"(?<=^)" 						+ regexPatternDateTimeOrNumber 			+ "(\\s(btwn|between)\\s)" + regexPatternDateTimeOrNumber + "(?=$)"),
 		EQUAL_OTHER_FIELD (null, null),
 		LESS_THAN_OTHER_FIELD (null, null),
 		GREATER_THAN_OTHER_FIELD (null ,null),
@@ -621,7 +621,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 				}else if(where.equals(Where.IS_NOT_NULL)){
 					this.addWhereIsNotNull(field);
 				}else if(where.equals(Where.BETWEEN)){
-					String[] val = m.group().replace(" ", "").split("btwn");
+					String[] val = m.group().replace(" ", "").split("(btwn|between)");
 					if(NumberUtils.isCreatable(val[0])){
 						this.whereRestriction.add(field, Where.BETWEEN, new Number[] {NumberUtils.createNumber(val[0]), NumberUtils.createNumber(val[1])});
 						return true;
@@ -640,7 +640,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 					}
 				}else if(where.equals(Where.IN) || where.equals(Where.NOT_IN)){
 					String[] val = m.group().replace(" ", "").split("\\,");
-					if(val[0] != null && (fieldType.equals(Date.class) || fieldType.equals(Calendar.class))){// || fieldType.equals(Temporal.class) || val[0].matches(regexPatternDateTime))){
+					if(val[0] != null && (Date.class.isAssignableFrom(fieldType) || Calendar.class.isAssignableFrom(fieldType))){// || fieldType.equals(Temporal.class) || val[0].matches(regexPatternDateTime))){
 						Date[] dates = new Date[val.length];
 						for(int i=0; i < val.length; i++){
 							dates[i] = DateUtil.parseDate(val[i]);
@@ -663,7 +663,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 					}
 				}else{
 					String val = m.group();
-					if(fieldType.equals(Date.class) || fieldType.equals(Calendar.class)){// val.matches(regexPatternDateTime)){
+					if(Date.class.isAssignableFrom(fieldType) || Calendar.class.isAssignableFrom(fieldType)){// val.matches(regexPatternDateTime)){
 						Date dt = DateUtil.parseDate(m.group());
 						if(val.matches(regexPatternDate) && (where.equals(Where.LESS_THAN) || where.equals(Where.LESS_THAN_OR_EQUAL_TO))){
 							DateUtils.setHours(dt, 23);
@@ -673,7 +673,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 						}
 						this.whereRestriction.add(field, where, dt);
 						return true;
-					}else if (fieldType.equals(Number.class)){
+					}else if (Number.class.isAssignableFrom(fieldType)){
 						this.whereRestriction.add(field, where, NumberUtils.createNumber(val));
 						return true;
 					}else{
@@ -726,8 +726,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	}
 	
 	@Override
-	public CriteriaFilterMetamodel<T> addWhereRegex(Attribute<?, ?> attribute, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
-		boolean added = configWhereRegex(attribute.getName(), fieldType, value, regexToAnalyse, defaultIfNotMatch);
+	public CriteriaFilterMetamodel<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
+		boolean added = configWhereRegex(attribute.getName(), attribute.getJavaType(), value, regexToAnalyse, defaultIfNotMatch);
 		if(!added && defaultIfNotMatch != null){
 			throw new ApplicationException(MessageSeverity.ERROR, "error.regex-config", value, attribute.getName());
 		}
@@ -1870,8 +1870,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	}
 
 	@Override
-	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException {
-		addWhereRegex(attribute.getMetamodelAttribute(), fieldType, value, regexToAnalyse, defaultIfNotMatch);
+	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException {
+		addWhereRegex(attribute.getMetamodelAttribute(), attribute.getFieldType(), value, regexToAnalyse, defaultIfNotMatch);
 		return this;
 	}
 

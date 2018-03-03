@@ -816,7 +816,7 @@ public class ReflectionUtil {
 	public static boolean isCollection(Class<?> klass){
 		return ArrayUtils.contains(klass.getInterfaces(), Collection.class) || ArrayUtils.contains(klass.getInterfaces(), List.class) || ArrayUtils.contains(klass.getInterfaces(), Set.class);
 	}
-
+	
 	/**
 	 * 
 	 * @param obj

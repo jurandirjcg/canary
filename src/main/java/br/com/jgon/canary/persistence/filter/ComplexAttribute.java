@@ -52,4 +52,11 @@ public class ComplexAttribute {
 	public static ComplexAttribute instance(Attribute<?, ?>... attributes){
 		return new ComplexAttribute(attributes);
 	}
+	/**
+	 * Retorna o tipo do ultimo atributo adicionado
+	 * @return
+	 */
+	public Class<?> getFieldType(){
+		return listAttribute.get(listAttribute.size() - 1).getJavaType();
+	}
 }

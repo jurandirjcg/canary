@@ -46,6 +46,7 @@ import javax.persistence.criteria.Selection;
 import org.apache.commons.lang3.ArrayUtils;
 
 import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.persistence.CriteriaFilterImpl.SelectAggregate;
 import br.com.jgon.canary.persistence.exception.RemoveEntityException;
 import br.com.jgon.canary.persistence.exception.SaveEntityException;
 import br.com.jgon.canary.persistence.exception.UpdateEntityException;
@@ -431,7 +432,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 				CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) criteriaManager.getListCollectionRelation().get(k)
 						.addSelect(fieldId.getName())
 						.addWhereIn(fieldId.getName(), listId);
-				
+									
 				List<?> listAux = getResultList(cf, null, null);
 				
 				for(E ret: listReturn){
@@ -483,6 +484,13 @@ public abstract class GenericDAO<T, K extends Serializable>{
 				
 				CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) criteriaManager.getListCollectionRelation().get(k);
 				cf.setObjBase(objAux);
+				
+				Map<String, SimpleEntry<SelectAggregate, String>> selAux= cf.getListSelection();
+				for(String key : selAux.keySet()) {
+					String valueAux = selAux.get(key).getValue(); 
+					selAux.get(key).setValue(valueAux.replace(k.concat("."), ""));
+				}
+				
 				List<?> resultCollection = getResultList(DAOUtil.getCollectionClass(fldAux), cf, null, null);
 
 				Collection col = (Collection<?>) fldAux.get(ret);
