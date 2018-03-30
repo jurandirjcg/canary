@@ -757,4 +757,5 @@ public interface CriteriaFilter<T> {
 	 * @return
 	 */
 	public CriteriaFilter<T> addJoin(String field);
+	
 }

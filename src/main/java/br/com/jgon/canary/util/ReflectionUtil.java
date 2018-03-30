@@ -134,17 +134,7 @@ public class ReflectionUtil {
 	public static List<Field> listAttributes(Object o, String pattern) {		
 		return listAttributes(o.getClass(), pattern);
 	}
-	
-	/**
-	 * 
-	 * @param fld
-	 * @param modifier
-	 * @return
-	 */
-	public static boolean checkModifier(Field fld, int modifier){
-		return fld.getModifiers() == modifier;
-	}
-	
+		
 	/**
 	 * Retorna lista de atributos que contenham o tipo especificado e a annotation
 	 * @param klass - Classe de pesquisa

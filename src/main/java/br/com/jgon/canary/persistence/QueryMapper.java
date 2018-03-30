@@ -26,8 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
@@ -151,9 +149,9 @@ abstract class QueryMapper {
 	 * @return
 	 */
 	private boolean isModifierValid(Field fld){
-		boolean valid = ReflectionUtil.checkModifier(fld, Modifier.STATIC)
-				|| ReflectionUtil.checkModifier(fld, Modifier.ABSTRACT)
-				|| ReflectionUtil.checkModifier(fld, Modifier.FINAL);
+		boolean valid = Modifier.isStatic(fld.getModifiers())
+				|| Modifier.isAbstract(fld.getModifiers())
+				|| Modifier.isFinal(fld.getModifiers());
 		
 		return !valid;
 	}
@@ -199,7 +197,12 @@ abstract class QueryMapper {
 				if(!isEnum && multiLevel){
 					Class<?> attrType = null;
 
-					if(fl.isAnnotationPresent(OneToMany.class) && !fl.getAnnotation(OneToMany.class).targetEntity().equals(void.class)){
+					if(ReflectionUtil.isCollection(fl.getType())) {
+						attrType = DAOUtil.getCollectionClass(fl);
+					}else {
+						attrType = fl.getType();
+					}
+					/*if(fl.isAnnotationPresent(OneToMany.class) && !fl.getAnnotation(OneToMany.class).targetEntity().equals(void.class)){
 						attrType = fl.getAnnotation(OneToMany.class).targetEntity();
 					}else if(fl.isAnnotationPresent(ManyToMany.class) && !fl.getAnnotation(ManyToMany.class).targetEntity().equals(void.class)){
 						attrType = fl.getAnnotation(ManyToMany.class).targetEntity();
@@ -208,8 +211,9 @@ abstract class QueryMapper {
 					}else{
 						attrType = fl.getType();
 					}
+					*/
 					
-					if(ReflectionUtil.isCollection(klass)){
+					if(ReflectionUtil.isCollection(attrType)){
 						throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-collection-not-definied", klass.getName() + "." + fl.getName());
 					}
 										

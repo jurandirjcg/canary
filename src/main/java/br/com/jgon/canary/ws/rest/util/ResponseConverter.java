@@ -26,15 +26,15 @@ import br.com.jgon.canary.util.Pagination;
  * @param <O> - Origem
  * @param <N> - Destino
  */
-public abstract class ResponseConverter<O, N> {
+public abstract class ResponseConverter<O> {
 
-	public abstract N converter(O obj);
+	public abstract <N extends ResponseConverter<O>> N converter(O obj);
 	/**
 	 * 
 	 * @param listObj
 	 * @return
 	 */
-	public List<N> converterList(Collection<O> listObj){
+	public <N extends ResponseConverter<O>> List<N> converter(Collection<O> listObj){
 		if(listObj == null){
 			return null;
 		}
@@ -50,14 +50,14 @@ public abstract class ResponseConverter<O, N> {
 	 * @param paginacao
 	 * @return
 	 */
-	public Pagination<N> converterPagination(Pagination<O> paginacao){
+	public <N extends ResponseConverter<O>> Pagination<N> converter(Pagination<O> paginacao){
 		Pagination<N> pRetorno = new Pagination<N>();
 		
 		pRetorno.setTotalPages(paginacao.getTotalPages());
 		pRetorno.setCurrentPage(paginacao.getCurrentPage());
 		pRetorno.setElementsPerPage(paginacao.getElementsPerPage());
 		pRetorno.setTotalElements(paginacao.getTotalElements());
-		pRetorno.setElements(this.converterList(paginacao.getElements()));
+		pRetorno.setElements(this.converter(paginacao.getElements()));
 		
 		return pRetorno;
 	}

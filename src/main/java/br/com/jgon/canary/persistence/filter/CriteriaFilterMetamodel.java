@@ -1711,5 +1711,5 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @throws ApplicationException
 	 */
 	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
-	
+
 }

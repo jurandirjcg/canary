@@ -143,7 +143,7 @@ class CriteriaManager<T> {
 		
 		//SELECT
 		query.select(configSelections(rootEntry));
-				
+		
 		List<Predicate> predicates = new ArrayList<Predicate>();
 		//WHERE 
 		if (obj != null) {
@@ -233,7 +233,7 @@ class CriteriaManager<T> {
 						}else{
 							Class<?> entityClass = DAOUtil.getCollectionClass(field);
 							CriteriaFilterImpl<?> criteriaFilterCollectionRelation = new CriteriaFilterImpl(entityClass);
-														
+							
 							criteriaFilterCollectionRelation.getListSelection().put(key, selectionAux);
 							criteriaFilterCollectionRelation.setCollectionSelectionControl(false);
 							listCollectionRelation.put(field.getName(), criteriaFilterCollectionRelation);
@@ -289,6 +289,10 @@ class CriteriaManager<T> {
 			if(from.equals(rootEntry) && !listCollectionRelation.isEmpty()){
 				Field fldId =  DAOUtil.getFieldId(entityClass);
 				if(!criteriaFilter.getListSelection().containsKey(fldId.getName())){
+					if(lista.isEmpty()) {
+						criteriaFilter.getListGroupBy().add(fldId.getName());
+					}
+					
 					lista.add(rootEntry.get(fldId.getName()).alias(ALIAS_ATTR_FORCED_ID));//fldId.getName()));
 				}
 			}
@@ -512,18 +516,18 @@ class CriteriaManager<T> {
 				
 		switch (operation) {
 			case IS_NULL:
-				if(value == null){
-					predicates.add(pathExpression.isNull());
-				}else{
-					predicates.add(criteriaBuilder.isNull((Expression<?>) value));
-				}
+				//if(value == null){
+				predicates.add(pathExpression.isNull());
+				/*}else{
+					predicates.add(criteriaBuilder.isNull(pathExpression);
+				}*/
 				break;
 			case IS_NOT_NULL:
-				if(value == null){
-					predicates.add(pathExpression.isNotNull());
-				}else{
-					predicates.add(criteriaBuilder.isNotNull((Expression<?>) value));
-				}
+				//	if(value == null){
+				predicates.add(pathExpression.isNotNull());
+				/*	}else{
+					predicates.add(criteriaBuilder.isNotNull(pathExpression));
+				}*/
 				break;
 			case LIKE_EXACT:
 				predicates.add(criteriaBuilder.like((Expression<String>) pathExpression, stringValue));
@@ -728,7 +732,7 @@ class CriteriaManager<T> {
 							predicates.add(criteriaBuilder.equal(pathExpression, wValue));
 						}
 					}
-				}else{
+				}else if (value!= null){
 					if(isStringType){
 						predicates.add(criteriaBuilder.equal(pathExpression, (String) value));
 					}else{

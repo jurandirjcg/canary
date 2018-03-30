@@ -403,6 +403,21 @@ public class ValidatorFactory {
 		}
 		return this;
 	}
+
+	/**
+	 * 
+	 * @autor jurandirjcg
+	 * @param obj
+	 * @param campoMsg
+	 * @return
+	 */
+	public ValidatorFactory isNotNull(Object obj, String campoMsg){
+		if (isNotNull(obj)) {
+			validatorException.add(new ValidateMessage(MessageSeverity.WARN, REQUIRED_KEY, campoMsg));
+		}
+		return this;
+	}
+	
 	/**
 	 * 
 	 */

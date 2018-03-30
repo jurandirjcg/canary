@@ -146,7 +146,7 @@ public class WSMapper {
 		if(!ReflectionUtil.isCollection(fldCheck.getType())){
 			type = fldCheck.getType();
 		}else {
-			type = wsMapperAttribute.collectionType().equals(Void.class) ? DAOUtil.getCollectionClass(fldCheck) : wsMapperAttribute.collectionType();
+			type = wsMapperAttribute == null || wsMapperAttribute.collectionType().equals(void.class) ? DAOUtil.getCollectionClass(fldCheck) : wsMapperAttribute.collectionType();
 		}
 		
 		List<String> retorno = new ArrayList<String>(0);
@@ -155,6 +155,10 @@ public class WSMapper {
 				WSAttribute wsMapperAttributeFieldAux = null;
 				if(fldCheckAux.isAnnotationPresent(WSAttribute.class)){
 					wsMapperAttributeFieldAux = fldCheckAux.getAnnotation(WSAttribute.class);
+					
+					if(!wsMapperAttributeFieldAux.autoInclude()) {
+						continue;
+					}
 				}
 				
 				if(!isPrimitive(fldCheckAux.getType()) && (wsMapperAttributeFieldAux == null || !wsMapperAttributeFieldAux.fixed())){
@@ -163,7 +167,7 @@ public class WSMapper {
 					String campoVerificado = verificaCampo(type, fldCheckAux.getName()); 
 					if(StringUtils.isNotBlank(campoVerificado)){
 						if(wsMapperAttribute != null && StringUtils.isNotBlank(wsMapperAttribute.value())){
-							String prefix = fNome.contains(".") ? fNome.substring(0, fNome.indexOf('.') + 1) : "";
+							String prefix = fNome.contains(".") ? fNome.substring(0, fNome.lastIndexOf('.') + 1) : "";
 							retorno.add(prefix.concat(wsMapperAttribute.value()).concat(".").concat(campoVerificado));
 						}else{
 							retorno.add(fNome.concat(".").concat(campoVerificado));
@@ -195,12 +199,13 @@ public class WSMapper {
 	 * @return
 	 */
 	private boolean isModifierValid(Field fld){
-		boolean valid = ReflectionUtil.checkModifier(fld, Modifier.STATIC)
-				|| ReflectionUtil.checkModifier(fld, Modifier.ABSTRACT)
-				|| ReflectionUtil.checkModifier(fld, Modifier.FINAL);
+		boolean valid = Modifier.isStatic(fld.getModifiers())
+				|| Modifier.isAbstract(fld.getModifiers())
+				|| Modifier.isFinal(fld.getModifiers());
 		
 		return !valid;
 	}
+	
 	/**
 	 * 
 	 * @param klass
@@ -245,7 +250,11 @@ public class WSMapper {
 				String campoMultiLevel = null;
 				if(/*!isEnum && */multiLevel){
 					Class<?> attrType = wsMapperAttribute != null && !wsMapperAttribute.collectionType().equals(void.class) ? wsMapperAttribute.collectionType() : fl.getType(); 
-							
+					
+					if(ReflectionUtil.isCollection(attrType)) {
+						attrType = DAOUtil.getCollectionClass(fl);
+					}
+					
 					campoMultiLevel = verificaCampo(attrType, fieldName.substring(fieldName.indexOf(".") + 1));
 					add = StringUtils.isNotBlank(campoMultiLevel);
 				}
