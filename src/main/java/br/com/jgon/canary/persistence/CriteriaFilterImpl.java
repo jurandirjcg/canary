@@ -240,6 +240,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	public Map<String, SimpleEntry<SelectAggregate, String>> getListSelection(){
 		return this.listSelection;
 	}
+	
 	/**
 	 * 
 	 * @param field
@@ -265,9 +266,10 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	public CriteriaFilterMetamodel<T> addSelect(Class<?> returnType, List<String> fields) throws ApplicationException{
 		Class<?> returnTypeAux = returnType == null ? this.objClass : returnType;
 		
-		if(returnType.equals(this.objClass)){
+		//TODO Verificar se funciona corretamente
+	/*	if(returnType.equals(this.objClass)){
 			addSelect(fields);
-		}else{
+		}else{*/
 			StringBuilder fieldAux = new StringBuilder();
 			if(fields != null){
 				for(String f : fields){
@@ -282,7 +284,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 			for(SimpleEntry<String, String> se : listaCampos){
 				addSelect(se.getKey(), se.getValue());
 			}
-		}
+	//	}
 		
 		return this;
 	}
@@ -306,31 +308,39 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	
 	@Override
 	public CriteriaFilterMetamodel<T> addSelect(String[] fields){
-		for(String fld : fields){
-			addSelect(fld);
+		if(fields != null) {
+			for(String fld : fields){
+				addSelect(fld);
+			}
 		}
 		return this;
 	}
 
 	@Override
 	public CriteriaFilterMetamodel<T> addSelect(Attribute<?, ?>... attributes){
-		for(Attribute<?, ?> fld : attributes){
-			addSelect(fld);
+		if(attributes != null) {
+			for(Attribute<?, ?> fld : attributes){
+				addSelect(fld);
+			}
 		}
 		return this;
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelect(List<String> fields) {
-		fields.forEach( item -> {
-			addSelect(item);
-		});
+		if(fields != null) {
+			fields.forEach( item -> {
+				addSelect(item);
+			});
+		}
 		return this;
 	}
 	
 	@Override
 	public CriteriaFilterMetamodel<T> addSelect(Map<String, String> fieldAlias){
-		for(String k : fieldAlias.keySet()){
-			addSelect(k, fieldAlias.get(k));
+		if(fieldAlias != null) {
+			for(String k : fieldAlias.keySet()){
+				addSelect(k, fieldAlias.get(k));
+			}
 		}
 		return this;
 	}
@@ -556,7 +566,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	 * @return
 	 */
 	private <E> CriteriaFilterMetamodel<T> addWhereListValues(String field, Where where, List<E> values){
-		if(values != null){
+		if(values != null && !values.isEmpty()){
 			this.whereRestriction.add(field, where, values);
 		}
 		return this;
@@ -1019,7 +1029,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereIsNotNull(String field){
-		this.listWhere.put(field, Where.IS_NOT_NULL);
+		this.whereRestriction.add(field, Where.IS_NOT_NULL, null);
 		return this;
 	}
 	@Override
@@ -1030,7 +1040,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereIsNull(String field){
-		this.listWhere.put(field, Where.IS_NULL);
+		this.whereRestriction.add(field, Where.IS_NULL, null);
 		return this;
 	}
 
@@ -1811,7 +1821,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereEqual(ComplexAttribute attribute, E value) {
-		addWhereEqual(attribute.getMetamodelAttribute());
+		addWhereEqual(attribute.getMetamodelAttribute(), value);
 		return this;
 	}
 
