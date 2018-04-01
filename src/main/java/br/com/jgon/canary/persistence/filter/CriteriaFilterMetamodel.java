@@ -1223,6 +1223,13 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @param anotherAttribute
 	 * @return
 	 */
+	public CriteriaFilterMetamodel<T> addWhereLessThanField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
 	public CriteriaFilterMetamodel<T> addWhereGreaterThanField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
 	/**
 	 * 
@@ -1237,14 +1244,28 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @param anotherAttribute
 	 * @return
 	 */
-	public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualToField(Attribute<?, ?> attribute, 	Attribute<?, ?> anotherAttribute);
+	public CriteriaFilterMetamodel<T> addWhereGreaterThanField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
 	/**
 	 * 
 	 * @param attribute
 	 * @param anotherAttribute
 	 * @return
 	 */
-	public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, 	Attribute<?, ?> anotherAttribute);
+	public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualToField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
 	/**
 	 * 
 	 * @param attribute
@@ -1265,6 +1286,13 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @param anotherAttribute
 	 * @return
 	 */
+	public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
 	public CriteriaFilterMetamodel<T> addWhereEqualField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
 	/**
 	 * 
@@ -1279,6 +1307,13 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @param anotherAttribute
 	 * @return
 	 */
+	public CriteriaFilterMetamodel<T> addWhereEqualField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
 	public CriteriaFilterMetamodel<T> addWhereNotEqualField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
 	/**
 	 * 
@@ -1287,6 +1322,13 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @return
 	 */
 	public CriteriaFilterMetamodel<T> addWhereNotEqualField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute);
+	/**
+	 * 
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilterMetamodel<T> addWhereNotEqualField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
 	/**
 	 * 
 	 * @param attribute

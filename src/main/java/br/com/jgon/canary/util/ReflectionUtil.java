@@ -170,7 +170,6 @@ public class ReflectionUtil {
 	public static List<Field> listAttributesByAnnotation(Class<?> klass, Class<? extends Annotation>... annotationClass){
 		return listAttributes(klass, null, annotationClass);
 	}
-	
 	/**
 	 * 
 	 * @param klass
@@ -804,7 +803,7 @@ public class ReflectionUtil {
 	 * @return
 	 */
 	public static boolean isCollection(Class<?> klass){
-		return ArrayUtils.contains(klass.getInterfaces(), Collection.class) || ArrayUtils.contains(klass.getInterfaces(), List.class) || ArrayUtils.contains(klass.getInterfaces(), Set.class);
+		return klass.isAssignableFrom(Collection.class) || klass.isAssignableFrom(List.class) || klass.isAssignableFrom(Set.class);
 	}
 	
 	/**
