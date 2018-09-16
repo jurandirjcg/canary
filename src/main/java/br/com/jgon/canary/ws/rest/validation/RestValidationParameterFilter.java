@@ -13,8 +13,10 @@
  */
 package br.com.jgon.canary.ws.rest.validation;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -50,6 +52,10 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.validation.ValidateMessage;
@@ -68,6 +74,7 @@ import br.com.jgon.canary.ws.rest.validation.annotation.RequiredRegExPattern;
 import br.com.jgon.canary.ws.rest.validation.annotation.RequiredSize;
 import br.com.jgon.canary.ws.rest.validation.annotation.RequiredValue;
 import br.com.jgon.canary.ws.rest.validation.annotation.RequiredXOR;
+import br.com.jgon.canary.ws.rest.validation.annotation.Validatable;
 import br.com.jgon.canary.ws.rest.validation.enumerator.ParameterTypeEnum;
 
 /**
@@ -111,19 +118,7 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 			wsAnnotation = null;
 
 			for(Annotation a : parametroAnotado){
-				if(a instanceof Required || 
-						a instanceof RequiredIfNull || 
-						a instanceof RequiredIfNotNull ||
-						a instanceof RequiredIfAllNull ||
-						a instanceof RequiredIfAnyNull ||
-						a instanceof RequiredIfAllNotNull ||
-						a instanceof RequiredIfAnyNotNull ||
-						a instanceof RequiredXOR ||
-						a instanceof RequiredSize ||
-						a instanceof RequiredValue ||
-						a instanceof RequiredRegExPattern ||
-						a instanceof RequiredDateLt ||
-						a instanceof RequiredDateGt){
+				if(isApiValidationAnnotation(a)){
 					possuiApiAnnotation = true;
 					apiAnnotations.add(a);
 				}else if(a instanceof QueryParam || 
@@ -134,15 +129,51 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 				}
 			}
 
-			RestValidationUnit vu = getParameterMap(apiAnnotations, wsAnnotation, parameterType, requestContext);
-			if(vu != null){
-				parametros.put(vu.getName(), vu);
+			if(wsAnnotation != null){
+				RestValidationUnit vu = getParameterMap(apiAnnotations, wsAnnotation, parameterType, requestContext);
+				
+				if(vu != null){
+					parametros.put(vu.getName(), vu);
+				}
+			}else if(possuiApiAnnotation){
+				boolean validar = false;
+				for (Annotation annotation : apiAnnotations) {
+					if(annotation instanceof Validatable) {
+						validar = true;
+						break;
+					}
+				}
+				if(validar) {
+					Object obj = getObjectParameter(parameterType, requestContext);
+					parametros.putAll(objectAttributeMap("", obj));
+				}
 			}
 		}
 
 		if(parametros != null && parametros.size() > 0 && possuiApiAnnotation){
 			validaParametros(parametros);
 		}
+	}
+	
+	/**
+	 * @author Luiz Gustavo M. de Lima
+	 * @param annotation
+	 * @return
+	 */
+	private boolean isApiValidationAnnotation(Annotation annotation){
+		return annotation instanceof Required || 
+				annotation instanceof RequiredIfNull || 
+				annotation instanceof RequiredIfNotNull ||
+				annotation instanceof RequiredIfAllNull ||
+				annotation instanceof RequiredIfAnyNull ||
+				annotation instanceof RequiredIfAllNotNull ||
+				annotation instanceof RequiredIfAnyNotNull ||
+				annotation instanceof RequiredXOR ||
+				annotation instanceof RequiredSize ||
+				annotation instanceof RequiredValue ||
+				annotation instanceof RequiredRegExPattern ||
+				annotation instanceof RequiredDateLt ||
+				annotation instanceof RequiredDateGt;
 	}
 	/**
 	 * 
@@ -210,7 +241,8 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 					retorno.setValue(v != null && v.size() > 0 ? v.get(0) : null);
 					retorno.setApiAnnotations(apiAnnotations);
 				}
-			}else if(requestContext.getMethod() == HttpMethod.POST){
+			}
+			/*else if(requestContext.getMethod() == HttpMethod.POST){
 			
 				return null;
 				/*TODO: Criar validação para obter objetos no corpo da request (POST)
@@ -221,15 +253,90 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 				 * MediaType.APPLICATION_JSON;
 				 * MediaType.APPLICATION_XML;
 				 * MediaType.TEXT_PLAIN;
-				 * MediaType.TEXT_XML;*/	
+				 * MediaType.TEXT_XML;* /
 			}else if(requestContext.getMethod() == HttpMethod.PUT){
 				return null;
-			}
+			}*/
 		} catch (Exception ex){
 			LOG.severe(ex.getMessage());
 		}
 		
 		return retorno;
+	}
+	
+	/**
+	 * @author Luiz Gustavo M. de Lima
+	 * @author Jurandir C. Goncalves
+	 * @param prefixo
+	 * @param obj
+	 * @return
+	 */
+	private Map<String, RestValidationUnit> objectAttributeMap(String prefixo, Object obj) {
+		Map<String, RestValidationUnit> retorno = new HashMap<String, RestValidationUnit>();
+		if(obj == null)
+			return retorno;
+		Field[] atributos = obj.getClass().getDeclaredFields();
+		for (Field field : atributos) {
+			boolean ehValidavel = false;
+			List<Annotation> fieldAnnotations = new ArrayList<Annotation>();
+			for (Annotation annotation : field.getAnnotations()) {
+				if(isApiValidationAnnotation(annotation)) {
+					fieldAnnotations.add(annotation);
+					ehValidavel = annotation instanceof Validatable ? true : ehValidavel;
+				}
+			}
+			
+			if(!fieldAnnotations.isEmpty()) {
+				field.setAccessible(true);
+				Object campo;
+				try {
+					campo = field.get(obj);
+
+					boolean ehCollectionVazia = campo instanceof Collection && ((Collection<?>)campo ).isEmpty();
+					RestValidationUnit atributoMapeado  = new RestValidationUnit();
+					String nomeAtributoMapeado = StringUtils.isNotEmpty(prefixo)? prefixo +"-> " + field.getName(): field.getName();
+					atributoMapeado.setName(nomeAtributoMapeado);
+					atributoMapeado.setType(field.getType());
+					atributoMapeado.setValue(campo!= null && !ehCollectionVazia && campo.toString() != "0" ? campo.toString(): null);
+					atributoMapeado.setApiAnnotations(fieldAnnotations);
+					retorno.put(atributoMapeado.getName(), atributoMapeado);
+					if(campo!= null && ehValidavel) {
+						if(!(campo instanceof Collection)) {
+							retorno.putAll(objectAttributeMap(nomeAtributoMapeado, campo));
+						}else if(!ehCollectionVazia) {
+							for(Object objLista : (Collection<?>)campo) {
+								retorno.putAll(objectAttributeMap(nomeAtributoMapeado, objLista));
+							}
+						}
+					}
+				}catch (IllegalAccessException e) {
+					LOG.severe(e.getMessage());
+				}
+			}
+		}
+		return retorno;
+	}
+	/**
+	 * @author Luiz Gustavo M. de Lima
+	 * @author Jurandir C. Goncalves
+	 * @param parameterType
+	 * @param requestContext
+	 * @return
+	 * @throws IOException
+	 * @throws JsonParseException
+	 * @throws JsonMappingException
+	 */
+	private Object getObjectParameter(Class<?> parameterType, ContainerRequestContext requestContext)
+			throws IOException, JsonParseException, JsonMappingException {
+		Object obj= null;
+		BufferedInputStream bufferedInputStream = new BufferedInputStream(requestContext.getEntityStream());
+		bufferedInputStream.mark(0);
+		String json = IOUtils.toString(bufferedInputStream, StandardCharsets.UTF_8);
+		bufferedInputStream.reset();
+		requestContext.setEntityStream(bufferedInputStream);
+		ObjectMapper mapper = new ObjectMapper();
+		obj = mapper.readValue(json, parameterType);
+		return obj;
 	}
 	/**
 	 * 
