@@ -314,6 +314,14 @@ class CriteriaManager<T> {
 				&& field.getModifiers() != (Modifier.PUBLIC + Modifier.STATIC + Modifier.FINAL);
 	}
 	
+	/*private boolean isModifierValid(Field fld){
+		boolean valid = Modifier.isStatic(fld.getModifiers())
+				|| Modifier.isAbstract(fld.getModifiers())
+				|| Modifier.isFinal(fld.getModifiers());
+		
+		return !valid;
+	}
+	*/
 	/**
 	 * Configura os JOINS com base nos campos passados como restrições do SELECT ou WHERE 
 	 * @param from
@@ -506,7 +514,7 @@ class CriteriaManager<T> {
 	private <E> void applyPredicate(From<?, ?> pathEntry, List<Predicate> predicates, String attributeName, Class<?> attributeClass, Where operation, E value){
 		boolean isStringType = attributeClass.equals(String.class);
 		String stringValue = null;
-		if(isStringType){
+		if(isStringType && value != null){
 			stringValue = ((String) value).replace("%", "");
 		}else if (value != null){
 			stringValue = value.toString().replace("%", "");
@@ -593,7 +601,7 @@ class CriteriaManager<T> {
 							predicates.add(criteriaBuilder.notEqual(pathExpression, wValue));
 						}
 					}
-				}else{
+				}else {// if (value!= null) {
 					if(isStringType){
 						predicates.add(criteriaBuilder.notEqual(pathExpression, (String) value));
 					}else{
@@ -692,7 +700,7 @@ class CriteriaManager<T> {
 					predicates.add(criteriaBuilder.lessThan(pathEntry.get(attributeName), pathAux.get(oFieldNameL.substring(oFieldNameL.lastIndexOf(".") + 1))));
 				}else{
 					predicates.add(criteriaBuilder.lessThan(pathEntry.get(attributeName), rootEntry.get(oFieldNameL)));
-				}	
+				}
 				break;
 			case LESS_THAN_OR_EQUAL_TO_OTHER_FIELD:
 				String oFieldNameLE =  (String) value;
@@ -732,7 +740,7 @@ class CriteriaManager<T> {
 							predicates.add(criteriaBuilder.equal(pathExpression, wValue));
 						}
 					}
-				}else if (value!= null){
+				}else {// if (value!= null){
 					if(isStringType){
 						predicates.add(criteriaBuilder.equal(pathExpression, (String) value));
 					}else{
@@ -823,36 +831,6 @@ class CriteriaManager<T> {
 	 */
 	public Map<String, CriteriaFilterImpl<?>> getListCollectionRelation() {
 		return listCollectionRelation;
-	}
-
-	/**
-	 * Classe responsável por organizar os relacionamentos entre as entidades
-	 *
-	 * @author Jurandir C. Goncalves
-	 * 
-	 * @version 1.0
-	 *
-	 */
-	public class CriteriaAssociations {
-		private Map<String, From<?, ?>> listAssociation = new HashMap<String, From<?, ?>>(0);
-		
-		public void add(String field, From<?, ?> join){
-			if(!exists(field)){
-				listAssociation.put(field, join);
-			}
-		}
-		
-		public boolean exists(String field){
-			return listAssociation.containsKey(field);
-		}
-		/**
-		 * 
-		 * @param field
-		 * @return
-		 */
-		public From<?, ?> getAssociation(String field){
-			return listAssociation.get(field);
-		}
 	}
 
 }

@@ -49,7 +49,6 @@ public class JsonDateTimeDeserializer extends JsonDeserializer<Date> implements 
 		this.pattern = pattern;
 	}
 	
-
 	@Override
 	public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) throws JsonMappingException {
 		JsonFormat jf;

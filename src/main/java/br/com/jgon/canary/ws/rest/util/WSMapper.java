@@ -107,7 +107,8 @@ public class WSMapper {
 					}
 					
 					if(fldCheck != null && !isPrimitive(fldCheck.getType()) && (wsMapperAttribute == null || !wsMapperAttribute.fixed())){
-						retorno.addAll(verificaCampoObject(fldCheck, !subObject && fNome.contains(".") ? fNome.substring(0, fNome.lastIndexOf(".")) : fNome));
+						String fldNomeTemp = wsMapperAttribute != null && StringUtils.isNotBlank(wsMapperAttribute.value()) ? wsMapperAttribute.value() : fNome;
+						retorno.addAll(verificaCampoObject(fldCheck, !subObject && fNome.contains(".") ? fldNomeTemp + fNome.substring(fNome.length() - 1, fNome.lastIndexOf(".")) : fldNomeTemp));
 					}else{
 						String campoVerificado = verificaCampo(responseClass, fNome); 
 						if(StringUtils.isNotBlank(campoVerificado)){

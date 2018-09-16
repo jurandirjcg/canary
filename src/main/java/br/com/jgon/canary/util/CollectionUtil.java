@@ -181,6 +181,9 @@ public class CollectionUtil {
 	 * @return
 	 */
 	public static boolean constainsValue(Collection<String> list, String value){
+		if(list == null) {
+			return false;
+		}
 		for(String s : list){
 			if(s.contains(value)){
 				return true;

@@ -57,7 +57,6 @@ public class RestFilter implements ContainerResponseFilter, ContextResolver<Obje
 		//mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
-
 	@Override
 	public ObjectMapper getContext(Class<?> type) {
 		return mapper;

@@ -19,6 +19,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
@@ -67,7 +68,8 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 		
 	public ResponseError configApplicationException(ApplicationException exception) {
 		ResponseError retorno = null;
-		retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, exception.getMessage(), exception.getMessageSeverity());
+		
+		retorno = new ResponseError(getStatusFromMessageSeverity(exception.getMessageSeverity()), exception.getMessage(), exception.getMessageSeverity());
 		if(exception.getMessageSeverity().equals(MessageSeverity.ERROR) || exception.getMessageSeverity().equals(MessageSeverity.FATAL)){
 			LOG.severe(exception.getMessage());
 		}
@@ -80,7 +82,7 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 	
 	public ResponseError configApplicationRuntimeException(ApplicationRuntimeException exception) {
 		ResponseError retorno = null;
-		retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, exception.getMessage(), exception.getMessageSeverity());
+		retorno = new ResponseError(getStatusFromMessageSeverity(exception.getMessageSeverity()), exception.getMessage(), exception.getMessageSeverity());
 		if(exception.getMessageSeverity().equals(MessageSeverity.ERROR) || exception.getMessageSeverity().equals(MessageSeverity.FATAL)){
 			LOG.severe(exception.getMessage());
 		}
@@ -90,5 +92,13 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 	public Response configWebApplicationException(WebApplicationException exception) {
 		WebApplicationException wa = (WebApplicationException) exception;
 		return wa.getResponse();
+	}
+	
+	protected Status getStatusFromMessageSeverity(MessageSeverity messageSeverity) {
+		if(messageSeverity != null && messageSeverity.equals(MessageSeverity.WARN)) {
+			return Response.Status.BAD_REQUEST;
+		}else {
+			return Response.Status.INTERNAL_SERVER_ERROR;
+		}
 	}
 }

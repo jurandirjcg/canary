@@ -38,7 +38,7 @@ public class ComplexAttribute {
 		listAttribute.addAll(Arrays.asList(attributes));
 	}
 		
-	public String getMetamodelAttribute(){
+	public String getName(){
 		StringBuilder f = new StringBuilder();
 		for(int i=0; i < listAttribute.size(); i++){
 			if(i > 0){

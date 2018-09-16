@@ -581,7 +581,10 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     	if(linkIncludeQueryParams){// || queryParams != null){
     		for(String key : uriInfo.getQueryParameters().keySet()){
     			if(uriInfo.getQueryParameters(false).get(key).size() > 1) {
-    				uriBuilder.replaceQueryParam(key, uriInfo.getQueryParameters(false).get(key));
+    				for(Object o : uriInfo.getQueryParameters(false).get(key)) {
+    					uriBuilder.queryParam(key, o);
+    				}
+    				//uriBuilder.replaceQueryParam(key, uriInfo.getQueryParameters(false).get(key));
     			}else {
     				uriBuilder.replaceQueryParam(key, uriInfo.getQueryParameters(false).getFirst(key));
     			}

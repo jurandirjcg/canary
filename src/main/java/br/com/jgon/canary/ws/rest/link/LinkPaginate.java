@@ -48,6 +48,12 @@ public @interface LinkPaginate {
 	 */
 	String embeddedCollectionName() default "";
 	/**
+	 * Indica qual sera o path inicial do link, default LinkResouceBasePath.COMPLETE
+	 * Ex: /page/recurso ou http://dominio.com/page/recurso
+	 * @return
+	 */
+	LinkResouceBasePath basePath() default LinkResouceBasePath.COMPLETE;
+	/**
 	 * 
 	 * @return
 	 */

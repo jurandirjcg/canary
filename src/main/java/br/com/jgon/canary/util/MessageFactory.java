@@ -41,9 +41,14 @@ public class MessageFactory {
 	static {
 		try {
 			defaultMessageResource = ResourceBundle.getBundle(DEFAULT_MESSAGE_RESOURCE, Locale.getDefault(), MessageFactory.class.getClassLoader());
+		} catch (MissingResourceException e) {
+			LOGGER.severe("Arquivo ApplicationDefaultMessages não encontrado " + e.getMessage());
+			//Nao e necessario lancar execao pois aplicacao sempre apresentara mensagem de erro generica
+		}
+		try {
 			customMessageResource = ResourceBundle.getBundle(CUSTOM_MESSAGE_RESOURCE, Locale.getDefault(), MessageFactory.class.getClassLoader());
 		} catch (MissingResourceException e) {
-			LOGGER.severe("Arquivo ApplicationMessages não encontrado");
+			LOGGER.severe("Arquivo ApplicationMessages não encontrado " + e.getMessage());
 			//Nao e necessario lancar execao pois aplicacao sempre apresentara mensagem de erro generica
 		}
 		

@@ -150,10 +150,14 @@ public class ReflectionUtil {
 			if(fieldClass != null && !fld.getType().equals(fieldClass)){
 				itField.remove();
 			}else{
+				boolean achou = false;
 				for(Class<? extends Annotation> a : annotationClass){
-					if(getAnnotation(fld, a) == null){
-						itField.remove();
+					if(getAnnotation(fld, a) != null){
+						achou = true;
 					}
+				}
+				if(!achou) {
+					itField.remove();
 				}
 			}
 		}
@@ -732,9 +736,11 @@ public class ReflectionUtil {
 	 * @param obj
 	 * @param field
 	 * @param value
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
 	 * @throws Exception 
 	 */
-	public static void setFieldValue(Object obj, Field field, Object value) throws Exception{
+	public static void setFieldValue(Object obj, Field field, Object value) throws IllegalArgumentException, IllegalAccessException{
 			field.setAccessible(true);
 			field.set(obj, value);
 	}
@@ -743,9 +749,11 @@ public class ReflectionUtil {
 	 * @param obj
 	 * @param fieldName
 	 * @param value
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
 	 * @throws Exception 
 	 */
-	public static void setFieldValue(Object obj, String fieldName, Object value) throws Exception{
+	public static void setFieldValue(Object obj, String fieldName, Object value) throws IllegalArgumentException, IllegalAccessException{
 		List<Field> lFld = listAttributes(obj.getClass(), fieldName);
 		if(lFld.size() == 1){
 			Field fld = lFld.get(0);

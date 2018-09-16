@@ -14,6 +14,7 @@
 package br.com.jgon.canary.ws.rest.link;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * Configura o link para serializacao
@@ -23,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @version 1.0
  *
  */
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(Include.NON_EMPTY)
 public class LinkEntity {
 	
 	private String rel;

@@ -692,11 +692,34 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 					this.whereRestriction.add(field, Where.EQUAL, value);
 					return true;
 				}else{
-					return configWhereRegex(field, fieldType, value, new RegexWhere[] {defaultIfNotMatch}, null);
+					boolean ret = configWhereRegex(field, fieldType, value, new RegexWhere[] {defaultIfNotMatch}, null);
+					if(!ret){
+						Where whereAux = getWhereFromRegexWhere(defaultIfNotMatch);
+						if(whereAux != null) {
+							this.whereRestriction.add(field, whereAux, value);
+							return true;
+						}else {
+							return false; 
+						}
+					}
 				}
 			}
 		}
 		return false;
+	}
+	/**
+	 * 
+	 * @autor jurandirjcg
+	 * @param regexWhr
+	 * @return
+	 */
+	private Where getWhereFromRegexWhere(RegexWhere regexWhr) {
+		for(Where whr : Where.values()) {
+			if(whr.regexWhere != null && whr.regexWhere.equals(regexWhr)) {
+				return whr;
+			}
+		}
+		return null;
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
@@ -899,12 +922,20 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 		return addWhereEqualField(attribute.getName(), anotherAttribute.getName());
 	}
 	@Override
+	public CriteriaFilterMetamodel<T> addWhereEqualField(Attribute<?, ?> attribute, ComplexAttribute anotherAttribute){
+		return addWhereEqualField(attribute.getName(), anotherAttribute.getName());
+	}
+	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotEqualField(String field, String anotherField){
 		this.whereRestriction.add(field, Where.NOT_EQUAL_OTHER_FIELD, anotherField);
 		return this;
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotEqualField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute){
+		return addWhereNotEqualField(attribute.getName(), anotherAttribute.getName());
+	}
+	@Override
+	public CriteriaFilterMetamodel<T> addWhereNotEqualField(Attribute<?, ?> attribute, ComplexAttribute anotherAttribute){
 		return addWhereNotEqualField(attribute.getName(), anotherAttribute.getName());
 	}
 	@Override
@@ -1329,313 +1360,313 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereILike(ComplexAttribute attribute, String value, MatchMode matchMode) {
-		return addWhereILike(attribute.getMetamodelAttribute(), value, matchMode);
+		return addWhereILike(attribute.getName(), value, matchMode);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereILike(ComplexAttribute attribute, MatchMode matchMode) {
-		return addWhereILike(attribute.getMetamodelAttribute(), matchMode);
+		return addWhereILike(attribute.getName(), matchMode);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotILike(ComplexAttribute attribute, String value, MatchMode matchMode) {
-		return addWhereNotILike(attribute.getMetamodelAttribute(), value, matchMode);
+		return addWhereNotILike(attribute.getName(), value, matchMode);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotLike(ComplexAttribute attribute, String value, MatchMode matchMode) {
-		return addWhereNotLike(attribute.getMetamodelAttribute(), value, matchMode);
+		return addWhereNotLike(attribute.getName(), value, matchMode);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLike(ComplexAttribute attribute,	String value, MatchMode matchMode) {
-		return addWhereLike(attribute.getMetamodelAttribute(), value, matchMode);
+		return addWhereLike(attribute.getName(), value, matchMode);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotILike(ComplexAttribute attribute, MatchMode matchMode) {
-		return addWhereNotILike(attribute.getMetamodelAttribute(), matchMode);
+		return addWhereNotILike(attribute.getName(), matchMode);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotLike(ComplexAttribute attribute, MatchMode matchMode) {
-		return addWhereNotLike(attribute.getMetamodelAttribute(), matchMode);
+		return addWhereNotLike(attribute.getName(), matchMode);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLike(ComplexAttribute attribute, MatchMode matchMode) {
-		return addWhereLike(attribute.getMetamodelAttribute(), matchMode);
+		return addWhereLike(attribute.getName(), matchMode);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelect(ComplexAttribute attribute, String alias) {
-		return addSelect(attribute.getMetamodelAttribute(), alias);
+		return addSelect(attribute.getName(), alias);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelect(ComplexAttribute... attributes) {
 		for(ComplexAttribute ca : attributes) {
-			this.addSelect(ca.getMetamodelAttribute());
+			this.addSelect(ca.getName());
 		}
 		return this;
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectCount(ComplexAttribute attribute, String alias) {
-		return addSelectCount(attribute.getMetamodelAttribute(), alias);
+		return addSelectCount(attribute.getName(), alias);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectCount(ComplexAttribute attribute) {
-		return addSelectCount(attribute.getMetamodelAttribute());
+		return addSelectCount(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectUpper(ComplexAttribute attribute) {
-		return addSelectUpper(attribute.getMetamodelAttribute());
+		return addSelectUpper(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectUpper(ComplexAttribute attribute, String alias) {
-		return addSelectUpper(attribute.getMetamodelAttribute(), alias);
+		return addSelectUpper(attribute.getName(), alias);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectLower(ComplexAttribute attribute) {
-		return addSelectLower(attribute.getMetamodelAttribute());
+		return addSelectLower(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectLower(ComplexAttribute attribute, String alias) {
-		return addSelectLower(attribute.getMetamodelAttribute(), alias);
+		return addSelectLower(attribute.getName(), alias);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectMax(ComplexAttribute attribute, String alias) {
-		return addSelectMax(attribute.getMetamodelAttribute(), alias);
+		return addSelectMax(attribute.getName(), alias);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectMax(ComplexAttribute attribute) {
-		return addSelectMax(attribute.getMetamodelAttribute());
+		return addSelectMax(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectMin(ComplexAttribute attribute, String alias) {
-		return addSelectMin(attribute.getMetamodelAttribute(), alias);
+		return addSelectMin(attribute.getName(), alias);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectMin(ComplexAttribute attribute) {
-		return addSelectMin(attribute.getMetamodelAttribute());
+		return addSelectMin(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectSum(ComplexAttribute attribute, String alias) {
-		return addSelectSum(attribute.getMetamodelAttribute(), alias);
+		return addSelectSum(attribute.getName(), alias);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelectSum(ComplexAttribute attribute) {
-		return addSelectSum(attribute.getMetamodelAttribute());
+		return addSelectSum(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addSelect(ComplexAttribute attribute) {
-		return addSelect(attribute.getMetamodelAttribute());
+		return addSelect(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addOrderAsc(ComplexAttribute attribute) {
-		return addOrderAsc(attribute.getMetamodelAttribute());
+		return addOrderAsc(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addOrderDesc(ComplexAttribute attribute) {
-		return addOrderDesc(attribute.getMetamodelAttribute());
+		return addOrderDesc(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereEqual(	ComplexAttribute attribute) {
-		return addWhereEqual(attribute.getMetamodelAttribute());
+		return addWhereEqual(attribute.getName());
 	}
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereIn(ComplexAttribute attribute, List<E> values) {
-		return addWhereIn(attribute.getMetamodelAttribute(), values);
+		return addWhereIn(attribute.getName(), values);
 	}
 	@SuppressWarnings("unchecked")
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereIn(ComplexAttribute attribute, E... values) {
-		return addWhereIn(attribute.getMetamodelAttribute(), values);
+		return addWhereIn(attribute.getName(), values);
 	}
 	@SuppressWarnings("unchecked")
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereNotIn(ComplexAttribute attribute, E... values) {
-		return addWhereNotIn(attribute.getMetamodelAttribute(), values);
+		return addWhereNotIn(attribute.getName(), values);
 	}
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereNotIn(ComplexAttribute attribute, List<E> values) {
-		return addWhereNotIn(attribute.getMetamodelAttribute(), values);
+		return addWhereNotIn(attribute.getName(), values);
 	}
 	@SuppressWarnings("unchecked")
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereEqual(ComplexAttribute attribute, E... values) {
-		return addWhereEqual(attribute.getMetamodelAttribute(), values);
+		return addWhereEqual(attribute.getName(), values);
 	}
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereEqual(ComplexAttribute attribute, List<E> values) {
-		return addWhereEqual(attribute.getMetamodelAttribute(), values);
+		return addWhereEqual(attribute.getName(), values);
 	}
 	@SuppressWarnings("unchecked")
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereNotEqual(ComplexAttribute attribute, E... values) {
-		return addWhereNotEqual(attribute.getMetamodelAttribute(), values);
+		return addWhereNotEqual(attribute.getName(), values);
 	}
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereNotEqual(ComplexAttribute attribute, List<E> values) {
-		return addWhereNotEqual(attribute.getMetamodelAttribute(), values);
+		return addWhereNotEqual(attribute.getName(), values);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereBetween(ComplexAttribute attribute, Integer startValue, Integer endValue) {
-		return addWhereBetween(attribute.getMetamodelAttribute(), startValue, endValue);
+		return addWhereBetween(attribute.getName(), startValue, endValue);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereBetween(ComplexAttribute attribute, Short startValue, Short endValue) {
-		return addWhereBetween(attribute.getMetamodelAttribute(), startValue, endValue);
+		return addWhereBetween(attribute.getName(), startValue, endValue);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereBetween(ComplexAttribute attribute, Long startValue, Long endValue) {
-		return addWhereBetween(attribute.getMetamodelAttribute(), startValue, endValue);
+		return addWhereBetween(attribute.getName(), startValue, endValue);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLessThanField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute) {
-		return addWhereLessThanField(attribute.getMetamodelAttribute(), anotherAttribute.getName());
+		return addWhereLessThanField(attribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereGreaterThanField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute) {
-		return addWhereGreaterThanField(attribute.getMetamodelAttribute(), anotherAttribute.getName());
+		return addWhereGreaterThanField(attribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute) {
-		return addWhereLessThanOrEqualToField(attribute.getMetamodelAttribute(), anotherAttribute.getName());
+		return addWhereLessThanOrEqualToField(attribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute) {
-		return addWhereGreaterThanOrEqualToField(attribute.getMetamodelAttribute(), anotherAttribute.getName());
+		return addWhereGreaterThanOrEqualToField(attribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereEqualField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute) {
-		return addWhereEqualField(attribute.getMetamodelAttribute(), anotherAttribute.getName());
+		return addWhereEqualField(attribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotEqualField(ComplexAttribute attribute, 	Attribute<?, ?> anotherAttribute) {
-		return addWhereNotEqualField(attribute.getMetamodelAttribute(), anotherAttribute.getName());
+		return addWhereNotEqualField(attribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereBetween(ComplexAttribute attribute, Date startValue, Date endValue) {
-		return addWhereBetween(attribute.getMetamodelAttribute(), startValue, endValue);
+		return addWhereBetween(attribute.getName(), startValue, endValue);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereBetween(ComplexAttribute attribute, LocalDate startValue, LocalDate endValue) {
-		return addWhereBetween(attribute.getMetamodelAttribute(), startValue, endValue);
+		return addWhereBetween(attribute.getName(), startValue, endValue);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereBetween(ComplexAttribute attribute, LocalDateTime startValue, LocalDateTime endValue) {
-		return addWhereBetween(attribute.getMetamodelAttribute(), startValue, endValue);
+		return addWhereBetween(attribute.getName(), startValue, endValue);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute) {
-		return addWhereGreaterThan(attribute.getMetamodelAttribute());
+		return addWhereGreaterThan(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute) {
-		return addWhereGreaterThanOrEqualTo(attribute.getMetamodelAttribute());
+		return addWhereGreaterThanOrEqualTo(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereIsNotNull(ComplexAttribute attribute) {
-		return addWhereIsNotNull(attribute.getMetamodelAttribute());
+		return addWhereIsNotNull(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereIsNull(ComplexAttribute attribute) {
-		return addWhereIsNull(attribute.getMetamodelAttribute());
+		return addWhereIsNull(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereIn(ComplexAttribute attribute) {
-		return addWhereIn(attribute.getMetamodelAttribute());
+		return addWhereIn(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLessThan(ComplexAttribute attribute) {
-		return addWhereLessThan(attribute.getMetamodelAttribute());
+		return addWhereLessThan(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute) {
-		return addWhereLessThanOrEqualTo(attribute.getMetamodelAttribute());
+		return addWhereLessThanOrEqualTo(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotEqual(	ComplexAttribute attribute) {
-		return addWhereNotEqual(attribute.getMetamodelAttribute());
+		return addWhereNotEqual(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotIn(ComplexAttribute attribute) {
-		return addWhereNotIn(attribute.getMetamodelAttribute());
+		return addWhereNotIn(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addGroupBy(ComplexAttribute attribute) {
-		return addGroupBy(attribute.getMetamodelAttribute());
+		return addGroupBy(attribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addJoin(ComplexAttribute attribute, JoinType joinType, boolean fetch) {
-		return addJoin(attribute.getMetamodelAttribute(), joinType, fetch);
+		return addJoin(attribute.getName(), joinType, fetch);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addJoin(ComplexAttribute attribute, JoinType joinType) {
-		return addJoin(attribute.getMetamodelAttribute(), joinType);
+		return addJoin(attribute.getName(), joinType);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addJoin(ComplexAttribute attribute) {
-		return addJoin(attribute.getMetamodelAttribute());
+		return addJoin(attribute.getName());
 	}
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereEqual(ComplexAttribute attribute, E value) {
-		return addWhereEqual(attribute.getMetamodelAttribute(), value);
+		return addWhereEqual(attribute.getName(), value);
 	}
 	@Override
 	public <E> CriteriaFilterMetamodel<T> addWhereNotEqual(ComplexAttribute attribute, E value) {
-		return addWhereNotEqual(attribute.getMetamodelAttribute(), value);
+		return addWhereNotEqual(attribute.getName(), value);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute, Date value) {
-		return addWhereGreaterThan(attribute.getMetamodelAttribute(), value);
+		return addWhereGreaterThan(attribute.getName(), value);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute, Number value) {
-		return addWhereGreaterThan(attribute.getMetamodelAttribute(), value);
+		return addWhereGreaterThan(attribute.getName(), value);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, Date value) {
-		return addWhereGreaterThanOrEqualTo(attribute.getMetamodelAttribute(), value);
+		return addWhereGreaterThanOrEqualTo(attribute.getName(), value);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, Number value) {
-		return addWhereGreaterThanOrEqualTo(attribute.getMetamodelAttribute(), value);
+		return addWhereGreaterThanOrEqualTo(attribute.getName(), value);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLessThan(ComplexAttribute attribute, Date value) {
-		return addWhereLessThan(attribute.getMetamodelAttribute(), value);
+		return addWhereLessThan(attribute.getName(), value);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLessThan(ComplexAttribute attribute, Number value) {
-		return addWhereLessThan(attribute.getMetamodelAttribute(), value);
+		return addWhereLessThan(attribute.getName(), value);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, Date value) {
-		return addWhereLessThanOrEqualTo(attribute.getMetamodelAttribute(), value);
+		return addWhereLessThanOrEqualTo(attribute.getName(), value);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, Number value) {
-		return addWhereLessThanOrEqualTo(attribute.getMetamodelAttribute(), value);
+		return addWhereLessThanOrEqualTo(attribute.getName(), value);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException {
-		return addWhereRegex(attribute.getMetamodelAttribute(), attribute.getFieldType(), value, regexToAnalyse, defaultIfNotMatch);
+		return addWhereRegex(attribute.getName(), attribute.getFieldType(), value, regexToAnalyse, defaultIfNotMatch);
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLessThanField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
-		return addWhereLessThanField(anotherAttribute.getMetamodelAttribute(), anotherAttribute.getMetamodelAttribute());
+		return addWhereLessThanField(anotherAttribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereGreaterThanField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
-		return addWhereGreaterThanField(anotherAttribute.getMetamodelAttribute(), anotherAttribute.getMetamodelAttribute());
+		return addWhereGreaterThanField(anotherAttribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
-		return addWhereLessThanOrEqualToField(anotherAttribute.getMetamodelAttribute(), anotherAttribute.getMetamodelAttribute());
+		return addWhereLessThanOrEqualToField(anotherAttribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
-		return addWhereGreaterThanOrEqualToField(anotherAttribute.getMetamodelAttribute(), anotherAttribute.getMetamodelAttribute());
+		return addWhereGreaterThanOrEqualToField(anotherAttribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereEqualField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
-		return addWhereEqualField(anotherAttribute.getMetamodelAttribute(), anotherAttribute.getMetamodelAttribute());
+		return addWhereEqualField(anotherAttribute.getName(), anotherAttribute.getName());
 	}
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotEqualField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
-		return addWhereNotEqualField(anotherAttribute.getMetamodelAttribute(), anotherAttribute.getMetamodelAttribute());
+		return addWhereNotEqualField(anotherAttribute.getName(), anotherAttribute.getName());
 	}
 }

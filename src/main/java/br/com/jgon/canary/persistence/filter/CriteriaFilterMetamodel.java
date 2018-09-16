@@ -1754,4 +1754,22 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 */
 	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
 
+	/**
+	 * 
+	 * @autor jurandirjcg
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilterMetamodel<T> addWhereNotEqualField(Attribute<?, ?> attribute, ComplexAttribute anotherAttribute);
+
+	/**
+	 * 
+	 * @autor jurandirjcg
+	 * @param attribute
+	 * @param anotherAttribute
+	 * @return
+	 */
+	public CriteriaFilterMetamodel<T> addWhereEqualField(Attribute<?, ?> attribute, ComplexAttribute anotherAttribute);
+
 }
