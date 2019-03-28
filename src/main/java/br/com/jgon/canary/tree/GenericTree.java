@@ -18,7 +18,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.util.MessageSeverity;
@@ -40,6 +43,8 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	private static final String SEPARATOR_NODE = "_";
 	private static final String SEPARATOR_NODE_NULL = "_";
 	
+	@Inject
+	private Logger logger;
 	/**
 	 * Nome do node
 	 */
@@ -82,6 +87,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 					nodeResAux += (k == 0 ? "" : SEPARATOR_NODE_NULL) + String.valueOf(resAux);
 			}
 		}catch (Exception e) {
+			logger.error("[configNodesConteudo]", e);
 			throw new ApplicationException(MessageSeverity.ERROR, "error.tree.node", e);
 		}
 		//Remove Formacacao

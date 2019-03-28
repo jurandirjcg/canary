@@ -30,8 +30,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
+import javax.inject.Inject;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
@@ -51,6 +51,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
+import org.slf4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -89,7 +90,8 @@ import br.com.jgon.canary.ws.rest.validation.enumerator.ParameterTypeEnum;
 public class RestValidationParameterFilter implements ContainerRequestFilter{
 	private final String VALOR_OCULTO = "[VALOR NAO EXIBIDO]";
 	
-	private final Logger LOG = Logger.getLogger(RestValidationParameterFilter.class.getName());
+	@Inject
+	private Logger logger;
 	
 	@Context
 	private ResourceInfo resourceInfo;
@@ -258,7 +260,7 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 				return null;
 			}*/
 		} catch (Exception ex){
-			LOG.severe(ex.getMessage());
+			logger.error("[getParameterMap]", ex);
 		}
 		
 		return retorno;
@@ -310,7 +312,7 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 						}
 					}
 				}catch (IllegalAccessException e) {
-					LOG.severe(e.getMessage());
+					logger.error("[objectAttributeMap]", e);
 				}
 			}
 		}
@@ -596,7 +598,7 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 				}
 			}
 		}else{
-			LOG.severe(MessageFactory.getMessage("message.erro.contenttype", new String[]{contentType}));
+			logger.error(MessageFactory.getMessage("error.contenttype", new String[]{contentType}));
 		}
 		
 		return retorno;
@@ -625,7 +627,7 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 				}finally{
 					if(retorno == null){
 						retorno = StandardCharsets.UTF_8;
-						LOG.warning("Nenhum charset encontrado nos headers da request. Assumindo " + retorno.displayName()); //Adiciona log ao servidor para facilitar a solução de um eventual problema com a codificação
+						logger.warn("Nenhum charset encontrado nos headers da request. Assumindo " + retorno.displayName()); //Adiciona log ao servidor para facilitar a solução de um eventual problema com a codificação
 					}
 				}
 			}else{
@@ -649,7 +651,7 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 			//Revalida a request já que, quando é lida, a request perde os dados
 			requestContext.setEntityStream(IOUtils.toInputStream(retorno, charset));
 		} catch (IOException ex) {
-			LOG.severe(ex.getMessage());
+			logger.error("[getEntityBody]", ex.getMessage());
 		}
 		
 		return retorno;

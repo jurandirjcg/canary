@@ -67,7 +67,7 @@ class SelectMapper extends QueryMapper {
 	 * @return
 	 * @throws ApplicationException
 	 */
-	private List<SimpleEntry<String, String>> getAllFields() throws ApplicationException{
+	private List<SimpleEntry<String, String>> getAllFields(){
 		List<SimpleEntry<String, String>> campos = new ArrayList<SimpleEntry<String, String>>(0);
 		QueryAttribute queryMapperAttribute;
 		for(Field fld : ReflectionUtil.listAttributes(responseClass)){

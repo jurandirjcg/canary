@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -30,6 +31,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 //import com.google.common.base.CaseFormat;
@@ -69,6 +71,8 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 	
 	private Class<?> serviceClass;
 	private Method serviceMethod;
+	@Inject
+	private Logger logger;
 	
 	public LinkResponseFilter() {
 		
@@ -539,7 +543,9 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     					values.add(uriInfo.getPathParameters(false).getFirst(rpAux));
     				}
     			}else{
-    				throw new ApplicationException(MessageSeverity.ERROR, "link-response.field-not-found", rpAux);
+    				ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "link-response.field-not-found", rpAux);
+    				logger.error("[getLink]", ae);
+    				throw ae;
     			}
     		}
     	}
@@ -643,6 +649,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     			return builder.build();
     		}
     	}catch(IllegalArgumentException e){
+    		logger.error("[getLink]", e);
     		throw new ApplicationException("error.link-builder", e);
     	}
     }

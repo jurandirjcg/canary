@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -48,6 +49,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.persistence.CriteriaFilterImpl.SelectAggregate;
@@ -78,8 +80,20 @@ class CriteriaManager<T> {
 	private CriteriaBuilder criteriaBuilder;
 	private CriteriaQuery<?> criteriaQuery;
 	private Class<T> entityClass;
+	
+	@Inject
+	private Logger logger;
 		
-	public CriteriaManager(EntityManager entityManager, Class<T> entityClass, Class<?> queryClass, Class<?> resultClass, CriteriaFilterImpl<T> criteriaFilter) throws ApplicationException, Exception {
+	/**
+	 * 
+	 * @param entityManager
+	 * @param entityClass
+	 * @param queryClass
+	 * @param resultClass
+	 * @param criteriaFilter
+	 * @throws ApplicationException 
+	 */
+	public CriteriaManager(EntityManager entityManager, Class<T> entityClass, Class<?> queryClass, Class<?> resultClass, CriteriaFilterImpl<T> criteriaFilter) throws ApplicationException {
 		this.entityManager = entityManager;
 		this.queryClass = queryClass;
 		this.criteriaFilter = criteriaFilter;
@@ -111,10 +125,10 @@ class CriteriaManager<T> {
 	 * @param queryClass
 	 * @param criteriaFilter
 	 * @return
-	 * @throws Exception
+	 * @throws ApplicationException 
 	 */
 	@SuppressWarnings("unchecked")
-	private void createCriteria() throws Exception {
+	private void createCriteria() throws ApplicationException  {
 		boolean isTuple = !criteriaFilter.getListSelection().isEmpty() && !ReflectionUtil.isPrimitive(queryClass);
 		
 		T obj = criteriaFilter.getObjBase();
@@ -195,10 +209,9 @@ class CriteriaManager<T> {
 	 * @param from
 	 * @param associations
 	 * @return
-	 * @throws ApplicationException 
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Selection configSelections(From<?, ?> from) throws ApplicationException{
+	private Selection configSelections(From<?, ?> from){
 		if(criteriaFilter != null && criteriaFilter.getListSelection().size() > 0){
 			List<Selection> lista = new ArrayList<Selection>(0);
 						
@@ -252,7 +265,8 @@ class CriteriaManager<T> {
 				try{
 					path = assocAux.getValue().get(assocAux.getKey());
 				}catch(IllegalArgumentException e)  {
-					throw new ApplicationException(MessageSeverity.ERROR, "genericdao-field-not-found", e, assocAux.getValue().getJavaType().getName(), assocAux.getKey());
+					logger.error("[configSelections]", MessageSeverity.ERROR, "genericdao-field-not-found", e, assocAux.getValue().getJavaType().getName(), assocAux.getKey());
+					throw e;
 				}
 				
 				switch (se.getKey()) {
@@ -386,10 +400,9 @@ class CriteriaManager<T> {
 	 * @param attributeParent
 	 * @param pathEntry
 	 * @return
-	 * @throws IllegalArgumentException
-	 * @throws IllegalAccessException
+	 * @throws ApplicationException
 	 */
-	private <E> List<Predicate> configPredicates(E obj, String attributeParent, From<?, ?> pathEntry) throws IllegalArgumentException, IllegalAccessException{
+	private <E> List<Predicate> configPredicates(E obj, String attributeParent, From<?, ?> pathEntry) throws ApplicationException{
 		List<Predicate> predicates = new ArrayList<Predicate>();
 		
 		Object auxObj;
@@ -427,7 +440,12 @@ class CriteriaManager<T> {
 					}
 				}
 				
-				auxObj = obj != null ? field.get(obj) : null;
+				try {
+					auxObj = obj != null ? field.get(obj) : null;
+				} catch (Exception e) {
+					logger.error("[configPredicates]", e);
+					throw new ApplicationException(MessageSeverity.ERROR, "error.field.access", field.getName(), obj.getClass().getName());
+				}
 				isEntityType = field.getType().isAnnotationPresent(Entity.class) || field.getType().isAnnotationPresent(Embeddable.class);
 					
 				if(predicateOperation.equals(Where.IS_NULL)){
@@ -760,7 +778,7 @@ class CriteriaManager<T> {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
-	private <E> List<Predicate> configComplexPredicates(Class<E> obj, String attributeParent, From<?, ?> pathEntry) throws IllegalArgumentException, IllegalAccessException{
+	private <E> List<Predicate> configComplexPredicates(Class<E> obj, String attributeParent, From<?, ?> pathEntry){
 		List<Predicate> predicates = new ArrayList<Predicate>();
 		
 		String attributeName;

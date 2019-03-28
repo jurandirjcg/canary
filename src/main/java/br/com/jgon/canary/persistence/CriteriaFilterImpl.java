@@ -27,12 +27,14 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.Attribute;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.persistence.filter.ComplexAttribute;
@@ -53,9 +55,14 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	
 	private static final String regexPatternAlpha = "[a-zA-Z0-9\u00C0-\u00FF\\s_-]+";
 	private static final String regexPatternDate = "(((0?[1-9]|[12][0-9]|3[01])[/-](0[1-9]|1[0-2])[/-]((19|20)\\d\\d))|((19|20)\\d\\d[-/](0[1-9]|1[012])[-/](0[1-9]|[12][0-9]|3[01])))";
-	private static final String regexPatternDateTime =  regexPatternDate +"(([\\s]?(0\\d|1\\d|2[0-3]):[0-5]\\d)?(:[0-5]\\d)?)?";
+	private static final String regexTime = "((0\\d|1\\d|2[0-3]):[0-5]\\d)?(:[0-5]\\d)?(.\\d\\d\\d)?(Z)?(\\+[0-2][0-4]:[0-5]\\d)?";
+	//OLD private static final String regexPatternDateTime =  regexPatternDate +"(([\\s]?(0\\d|1\\d|2[0-3]):[0-5]\\d)?(:[0-5]\\d)?)?";
+	private static final String regexPatternDateTime =  regexPatternDate +"(([\\s]|T|'T')?" + regexTime + ")?";
 	private static final String regexPatternDateTimeOrNumber = "((" + regexPatternDateTime + ")|[0-9]+)";
 	private static final String regexPatternMultiDateTimeOrNumber = "(([a-zA-Z0-9,\\s_-\u00C0-\u00FF]+)|[" + regexPatternDateTime + ",]+)";
+	
+	@Inject
+	private Logger logger;
 	/**
 	 * Filtro de restricao
 	 *
@@ -563,7 +570,9 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	public CriteriaFilterMetamodel<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
 		boolean added = configWhereRegex(field, fieldType, value, regexToAnalyse, defaultIfNotMatch);
 		if(!added && defaultIfNotMatch != null){
-			throw new ApplicationException(MessageSeverity.ERROR, "error.regex-config", value, field);
+			ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "error.regex-config", value, field);
+			logger.error("addWhereRegex]", ae);
+			throw ae;
 		}
 		return this;
 	}
@@ -595,7 +604,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 				}else if(where.equals(Where.IS_NOT_NULL)){
 					this.addWhereIsNotNull(field);
 				}else if(where.equals(Where.BETWEEN)){
-					String[] val = m.group().replace(" ", "").split("(btwn|between)");
+					String[] val = m.group().split("\\s(btwn|between)\\s");
 					if(NumberUtils.isCreatable(val[0])){
 						this.whereRestriction.add(field, Where.BETWEEN, new Number[] {NumberUtils.createNumber(val[0]), NumberUtils.createNumber(val[1])});
 						return true;
@@ -604,10 +613,10 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 						dt1 = DateUtil.parseDate(val[0]);
 						dt2 = DateUtil.parseDate(val[1]);
 						if(val[1].matches(regexPatternDate)){
-								DateUtils.setHours(dt2, 23);
-								DateUtils.setMinutes(dt2, 59);
-								DateUtils.setSeconds(dt2, 59);
-								DateUtils.setMilliseconds(dt2, 999);
+								dt2 = DateUtils.setHours(dt2, 23);
+								dt2 = DateUtils.setMinutes(dt2, 59);
+								dt2 = DateUtils.setSeconds(dt2, 59);
+								dt2 = DateUtils.setMilliseconds(dt2, 999);
 						}
 						addWhereBetween(field, dt1, dt2);
 						return true;
@@ -725,6 +734,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	public CriteriaFilterMetamodel<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
 		boolean added = configWhereRegex(attribute.getName(), attribute.getJavaType(), value, regexToAnalyse, defaultIfNotMatch);
 		if(!added && defaultIfNotMatch != null){
+			ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "error.regex-config", value, attribute.getName());
+			logger.error("[addWhereRegex]", ae.getMessage());
 			throw new ApplicationException(MessageSeverity.ERROR, "error.regex-config", value, attribute.getName());
 		}
 		return this;

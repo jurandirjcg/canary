@@ -27,8 +27,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.persistence.DAOUtil;
@@ -49,6 +51,9 @@ public class WSMapper {
 	private static final String expSort = "[a-zA-Z]+\\{(([-+a-zA-Z\\.]+(:(asc|desc))?),*)+\\}";
 	private static final String expFields = "[a-zA-Z]+\\{[a-zA-Z,\\.]+\\}";
 	public static final String RESPONSE_ALL = "RESPONSE_ALL"; 
+	
+	@Inject
+	private Logger logger;
 	
 	public WSMapper(){
 		
@@ -118,7 +123,9 @@ public class WSMapper {
 								retorno.add(campoVerificado);
 							}
 						}else{
-							throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+							ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+							logger.error("[getCamposAjustados]", ae);
+							throw ae;
 						}
 					}
 				}
@@ -174,7 +181,9 @@ public class WSMapper {
 							retorno.add(fNome.concat(".").concat(campoVerificado));
 						}
 					}else{
-						throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+						ApplicationException ae =new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+						logger.error("[verificaCampoObject]", ae);
+						throw ae;
 					}
 				}
 			}

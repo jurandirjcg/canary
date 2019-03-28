@@ -17,9 +17,11 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 /**
  * 
@@ -36,19 +38,21 @@ public class MessageFactory {
 	private static final String CUSTOM_MESSAGE_RESOURCE = "ApplicationMessages";
 	private static final String DEFAULT_MESSAGE_RESOURCE = "br.com.jgon.jee.messages.ApplicationDefaultMessages";
 	private static final String DEFAULT_MESSAGE_KEY = "default.message";
-	private static Logger LOGGER = Logger.getLogger(MessageFactory.class.getName());
+	
+	@Inject
+	private static Logger logger;
 	
 	static {
 		try {
 			defaultMessageResource = ResourceBundle.getBundle(DEFAULT_MESSAGE_RESOURCE, Locale.getDefault(), MessageFactory.class.getClassLoader());
 		} catch (MissingResourceException e) {
-			LOGGER.severe("Arquivo ApplicationDefaultMessages não encontrado " + e.getMessage());
+			logger.error("[static] - Arquivo ApplicationDefaultMessages não encontrado", e);
 			//Nao e necessario lancar execao pois aplicacao sempre apresentara mensagem de erro generica
 		}
 		try {
 			customMessageResource = ResourceBundle.getBundle(CUSTOM_MESSAGE_RESOURCE, Locale.getDefault(), MessageFactory.class.getClassLoader());
 		} catch (MissingResourceException e) {
-			LOGGER.severe("Arquivo ApplicationMessages não encontrado " + e.getMessage());
+			logger.error("[sraric] - Arquivo ApplicationMessages não encontrado", e);
 			//Nao e necessario lancar execao pois aplicacao sempre apresentara mensagem de erro generica
 		}
 		
@@ -131,7 +135,7 @@ public class MessageFactory {
 		if(params != null && params.length > 0){
 			for(int i = 0; i < params.length; i++){
 				if(params[i].length() > 0 && params[i].charAt(0) != '\''){
-					params[i] = "'" + params[i] + "'";
+					params[i] = params[i];//"'" + params[i] + "'";
 				}
 			}
 			

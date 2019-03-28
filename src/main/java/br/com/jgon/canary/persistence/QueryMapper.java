@@ -26,9 +26,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.persistence.filter.QueryAttribute;
@@ -45,6 +47,8 @@ import br.com.jgon.canary.util.ReflectionUtil;
  */
 abstract class QueryMapper {
 	
+	@Inject
+	private Logger logger;
 	protected Class<?> responseClass;
 		
 	public QueryMapper(Class<?> responseClass){
@@ -89,7 +93,9 @@ abstract class QueryMapper {
 						if(campoVerificado != null){
 							retorno.add(campoVerificado);
 						}else{
-							throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+							ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+							logger.error("[getCamposAjustados]", ae.getMessage());
+							throw ae;
 						}
 					}
 				}
@@ -122,7 +128,9 @@ abstract class QueryMapper {
 						retorno.add(new SimpleEntry<String, String>(fNome.concat(".").concat(campoVerificado.getKey()), fNome.concat(".").concat(campoVerificado.getValue())));
 					}
 				}else{
-					throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+					ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+					logger.error("[verificaCampoObject]", ae.getMessage());
+					throw ae; 
 				}
 			}
 		}
@@ -214,7 +222,9 @@ abstract class QueryMapper {
 					*/
 					
 					if(ReflectionUtil.isCollection(attrType)){
-						throw new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-collection-not-definied", klass.getName() + "." + fl.getName());
+						ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-collection-not-definied", klass.getName() + "." + fl.getName());
+						logger.error("[verificaCampo]", ae.getMessage());
+						throw ae;
 					}
 										
 					campoMultiLevel = verificaCampo(attrType, fieldName.substring(fieldName.indexOf(".") + 1));

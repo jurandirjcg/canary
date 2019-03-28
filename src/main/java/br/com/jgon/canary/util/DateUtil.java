@@ -3,8 +3,11 @@ package br.com.jgon.canary.util;
 import java.text.ParseException;
 import java.util.Date;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
 
 import br.com.jgon.canary.exception.ApplicationException;
 
@@ -26,6 +29,11 @@ public abstract class DateUtil {
     public static final String PATTERN_DD_MM_YYYY = "dd-MM-yyyy";
     public static final String PATTERN_DD_MM_YYYY_HH_MM = "dd-MM-yyyy HH:mm";
     public static final String PATTERN_DD_MM_YYYY_HH_MM_SS = "dd-MM-yyyy HH:mm:ss";
+    public static final String ISO_8601_MILLIS_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String ISO_8601_EXTENDED_MILLIS_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+    
+    @Inject
+    private static Logger logger;
     
 	public static Date parseDate(String dateValue) throws ApplicationException{
 		try {
@@ -34,6 +42,8 @@ public abstract class DateUtil {
 					DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.getPattern(),
 					DateFormatUtils.ISO_8601_EXTENDED_TIME_FORMAT.getPattern(),
 					DateFormatUtils.ISO_8601_EXTENDED_TIME_TIME_ZONE_FORMAT.getPattern(),
+					ISO_8601_EXTENDED_MILLIS_DATETIME_FORMAT,
+					ISO_8601_MILLIS_DATETIME_FORMAT,
 					PATTERN_ASCTIME,
 					PATTERN_RFC1036,
 					PATTERN_RFC1123,
@@ -44,6 +54,7 @@ public abstract class DateUtil {
 					PATTERN_DD_MM_YYYY_HH_MM_SS,
 					PATTERN_DD_MM_YYYY_HH_MM_SS_BAR});
 		} catch (ParseException e) {
+			logger.error("[parseDate]", e);
 			throw new ApplicationException(MessageSeverity.ERROR, "error.parse-date", e, dateValue);
 		}
 	}
