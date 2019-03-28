@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EmbeddedId;
 import javax.persistence.EntityManager;
@@ -44,6 +42,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
+import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -109,7 +108,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return objeto  persistido
 	 * @throws SaveEntityException  erro ao salvar
 	 */
-	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	@Transactional(Transactional.TxType.MANDATORY)
 	public T save(T obj) throws SaveEntityException {
 		try {
 			getEntityManager().persist(obj);
@@ -127,7 +126,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @throws UpdateEntityException  erro ao atualizar
 	 * @throws SaveEntityException  erro ao salvar
 	 */
-	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	@Transactional(Transactional.TxType.MANDATORY)
 	public T saveOrUpdate(T obj) throws UpdateEntityException, SaveEntityException {
 		boolean isSave = true;
 		if(fieldId != null){
@@ -152,7 +151,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return  objeto atualizado
 	 * @throws UpdateEntityException  erro ao atualizar
 	 */
-	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	@Transactional(Transactional.TxType.MANDATORY)
 	public T update(T obj) throws UpdateEntityException {
 		try {
 			return getEntityManager().merge(obj);
@@ -167,7 +166,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param obj  objeto a ser removido
 	 * @throws RemoveEntityException  erro ao remover
 	 */
-	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	@Transactional(Transactional.TxType.MANDATORY)
 	public void remove(T obj) throws RemoveEntityException {
 		try {
 			obj = find(obj);
@@ -183,7 +182,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param id  identificardo do objeto
 	 * @throws RemoveEntityException  erro ao remover
 	 */
-	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	@Transactional(Transactional.TxType.MANDATORY)
 	public void remove(K id) throws RemoveEntityException {
 		try {
 			T obj = find(id);
