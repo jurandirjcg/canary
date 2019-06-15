@@ -16,12 +16,12 @@ package br.com.jgon.canary.util;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -790,6 +790,10 @@ public class ReflectionUtil {
 				|| klass.equals(Long.class)
 				|| klass.equals(Integer.class)
 				|| klass.equals(Short.class)
+				|| klass.equals(Double.class)
+				|| klass.equals(Number.class)
+				|| klass.equals(Float.class)
+				|| klass.equals(BigInteger.class)
 				|| klass.equals(Boolean.class)
 				|| klass.equals(Character.class);
 	}
@@ -811,7 +815,8 @@ public class ReflectionUtil {
 	 * @return
 	 */
 	public static boolean isCollection(Class<?> klass){
-		return klass.isAssignableFrom(Collection.class) || klass.isAssignableFrom(List.class) || klass.isAssignableFrom(Set.class);
+		//return klass.isAssignableFrom(Collection.class) || klass.isAssignableFrom(List.class) || klass.isAssignableFrom(Set.class);
+		return Collection.class.isAssignableFrom(klass);
 	}
 	
 	/**

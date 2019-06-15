@@ -1772,4 +1772,11 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 */
 	public CriteriaFilterMetamodel<T> addWhereEqualField(Attribute<?, ?> attribute, ComplexAttribute anotherAttribute);
 
+	/**
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	public <E> CriteriaFilterMetamodel<T> addUpdate(Attribute<?, ?> attribute, E value);
+
 }

@@ -146,6 +146,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	private Map<String, Order> listOrder = new LinkedHashMap<String, Order>(0);
 	private Set<String> listGroupBy = new LinkedHashSet<String>();
 	private Map<String, SimpleEntry<JoinType, Boolean>> listJoin = new LinkedHashMap<String, SimpleEntry<JoinType, Boolean>>();
+	private Map<String, Object> listUpdate = new LinkedHashMap<String, Object>();
 	private T objBase;
 	private Class<T> objClass;
 	
@@ -207,6 +208,13 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	 */
 	public Map<String, Where> getListWhere() {
 		return listWhere;
+	}
+	/**
+	 * 
+	 * @return
+	 */
+	public Map<String, Object> getListUpdate(){
+		return listUpdate;
 	}
 	/**
 	 * 
@@ -1679,5 +1687,15 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T> {
 	@Override
 	public CriteriaFilterMetamodel<T> addWhereNotEqualField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
 		return addWhereNotEqualField(anotherAttribute.getName(), anotherAttribute.getName());
+	}
+	@Override
+	public <E> CriteriaFilterMetamodel<T> addUpdate(String field, E value){
+		this.listUpdate.put(field, value);
+		return this;
+	}
+	@Override
+	public <E> CriteriaFilterMetamodel<T> addUpdate(Attribute<?, ?> attribute, E value){
+		this.listUpdate.put(attribute.getName(), value);
+		return this;
 	}
 }

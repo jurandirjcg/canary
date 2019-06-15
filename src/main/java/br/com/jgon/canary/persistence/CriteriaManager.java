@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.persistence.Embeddable;
@@ -38,6 +40,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
@@ -79,6 +82,7 @@ class CriteriaManager<T> {
 	private Class<?> resultClass;
 	private CriteriaBuilder criteriaBuilder;
 	private CriteriaQuery<?> criteriaQuery;
+	private CriteriaUpdate<T> criteriaUpdate;
 	private Class<T> entityClass;
 	
 	@Inject
@@ -103,6 +107,21 @@ class CriteriaManager<T> {
 		createCriteria();
 	}
 	
+	/**
+	 * 
+	 * @param entityManager
+	 * @param entityClass
+	 * @param criteriaFilter
+	 * @throws ApplicationException
+	 */
+	public CriteriaManager(EntityManager entityManager, Class<T> entityClass, CriteriaFilterImpl<T> criteriaFilter) throws ApplicationException {
+		this.entityManager = entityManager;
+		this.criteriaFilter = criteriaFilter;
+		this.criteriaAssociations = new CriteriaAssociations();
+		this.entityClass = entityClass;
+		createCriteriaUpdate();
+	}
+	
 	public Root<T> getRootEntry(){
 		return this.rootEntry;
 	}
@@ -116,8 +135,18 @@ class CriteriaManager<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <E> CriteriaQuery<E> getCriteriaQuery(){
+	public <E> CriteriaQuery<E> getCriteriaQuery() throws ApplicationException{
+		if(this.criteriaQuery == null){
+			this.createCriteria();
+		}
 		return (CriteriaQuery<E>) this.criteriaQuery;
+	}
+	
+	public CriteriaUpdate<T> getCriteriaUpdate() throws ApplicationException{
+		if(this.criteriaUpdate == null){
+			this.createCriteriaUpdate();
+		}
+		return this.criteriaUpdate;
 	}
 
 	/**
@@ -202,6 +231,48 @@ class CriteriaManager<T> {
 		}
 	
 		criteriaQuery = query;
+	}
+	/**
+	 * 
+	 * @throws ApplicationException
+	 */
+	private void createCriteriaUpdate() throws ApplicationException{
+		T obj = criteriaFilter.getObjBase();
+			
+		this.criteriaBuilder = entityManager.getCriteriaBuilder();
+		CriteriaUpdate<T> update = criteriaBuilder.createCriteriaUpdate(entityClass);
+		this.rootEntry = update.from(entityClass);
+		
+		List<Predicate> predicates = configAllPredicates(obj);
+		Map<String, Object> listUpdate = criteriaFilter.getListUpdate();
+
+		for(Iterator<Entry<String, Object>> it = listUpdate.entrySet().iterator(); it.hasNext();){
+			Entry<String, Object> attr = it.next();
+			update.set(attr.getKey(), attr.getValue());
+		}
+		
+		if(!predicates.isEmpty()){
+			update.where(predicates.toArray(new Predicate[] {}));
+		}
+		
+		this.criteriaUpdate = update;
+	}
+	/**
+	 * 
+	 * @param obj
+	 * @return
+	 * @throws ApplicationException
+	 */
+	private List<Predicate> configAllPredicates(T obj) throws ApplicationException{
+		List<Predicate> predicates = new ArrayList<Predicate>();
+		//WHERE 
+		if (obj != null) {
+			predicates.addAll(configPredicates(obj, null, rootEntry));
+		}
+		
+		predicates.addAll(configComplexPredicates(entityClass, null, rootEntry));
+		
+		return predicates;
 	}
 	
 	/**
@@ -619,7 +690,8 @@ class CriteriaManager<T> {
 							predicates.add(criteriaBuilder.notEqual(pathExpression, wValue));
 						}
 					}
-				}else {// if (value!= null) {
+				//Permite somente not equal diferente de null
+				}else if (value!= null) {
 					if(isStringType){
 						predicates.add(criteriaBuilder.notEqual(pathExpression, (String) value));
 					}else{
@@ -758,7 +830,8 @@ class CriteriaManager<T> {
 							predicates.add(criteriaBuilder.equal(pathExpression, wValue));
 						}
 					}
-				}else {// if (value!= null){
+				//Permite somente equal diferente de null
+				}else if (value!= null){
 					if(isStringType){
 						predicates.add(criteriaBuilder.equal(pathExpression, (String) value));
 					}else{

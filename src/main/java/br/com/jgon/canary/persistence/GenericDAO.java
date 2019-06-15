@@ -38,6 +38,7 @@ import javax.persistence.TupleElement;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
@@ -114,7 +115,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 			getEntityManager().persist(obj);
 			return obj;
 		} catch (Exception e) {
-			logger.error("[salve]", e);
+			logger.error("[save]", e);
 			throw new SaveEntityException(e, getPrimaryClass());
 		}
 	}
@@ -161,21 +162,27 @@ public abstract class GenericDAO<T, K extends Serializable>{
 		}
 	}
 
+	@Transactional(Transactional.TxType.MANDATORY)
+	public int update(CriteriaFilterImpl<T> criteriaFilter) throws ApplicationException{
+		CriteriaManager<T> criteriaManager = new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), criteriaFilter);
+		CriteriaUpdate<T> update = criteriaManager.getCriteriaUpdate();
+		return getEntityManager().createQuery(update).executeUpdate();
+	}
 	/**
 	 * 
 	 * @param obj  objeto a ser removido
 	 * @throws RemoveEntityException  erro ao remover
 	 */
-	@Transactional(Transactional.TxType.MANDATORY)
-	public void remove(T obj) throws RemoveEntityException {
-		try {
-			obj = find(obj);
-			getEntityManager().remove(obj);
-		} catch (Exception e) {
-			logger.error("[remove]", e);
-			throw new RemoveEntityException(e, getPrimaryClass());
-		}
-	}
+//	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+//	public void remove(T obj) throws RemoveEntityException {
+//		try {
+//			obj = find(obj);
+//			getEntityManager().remove(obj);
+//		} catch (Exception e) {
+//			logger.error("[remove]", e);
+//			throw new RemoveEntityException(e, getPrimaryClass());
+//		}
+//	}
 
 	/**
 	 * 
@@ -574,6 +581,115 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	
 	/**
 	 * 
+	 * @since 13/06/2019
+	 * @author Jurandir Cordeiro Gonçalves
+	 * @param criteriaFilter
+	 * @return
+	 * @throws ApplicationException
+	 * @rastreabilidade_requisito
+	 */
+	protected T getFirstResult(CriteriaFilter<T> criteriaFilter) throws ApplicationException {
+		return getFirstResult(getPrimaryClass(), criteriaFilter);
+	}
+	
+	/**
+	 * 
+	 * @since 13/06/2019
+	 * @author Jurandir Cordeiro Gonçalves
+	 * @param <E>
+	 * @param resultClass
+	 * @param criteriaQuery
+	 * @return
+	 * @throws ApplicationException
+	 * @rastreabilidade_requisito
+	 */
+	protected <E> E getFirstResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationException{
+		List<E> list = new LinkedList<E>();
+		for(SimpleEntry<?, E> se : getPreparedResultList(resultClass, criteriaQuery, 1, 1)){
+			list.add(se.getValue());
+		}
+		
+		if(list == null || list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
+	}
+	
+	/**
+	 * 
+	 * @since 13/06/2019
+	 * @author Jurandir Cordeiro Gonçalves
+	 * @param criteriaQuery
+	 * @return
+	 * @throws ApplicationException
+	 * @rastreabilidade_requisito
+	 */
+	protected T getFirstResult(CriteriaQuery<T> criteriaQuery) throws ApplicationException{
+		return getFirstResult(getPrimaryClass(), criteriaQuery);
+	}
+	
+	/**
+	 * 
+	 * @since 13/06/2019
+	 * @author Jurandir Cordeiro Gonçalves
+	 * @param <E>
+	 * @param resultClass
+	 * @param criteriaFilter
+	 * @return
+	 * @throws ApplicationException
+	 * @rastreabilidade_requisito
+	 */
+	@SuppressWarnings("unchecked")
+	protected <E> E getFirstResult(Class<E> resultClass, CriteriaFilter<T> criteriaFilter) throws ApplicationException{
+		List<E> list = (List<E>) getResultList(criteriaFilter, 1, 1);
+		if(list == null || list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
+	}
+	
+	/**
+	 * 
+	 * @since 13/06/2019
+	 * @author Jurandir Cordeiro Gonçalves
+	 * @param <E>
+	 * @param resultClass
+	 * @param objRef
+	 * @param fields
+	 * @return
+	 * @throws ApplicationException
+	 * @rastreabilidade_requisito
+	 */
+	protected <E> E getFirstResult(Class<E> resultClass, T objRef, List<String> fields) throws ApplicationException {
+		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
+				.addSelect(resultClass, fields);
+		
+		return (E) getFirstResult(resultClass, cf);
+	}
+	
+	/**
+	 * 
+	 * @since 13/06/2019
+	 * @author Jurandir Cordeiro Gonçalves
+	 * @param <E>
+	 * @param resultClass
+	 * @param objRef
+	 * @param fieldAlias
+	 * @return
+	 * @throws ApplicationException
+	 * @rastreabilidade_requisito
+	 */
+	protected <E> E getFirstResult(Class<E> resultClass, T objRef, Map<String, String> fieldAlias) throws ApplicationException {
+		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
+				.addSelect(fieldAlias);
+		
+		return (E) getFirstResult(resultClass, cf);
+	}
+	
+	/**
+	 * 
 	 * @param resultClass  classe que indica o tipo de objeto de retorno
 	 * @param criteriaFilter  filtro de pesquisa {@link CriteriaFilter}
 	 * @return  {@link CriteriaManager}
@@ -672,15 +788,12 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass  classe que indica o tipo de objeto de retorno
 	 * @param objRef  objeto de referencia para pesquisa
 	 * @param fieldAlias  associacao entre atributo da entidade e atributo de retorno
-	 * @param sort  ordenacao
-	 * @param criteriaFilter  filtro de pesquisa {@link CriteriaFilter}
 	 * @return objeto pesquisado
 	 * @throws ApplicationException  erro ao pesquisar
 	 */
-	protected <E> E getSingleResult(Class<E> resultClass, T objRef, Map<String, String> fieldAlias, List<String> sort, CriteriaFilter<T> criteriaFilter) throws ApplicationException {
+	protected <E> E getSingleResult(Class<E> resultClass, T objRef, Map<String, String> fieldAlias) throws ApplicationException {
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
-				.addSelect(fieldAlias)
-				.addOrder(sort);
+				.addSelect(fieldAlias);
 		
 		return (E) getSingleResult(resultClass, cf);
 	}
@@ -689,15 +802,12 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass  classe que indica o tipo de objeto de retorno
 	 * @param objRef  objeto de referencia para pesquisa
 	 * @param fields  campos retornados
-	 * @param sort  ordenacao
-	 * @param criteriaFilter  {@link CriteriaFilter}
 	 * @return  objeto pesquisado
 	 * @throws ApplicationException  erro ao pesquisa
 	 */
-	protected <E> E getSingleResult(Class<E> resultClass, T objRef, List<String> fields, List<String> sort, CriteriaFilter<T> criteriaFilter) throws ApplicationException {
+	protected <E> E getSingleResult(Class<E> resultClass, T objRef, List<String> fields) throws ApplicationException {
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
-				.addSelect(resultClass, fields)
-				.addOrder(sort);
+				.addSelect(resultClass, fields);
 		
 		return (E) getSingleResult(resultClass, cf);
 	}

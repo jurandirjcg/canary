@@ -757,5 +757,11 @@ public interface CriteriaFilter<T> {
 	 * @return
 	 */
 	public CriteriaFilter<T> addJoin(String field);
+	/**
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public <E> CriteriaFilterMetamodel<T> addUpdate(String field, E value);
 	
 }
