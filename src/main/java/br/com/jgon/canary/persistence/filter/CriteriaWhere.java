@@ -166,7 +166,11 @@ public interface CriteriaWhere<T> {
 		START,
 		END
 	}
-	
+	/**
+	 * 
+	 * @return
+	 */
+	public T getObjBase();
 	/**
 	 * 
 	 * @param field

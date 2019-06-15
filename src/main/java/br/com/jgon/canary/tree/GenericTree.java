@@ -18,10 +18,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.util.MessageSeverity;
@@ -43,8 +42,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	private static final String SEPARATOR_NODE = "_";
 	private static final String SEPARATOR_NODE_NULL = "_";
 	
-	@Inject
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(GenericTree.class);
 	/**
 	 * Nome do node
 	 */

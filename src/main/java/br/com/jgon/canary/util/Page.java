@@ -23,38 +23,38 @@ import java.util.Collection;
  *
  * @param <T>
  */
-public class Pagination<T> {
+public class Page<T> {
 	private Long totalElements;
 	private Integer elementsPerPage;
 	private Integer currentPage;
 	private Long totalPages;
 	private Collection<T> elements;
 	
-	public Pagination(){
+	public Page(){
 		totalElements = 0L;
 	}
 	
-	public Pagination(Collection<T> elements){
+	public Page(Collection<T> elements){
 		super();
 		this.elements = elements;
 	}
 	
-	public Pagination(Integer currentPage, Integer elementsPerPage){
+	public Page(Integer currentPage, Integer elementsPerPage){
 		super();
 		this.currentPage = currentPage;
 		this.elementsPerPage = elementsPerPage;
 	}
 	
-	public Pagination(Collection<T> elements, Pagination<T> pagination) {
+	public Page(Collection<T> elements, Page<T> page) {
 		super();
 		this.elements = elements;
-		this.totalElements = pagination.getTotalElements();
-		this.elementsPerPage = pagination.getElementsPerPage();
-		this.currentPage = pagination.getCurrentPage();
-		this.totalPages = pagination.getTotalPages();
+		this.totalElements = page.getTotalElements();
+		this.elementsPerPage = page.getElementsPerPage();
+		this.currentPage = page.getCurrentPage();
+		this.totalPages = page.getTotalPages();
 	}
 	
-	public Pagination(Long totalElementes, Integer elementsPerPage, Integer currentPage) {
+	public Page(Long totalElementes, Integer elementsPerPage, Integer currentPage) {
 		super();
 		this.totalElements = totalElementes;
 		this.elementsPerPage = elementsPerPage;

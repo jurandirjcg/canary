@@ -30,7 +30,7 @@ import javax.ws.rs.ext.Provider;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import br.com.jgon.canary.util.Pagination;
+import br.com.jgon.canary.util.Page;
 import br.com.jgon.canary.ws.rest.util.DominiosRest;
 
 /**
@@ -66,8 +66,8 @@ public class RestFilter implements ContainerResponseFilter, ContextResolver<Obje
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
     	//responseContext.getHeaders().add("Content-Type", responseContext.getHeaders().get("Content-Type") + ";charset=UFT-8");
     	
-    	if(responseContext.getEntity() instanceof Pagination){
-    		Pagination<?> pEntity = (Pagination<?>) responseContext.getEntity();
+    	if(responseContext.getEntity() instanceof Page){
+    		Page<?> pEntity = (Page<?>) responseContext.getEntity();
     		if(pEntity.getElements() == null){
     			responseContext.setEntity(Collections.EMPTY_LIST);
     		}else{

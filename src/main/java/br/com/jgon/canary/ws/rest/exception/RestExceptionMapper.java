@@ -13,7 +13,6 @@
  */
 package br.com.jgon.canary.ws.rest.exception;
 
-import javax.inject.Inject;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -24,6 +23,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.jboss.resteasy.spi.Failure;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
@@ -44,8 +44,7 @@ import br.com.jgon.canary.ws.rest.util.ResponseError;
 @Provider
 public class RestExceptionMapper implements ExceptionMapper<Exception>{
 
-	@Inject
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(RestExceptionMapper.class);
 	
 	@Override
 	@Produces(MediaType.APPLICATION_JSON)

@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.persistence.EmbeddedId;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
@@ -37,6 +36,7 @@ import javax.persistence.Tuple;
 import javax.persistence.TupleElement;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Expression;
@@ -47,6 +47,7 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.persistence.CriteriaFilterImpl.SelectAggregate;
@@ -54,11 +55,13 @@ import br.com.jgon.canary.persistence.exception.RemoveEntityException;
 import br.com.jgon.canary.persistence.exception.SaveEntityException;
 import br.com.jgon.canary.persistence.exception.UpdateEntityException;
 import br.com.jgon.canary.persistence.filter.CriteriaFilter;
+import br.com.jgon.canary.persistence.filter.CriteriaFilterDelete;
 import br.com.jgon.canary.persistence.filter.CriteriaFilterMetamodel;
+import br.com.jgon.canary.persistence.filter.CriteriaFilterUpdate;
 import br.com.jgon.canary.persistence.filter.QueryAttribute;
 import br.com.jgon.canary.util.CollectionUtil;
 import br.com.jgon.canary.util.MessageSeverity;
-import br.com.jgon.canary.util.Pagination;
+import br.com.jgon.canary.util.Page;
 import br.com.jgon.canary.util.ReflectionUtil;
 
 /**
@@ -78,8 +81,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	protected static final String ERROR_CRITERIA = "error.criteria";
 	protected static final String ERROR_FIELD_DOES_NOT_EXIST = "error.field-does-not-exist";
 			
-	@Inject
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(GenericDAO.class);
 	/**
 	 * 
 	 */
@@ -162,9 +164,15 @@ public abstract class GenericDAO<T, K extends Serializable>{
 		}
 	}
 
+	/**
+	 * 
+	 * @param criteriaFilterUpdate
+	 * @return
+	 * @throws ApplicationException
+	 */
 	@Transactional(Transactional.TxType.MANDATORY)
-	public int update(CriteriaFilterImpl<T> criteriaFilter) throws ApplicationException{
-		CriteriaManager<T> criteriaManager = new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), criteriaFilter);
+	public int update(CriteriaFilterUpdate<T> criteriaFilterUpdate) throws ApplicationException{
+		CriteriaManager<T> criteriaManager = new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), (CriteriaFilterImpl<T>) criteriaFilterUpdate);
 		CriteriaUpdate<T> update = criteriaManager.getCriteriaUpdate();
 		return getEntityManager().createQuery(update).executeUpdate();
 	}
@@ -199,6 +207,19 @@ public abstract class GenericDAO<T, K extends Serializable>{
 			throw new RemoveEntityException(e, getPrimaryClass());
 		}
 	}	
+	/**
+	 * 
+	 * @param criteriaFilterDelete
+	 * @return
+	 * @throws ApplicationException
+	 */
+	@Transactional(Transactional.TxType.MANDATORY)
+	public int remove(CriteriaFilterDelete<T> criteriaFilterDelete) throws ApplicationException{
+		CriteriaManager<T> criteriaManager = new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), (CriteriaFilterImpl<T>) criteriaFilterDelete);
+		CriteriaDelete<T> delete = criteriaManager.getCriteriaDelete();
+		return getEntityManager().createQuery(delete).executeUpdate();
+	}
+
 	/**
 	 * Obtem a entidade pela chave, utiliza a instrução JPA - EntityManager.find(T.class, K) - para obter, 
 	 * atenção pois normalmente este comando carrega todos os objetos relacionados com a entidade
@@ -1163,6 +1184,24 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	protected CriteriaFilter<T> getCriteriaFilter(){
 		return new CriteriaFilterImpl<T>(getPrimaryClass());
 	}
+	/**
+	 * 
+	 * @return
+	 */
+	protected CriteriaFilterUpdate<T> getCriteriaFilterUpdate(){
+		return new CriteriaFilterImpl<T>(getPrimaryClass());
+	}
+	/**
+	 * 
+	 * @param objRef
+	 * @return
+	 */
+	protected CriteriaFilterUpdate<T> getCriteriaFilterUpdate(T objRef){
+		if(objRef == null){
+			return getCriteriaFilterUpdate();
+		}
+		return new CriteriaFilterImpl<T>(objRef, getPrimaryClass());
+	}
 	
 	/**
 	 * 
@@ -1192,7 +1231,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return lista de objetos paginada
 	 * @throws ApplicationException  erro ao pesquisar
 	 */
-	protected Pagination<T> getResultPaginate(CriteriaFilter<T> criteriaFilter, int page, int qtde) throws ApplicationException{
+	protected Page<T> getResultPaginate(CriteriaFilter<T> criteriaFilter, int page, int qtde) throws ApplicationException{
 		return getResultPaginate(getPrimaryClass(), criteriaFilter, page, qtde);
 	}
 	/**
@@ -1203,7 +1242,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return  lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	public Pagination<T> paginate(T obj, int page, int qtde) throws ApplicationException{
+	public Page<T> paginate(T obj, int page, int qtde) throws ApplicationException{
 		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj);
 		return getResultPaginate(getPrimaryClass(), cf, page, qtde);
 	}
@@ -1216,7 +1255,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	public Pagination<T> paginate(List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationException{
+	public Page<T> paginate(List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationException{
 		return paginate(null, fields, sort, pagina, qtde);
 	}
 	/**
@@ -1229,7 +1268,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	public Pagination<T> paginate(T obj, List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationException{
+	public Page<T> paginate(T obj, List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationException{
 		return paginate(obj, null, fields, sort, pagina, qtde);
 	}
 	
@@ -1243,7 +1282,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return  lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	public Pagination<T> paginate(T obj, String[] fields, String[] sort, int pagina, int qtde) throws ApplicationException{
+	public Page<T> paginate(T obj, String[] fields, String[] sort, int pagina, int qtde) throws ApplicationException{
 		return paginate(obj, null, fields, sort, pagina, qtde);
 	}
 	
@@ -1258,7 +1297,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	public <E> Pagination<E> paginate(T obj, Class<E> resultClass, List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationException{
+	public <E> Page<E> paginate(T obj, Class<E> resultClass, List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationException{
 		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj);
 		
 		if(resultClass == null){
@@ -1282,7 +1321,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return  lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	public <E> Pagination<E> paginate(T obj, Class<E> resultClass, Map<String, String> fieldAlias, List<String> sort, int pagina, int qtde) throws ApplicationException{
+	public <E> Page<E> paginate(T obj, Class<E> resultClass, Map<String, String> fieldAlias, List<String> sort, int pagina, int qtde) throws ApplicationException{
 		return getResultPaginate(resultClass, obj, fieldAlias, sort, pagina, qtde);
 	}
 	
@@ -1297,7 +1336,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	public <E> Pagination<E> paginate(T obj, Class<E> resultClass, String[] fields, String[] sort, int pagina, int qtde) throws ApplicationException{
+	public <E> Page<E> paginate(T obj, Class<E> resultClass, String[] fields, String[] sort, int pagina, int qtde) throws ApplicationException{
 		return paginate(obj, resultClass, CollectionUtil.convertArrayToList(fields), CollectionUtil.convertArrayToList(sort), pagina, qtde);
 	}
 	/**
@@ -1311,7 +1350,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return  lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	public <E> Pagination<E> paginate(T obj, Class<E> resultClass, Map<String, String> fieldAlias, String[] sort, int pagina, int qtde) throws ApplicationException{
+	public <E> Page<E> paginate(T obj, Class<E> resultClass, Map<String, String> fieldAlias, String[] sort, int pagina, int qtde) throws ApplicationException{
 		return paginate(obj, resultClass, fieldAlias, CollectionUtil.convertArrayToList(sort), pagina, qtde);
 	}
 	
@@ -1434,7 +1473,77 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	public List<T> list(String[] fields, String[] sort, Integer pagina, Integer qtde) throws ApplicationException{
 		return list(null, null, fields, sort, pagina, qtde);
 	}
-	
+	/**
+	 * 
+	 * @param criteriaFilter
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public boolean exists(CriteriaFilter<T> criteriaFilter) throws ApplicationException{
+		return this.count(criteriaFilter) > 0;
+	}
+	/**
+	 * 
+	 * @param objRef
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public boolean exists(T objRef) throws ApplicationException{
+		CriteriaFilter<T> cf = getCriteriaFilter(objRef);
+		return this.exists(cf);
+	}
+	/**
+	 * 
+	 * @param criteriaFilter
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public Long count(CriteriaFilter<T> criteriaFilter) throws ApplicationException{
+		CriteriaManager<T> criteriaManager = getCriteriaManager(getPrimaryClass(), (CriteriaFilterImpl<T>) criteriaFilter);	
+		CriteriaQuery<?> query = criteriaManager.getCriteriaQuery();
+		return getCountResult(query, criteriaManager.getRootEntry());
+	}
+	/**
+	 * 
+	 * @param objRef
+	 * @return
+	 * @throws ApplicationException 
+	 */
+	public Long count(T objRef) throws ApplicationException{
+		CriteriaFilter<T> cf = getCriteriaFilter(objRef);
+		return this.count(cf);
+	}
+	/**
+	 * 
+	 * @param criteriaQuery
+	 * @param root
+	 * @return
+	 * @throws ApplicationException
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected Long getCountResult(final CriteriaQuery<?> criteriaQuery, Root<T> root) throws ApplicationException{ 
+		criteriaQuery.getOrderList().clear();
+		criteriaQuery.getGroupList().clear();
+
+		List<Field> flds = ReflectionUtil.listAttributesByAnnotation(getPrimaryClass(), Id.class);
+		boolean existEmbeddedId = false;
+		if(flds.isEmpty()){
+			existEmbeddedId = ReflectionUtil.existAnnotation(getPrimaryClass(), null, EmbeddedId.class);
+		}
+
+		CriteriaBuilder criteriaBuilder = getSearchEntityManager().getCriteriaBuilder();
+
+		if(flds.size() == 1){
+			Field fldId = flds.get(0);
+			criteriaQuery.select((Selection) criteriaBuilder.tuple(criteriaBuilder.countDistinct(root.get(fldId.getName())).alias(fldId.getName())));
+		} else if(existEmbeddedId){
+			criteriaQuery.select((Selection) criteriaBuilder.tuple(criteriaBuilder.countDistinct(root)));
+		} else{
+			criteriaQuery.select((Selection) criteriaBuilder.countDistinct(root));
+		}
+
+		return getSingleResult(Long.class, criteriaQuery);
+	}
 	/**
 	 * 
 	 * @param returnClass  classe que indica o tipo de objeto de retorno
@@ -1446,7 +1555,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return  lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	protected <E> Pagination<E> getResultPaginate(Class<E> returnClass, T objRef, List<String> fields, List<String> sort, int page, int limit) throws ApplicationException{
+	protected <E> Page<E> getResultPaginate(Class<E> returnClass, T objRef, List<String> fields, List<String> sort, int page, int limit) throws ApplicationException{
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
 				.addSelect(returnClass, fields)
 				.addOrder(sort);
@@ -1465,7 +1574,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return  lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	protected <E> Pagination<E> getResultPaginate(Class<E> returnClass, T objRef, Map<String, String> fieldAlias, List<String> sort, int page, int limit) throws ApplicationException{
+	protected <E> Page<E> getResultPaginate(Class<E> returnClass, T objRef, Map<String, String> fieldAlias, List<String> sort, int page, int limit) throws ApplicationException{
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
 				.addSelect(fieldAlias)
 				.addOrder(sort);
@@ -1481,76 +1590,12 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return lista de objetos paginada
 	 * @throws ApplicationException  erro ao paginar
 	 */
-	protected <E> Pagination<E> getResultPaginate(Class<E> returnClass, CriteriaFilter<T> criteriaFilter, int page, int limit) throws ApplicationException{
-	/*	
-		CriteriaFilterImpl<T> cFilter = (CriteriaFilterImpl<T>) criteriaFilter; 
-		for(String key : cFilter.getListSelection().keySet()) {
-			cFilter.addGroupBy(key);
-		}*/
-		
+	protected <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaFilter<T> criteriaFilter, int page, int limit) throws ApplicationException{
+
 		CriteriaManager<T> criteriaManager = getCriteriaManager(returnClass, (CriteriaFilterImpl<T>) criteriaFilter);	
 		CriteriaQuery<?> query = criteriaManager.getCriteriaQuery();
 		
 		return getResultPaginate(returnClass, query, criteriaManager.getRootEntry(), criteriaManager.getListCollectionRelation(), page, limit);
-		/*//SELECT
-		Selection<?> sel = query.getSelection();
-		//ORDER
-		List<Order> orderList = new ArrayList<Order>(query.getOrderList()); 
-		query.getOrderList().clear();
-		//GROUP
-		List<Expression<?>> groupList = new ArrayList<Expression<?>>(query.getGroupList());
-		query.getGroupList().clear();
-				
-		List<Field> flds = ReflectionUtil.listAttributesByAnnotation(getPrimaryClass(), Id.class);
-		boolean existEmbeddedId = false;
-		if(flds.isEmpty()){
-			existEmbeddedId = ReflectionUtil.existAnnotation(getPrimaryClass(), null, EmbeddedId.class);
-		}
-		
-		if(flds.size() == 1){
-			Field fldId = flds.get(0);
-			query.select((Selection) criteriaManager.getCriteriaBuilder().tuple(criteriaManager.getCriteriaBuilder().countDistinct(criteriaManager.getRootEntry().get(fldId.getName())).alias(fldId.getName())));
-		} else if(existEmbeddedId){
-			query.select((Selection) criteriaManager.getCriteriaBuilder().tuple(criteriaManager.getCriteriaBuilder().countDistinct(criteriaManager.getRootEntry())));
-		} else{
-			query.select((Selection) criteriaManager.getCriteriaBuilder().countDistinct(criteriaManager.getRootEntry()));
-		}
-		
-		Long qtdeReg = getSingleResult(Long.class, query);
-		
-		Pagination<E> paginacao = new Pagination<E>(qtdeReg, limit, page);
-		
-		if(qtdeReg > 0){			
-			query.select((Selection) sel);
-			query.orderBy(orderList);
-			
-			for(Iterator<Expression<?>> itExp = groupList.iterator(); itExp.hasNext();) {
-				Expression expAux = itExp.next();
-				boolean findSel = false;
-				for(Selection selAux : sel.getCompoundSelectionItems()) {
-					if(expAux.getAlias() != null && selAux.getAlias() != null && expAux.getAlias().equals(selAux.getAlias())) {
-						findSel = true;
-						break;
-					}
-				}
-				if(!findSel) {
-					itExp.remove();
-				}
-			}
-
-			query.groupBy(groupList);
-			
-			List<SimpleEntry<?, E>> returnList = getPreparedResultList(returnClass, query, page, limit);
-			
-			try {
-				paginacao.setElements(checkTupleResultList(criteriaManager, returnList));
-			} catch (ApplicationException e) {
-				throw e;
-			} catch (Exception e) {
-				throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, e, new String[] { getPrimaryClass().getSimpleName() });
-			}			
-		}		
-		return paginacao;*/
 	}
 
 	/**
@@ -1565,7 +1610,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @throws ApplicationException
 	 */
 	@SuppressWarnings("unchecked")
-	protected <E> Pagination<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, int page, int limit) throws ApplicationException{
+	protected <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, int page, int limit) throws ApplicationException{
 		Root<T> root = null;
 		for(Root<?> rootAux : criteriaQuery.getRoots()) {
 			if(rootAux.getJavaType().equals(getPrimaryClass())) {
@@ -1589,7 +1634,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @throws ApplicationException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private <E> Pagination<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, Root<T> root, Map<String, CriteriaFilterImpl<?>> listCollectionRelation,  int page, int limit) throws ApplicationException{
+	private <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, Root<T> root, Map<String, CriteriaFilterImpl<?>> listCollectionRelation,  int page, int limit) throws ApplicationException{
 			
 		//SELECT
 		Selection<?> sel = criteriaQuery.getSelection();
@@ -1619,7 +1664,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 		
 		Long qtdeReg = getSingleResult(Long.class, criteriaQuery);
 		
-		Pagination<E> paginacao = new Pagination<E>(qtdeReg, limit, page);
+		Page<E> paginacao = new Page<E>(qtdeReg, limit, page);
 		
 		if(qtdeReg > 0){			
 			criteriaQuery.select((Selection) sel);

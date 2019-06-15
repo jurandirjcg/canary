@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import br.com.jgon.canary.util.Pagination;
+import br.com.jgon.canary.util.Page;
 
 /**
  * Auxlia na conversao do objeto para o objeto de response
@@ -50,8 +50,8 @@ public abstract class ResponseConverter<O> {
 	 * @param paginacao
 	 * @return
 	 */
-	public <N extends ResponseConverter<O>> Pagination<N> converter(Pagination<O> paginacao){
-		Pagination<N> pRetorno = new Pagination<N>();
+	public <N extends ResponseConverter<O>> Page<N> converter(Page<O> paginacao){
+		Page<N> pRetorno = new Page<N>();
 		
 		pRetorno.setTotalPages(paginacao.getTotalPages());
 		pRetorno.setCurrentPage(paginacao.getCurrentPage());

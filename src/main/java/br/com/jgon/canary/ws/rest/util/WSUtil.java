@@ -18,7 +18,7 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
-import br.com.jgon.canary.util.Pagination;
+import br.com.jgon.canary.util.Page;
 
 /**
  * Util de WebService
@@ -39,7 +39,7 @@ public class WSUtil {
 	 * @param paginacao
 	 * @return
 	 */
-	public static <T> ResponseBuilder setPaginationToResponse(Pagination<T> paginacao){
+	public static <T> ResponseBuilder setPaginationToResponse(Page<T> paginacao){
 		return Response.ok().entity(paginacao.getElements())
 				.header(DominiosRest.X_PAGINATION_TOTAL_ELEMENTS, paginacao.getTotalElements())
 				.header(DominiosRest.X_PAGINATION_ELEMENTS_PER_PAGE, paginacao.getElementsPerPage())

@@ -26,11 +26,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.persistence.filter.QueryAttribute;
@@ -47,8 +47,7 @@ import br.com.jgon.canary.util.ReflectionUtil;
  */
 abstract class QueryMapper {
 	
-	@Inject
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(QueryMapper.class);;
 	protected Class<?> responseClass;
 		
 	public QueryMapper(Class<?> responseClass){

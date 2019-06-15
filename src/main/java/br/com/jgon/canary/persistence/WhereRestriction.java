@@ -14,14 +14,14 @@
 package br.com.jgon.canary.persistence;
 
 import java.util.AbstractMap.SimpleEntry;
-
-import br.com.jgon.canary.persistence.CriteriaFilterImpl.Where;
-
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import br.com.jgon.canary.persistence.CriteriaFilterImpl.Where;
+
 
 /**
  * 

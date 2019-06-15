@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.inject.Inject;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -39,6 +38,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Expression;
@@ -53,6 +53,7 @@ import javax.persistence.criteria.Selection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.persistence.CriteriaFilterImpl.SelectAggregate;
@@ -82,11 +83,9 @@ class CriteriaManager<T> {
 	private Class<?> resultClass;
 	private CriteriaBuilder criteriaBuilder;
 	private CriteriaQuery<?> criteriaQuery;
-	private CriteriaUpdate<T> criteriaUpdate;
 	private Class<T> entityClass;
 	
-	@Inject
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(CriteriaManager.class);
 		
 	/**
 	 * 
@@ -111,15 +110,14 @@ class CriteriaManager<T> {
 	 * 
 	 * @param entityManager
 	 * @param entityClass
-	 * @param criteriaFilter
+	 * @param criteriaFilterUpdate
 	 * @throws ApplicationException
 	 */
-	public CriteriaManager(EntityManager entityManager, Class<T> entityClass, CriteriaFilterImpl<T> criteriaFilter) throws ApplicationException {
+	public CriteriaManager(EntityManager entityManager, Class<T> entityClass, CriteriaFilterImpl<T> criteriaFilterUpdate) throws ApplicationException {
 		this.entityManager = entityManager;
-		this.criteriaFilter = criteriaFilter;
+		this.criteriaFilter = criteriaFilterUpdate;
 		this.criteriaAssociations = new CriteriaAssociations();
 		this.entityClass = entityClass;
-		createCriteriaUpdate();
 	}
 	
 	public Root<T> getRootEntry(){
@@ -142,13 +140,6 @@ class CriteriaManager<T> {
 		return (CriteriaQuery<E>) this.criteriaQuery;
 	}
 	
-	public CriteriaUpdate<T> getCriteriaUpdate() throws ApplicationException{
-		if(this.criteriaUpdate == null){
-			this.createCriteriaUpdate();
-		}
-		return this.criteriaUpdate;
-	}
-
 	/**
 	 * 
 	 * @param queryClass
@@ -236,7 +227,7 @@ class CriteriaManager<T> {
 	 * 
 	 * @throws ApplicationException
 	 */
-	private void createCriteriaUpdate() throws ApplicationException{
+	public CriteriaUpdate<T> getCriteriaUpdate() throws ApplicationException{
 		T obj = criteriaFilter.getObjBase();
 			
 		this.criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -255,7 +246,27 @@ class CriteriaManager<T> {
 			update.where(predicates.toArray(new Predicate[] {}));
 		}
 		
-		this.criteriaUpdate = update;
+		return update;
+	}
+	/**
+	 * 
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public CriteriaDelete<T> getCriteriaDelete() throws ApplicationException{
+		T obj = criteriaFilter.getObjBase();
+		
+		this.criteriaBuilder = entityManager.getCriteriaBuilder();
+		CriteriaDelete<T> delete = criteriaBuilder.createCriteriaDelete(entityClass);
+		this.rootEntry = delete.from(entityClass);
+		
+		List<Predicate> predicates = configAllPredicates(obj);
+		
+		if(!predicates.isEmpty()){
+			delete.where(predicates.toArray(new Predicate[] {}));
+		}
+		
+		return delete;
 	}
 	/**
 	 * 

@@ -18,10 +18,9 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -39,8 +38,7 @@ public class MessageFactory {
 	private static final String DEFAULT_MESSAGE_RESOURCE = "br.com.jgon.jee.messages.ApplicationDefaultMessages";
 	private static final String DEFAULT_MESSAGE_KEY = "default.message";
 	
-	@Inject
-	private static Logger logger;
+	private static Logger logger = LoggerFactory.getLogger(MessageFactory.class);
 	
 	static {
 		try {

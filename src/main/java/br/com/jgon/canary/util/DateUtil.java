@@ -3,11 +3,10 @@ package br.com.jgon.canary.util;
 import java.text.ParseException;
 import java.util.Date;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationException;
 
@@ -32,8 +31,7 @@ public abstract class DateUtil {
     public static final String ISO_8601_MILLIS_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     public static final String ISO_8601_EXTENDED_MILLIS_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
     
-    @Inject
-    private static Logger logger;
+    private static Logger logger = LoggerFactory.getLogger(DateUtil.class);
     
 	public static Date parseDate(String dateValue) throws ApplicationException{
 		try {

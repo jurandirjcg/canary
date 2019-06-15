@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -32,6 +31,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 //import com.google.common.base.CaseFormat;
@@ -40,7 +40,7 @@ import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.CollectionUtil;
 import br.com.jgon.canary.util.MessageSeverity;
-import br.com.jgon.canary.util.Pagination;
+import br.com.jgon.canary.util.Page;
 import br.com.jgon.canary.util.ReflectionUtil;
 import br.com.jgon.canary.ws.rest.param.WSFieldParam;
 import br.com.jgon.canary.ws.rest.param.WSParamFormat;
@@ -71,8 +71,8 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 	
 	private Class<?> serviceClass;
 	private Method serviceMethod;
-	@Inject
-	private Logger logger;
+	
+	private Logger logger = LoggerFactory.getLogger(LinkResponseFilter.class);
 	
 	public LinkResponseFilter() {
 		
@@ -339,8 +339,8 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     	}else if(attrNotPresentInRequest != null && !attrNotPresentInRequest.isEmpty()){
     		if(responseContext.getEntity() instanceof Collection){
     			responseContext.setEntity(getCollectionEntity((Collection<Object>) responseContext.getEntity(), attrNotPresentInRequest));
-    		}else if(responseContext.getEntity() instanceof Pagination){
-    			((Pagination) responseContext.getEntity()).setElements(getCollectionEntity(((Pagination) responseContext.getEntity()).getElements(), attrNotPresentInRequest));
+    		}else if(responseContext.getEntity() instanceof Page){
+    			((Page) responseContext.getEntity()).setElements(getCollectionEntity(((Page) responseContext.getEntity()).getElements(), attrNotPresentInRequest));
     		}else{
     			responseContext.setEntity(configEntityAttributes(responseContext.getEntity(), attrNotPresentInRequest));
     		}
@@ -675,8 +675,8 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     	int limitPg = 0;
     	long maxPgs = 0;
     	
-    	if(entity != null && entity instanceof Pagination){
-    		Pagination<?> pEntity = (Pagination<?>) entity;
+    	if(entity != null && entity instanceof Page){
+    		Page<?> pEntity = (Page<?>) entity;
     		
     		pgAtual = pEntity.getCurrentPage();
     		limitPg = pEntity.getElementsPerPage();

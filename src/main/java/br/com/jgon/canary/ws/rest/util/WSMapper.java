@@ -27,10 +27,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.persistence.DAOUtil;
@@ -52,8 +52,7 @@ public class WSMapper {
 	private static final String expFields = "[a-zA-Z]+\\{[a-zA-Z,\\.]+\\}";
 	public static final String RESPONSE_ALL = "RESPONSE_ALL"; 
 	
-	@Inject
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(WSMapper.class);
 	
 	public WSMapper(){
 		
