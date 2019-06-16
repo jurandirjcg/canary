@@ -39,7 +39,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
@@ -1495,36 +1494,78 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	/**
 	 * 
 	 * @param criteriaFilter
+	 * @param distinct
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public Long count(CriteriaFilter<T> criteriaFilter, boolean distinct) throws ApplicationException{
+		CriteriaManager<T> criteriaManager = getCriteriaManager(getPrimaryClass(), (CriteriaFilterImpl<T>) criteriaFilter);	
+		CriteriaQuery<?> query = criteriaManager.getCriteriaQuery();
+		return getCountResult(query, criteriaManager.getRootEntry(), distinct);
+	}
+	/**
+	 * COUNT com distinct false
+	 * @param criteriaFilter
 	 * @return
 	 * @throws ApplicationException
 	 */
 	public Long count(CriteriaFilter<T> criteriaFilter) throws ApplicationException{
 		CriteriaManager<T> criteriaManager = getCriteriaManager(getPrimaryClass(), (CriteriaFilterImpl<T>) criteriaFilter);	
 		CriteriaQuery<?> query = criteriaManager.getCriteriaQuery();
-		return getCountResult(query, criteriaManager.getRootEntry());
+		return getCountResult(query, criteriaManager.getRootEntry(), false);
 	}
 	/**
 	 * 
 	 * @param objRef
+	 * @param distinct
 	 * @return
 	 * @throws ApplicationException 
 	 */
-	public Long count(T objRef) throws ApplicationException{
+	public Long count(T objRef, boolean distinct) throws ApplicationException{
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef);
-		return this.count(cf);
+		return this.count(cf, distinct);
 	}
 	/**
-	 * 
+	 * COUNT com distinct false
+	 * @param objRef
+	 * @return
+	 * @throws ApplicationException
+	 */
+	public Long count(T objRef) throws ApplicationException{
+		CriteriaFilter<T> cf = getCriteriaFilter(objRef);
+		return this.count(cf, false);
+	}
+	/**
+	 * <b>COUNT</b> utilizando o campo chave da entidade (root) ou em ultimo caso a entidade (root)
 	 * @param criteriaQuery
 	 * @param root
+	 * @param distinct - true para utilizar countDistinct
 	 * @return
 	 * @throws ApplicationException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected Long getCountResult(final CriteriaQuery<?> criteriaQuery, Root<T> root) throws ApplicationException{ 
+	protected Long getCountResult(CriteriaQuery<?> criteriaQuery, Root<T> root, boolean distinct) throws ApplicationException{
+		//SELECT
+		Selection<?> sel = criteriaQuery.getSelection();
+		//ORDER
+		List<Order> orderList = new ArrayList<Order>(criteriaQuery.getOrderList());
 		criteriaQuery.getOrderList().clear();
-		criteriaQuery.getGroupList().clear();
+		//GROUP
+		//List<Expression<?>> groupList = new ArrayList<Expression<?>>(criteriaQuery.getGroupList());
+		//criteriaQuery.getGroupList().clear();
 
+		criteriaQuery.select(configCount(root, distinct));
+
+		Long count = getSingleResult(Long.class, criteriaQuery);
+		
+		criteriaQuery.select((Selection) sel);
+		criteriaQuery.orderBy(orderList);
+	
+		return count;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private Selection configCount(Root<T> root, boolean distinct){
 		List<Field> flds = ReflectionUtil.listAttributesByAnnotation(getPrimaryClass(), Id.class);
 		boolean existEmbeddedId = false;
 		if(flds.isEmpty()){
@@ -1532,17 +1573,26 @@ public abstract class GenericDAO<T, K extends Serializable>{
 		}
 
 		CriteriaBuilder criteriaBuilder = getSearchEntityManager().getCriteriaBuilder();
-
-		if(flds.size() == 1){
-			Field fldId = flds.get(0);
-			criteriaQuery.select((Selection) criteriaBuilder.tuple(criteriaBuilder.countDistinct(root.get(fldId.getName())).alias(fldId.getName())));
-		} else if(existEmbeddedId){
-			criteriaQuery.select((Selection) criteriaBuilder.tuple(criteriaBuilder.countDistinct(root)));
-		} else{
-			criteriaQuery.select((Selection) criteriaBuilder.countDistinct(root));
+	
+		if(distinct){
+			if(flds.size() == 1){
+				Field fldId = flds.get(0);
+				return criteriaBuilder.tuple(criteriaBuilder.countDistinct(root.get(fldId.getName())).alias(fldId.getName()));
+			}else if(existEmbeddedId){
+				return criteriaBuilder.tuple(criteriaBuilder.countDistinct(root));
+			}else{
+				return criteriaBuilder.countDistinct(root);
+			}
+		}else{
+			if(flds.size() == 1){
+				Field fldId = flds.get(0);
+				return criteriaBuilder.tuple(criteriaBuilder.count(root.get(fldId.getName())).alias(fldId.getName()));
+			}else if(existEmbeddedId){
+				return criteriaBuilder.tuple(criteriaBuilder.count(root));
+			}else{
+				return criteriaBuilder.count(root);
+			}
 		}
-
-		return getSingleResult(Long.class, criteriaQuery);
 	}
 	/**
 	 * 
@@ -1633,19 +1683,19 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return
 	 * @throws ApplicationException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, Root<T> root, Map<String, CriteriaFilterImpl<?>> listCollectionRelation,  int page, int limit) throws ApplicationException{
 			
 		//SELECT
-		Selection<?> sel = criteriaQuery.getSelection();
+		//Selection<?> sel = criteriaQuery.getSelection();
 		//ORDER
-		List<Order> orderList = new ArrayList<Order>(criteriaQuery.getOrderList()); 
-		criteriaQuery.getOrderList().clear();
-		//GROUP
-		List<Expression<?>> groupList = new ArrayList<Expression<?>>(criteriaQuery.getGroupList());
-		criteriaQuery.getGroupList().clear();
-				
-		List<Field> flds = ReflectionUtil.listAttributesByAnnotation(getPrimaryClass(), Id.class);
+		//List<Order> orderList = new ArrayList<Order>(criteriaQuery.getOrderList()); 
+		//criteriaQuery.getOrderList().clear();
+		///GROUP
+		///List<Expression<?>> groupList = new ArrayList<Expression<?>>(criteriaQuery.getGroupList());
+		////criteriaQuery.getGroupList().clear();
+		
+		//FIXME REMOVER CASO COUNT FUNCIONE
+		/*List<Field> flds = ReflectionUtil.listAttributesByAnnotation(getPrimaryClass(), Id.class);
 		boolean existEmbeddedId = false;
 		if(flds.isEmpty()){
 			existEmbeddedId = ReflectionUtil.existAnnotation(getPrimaryClass(), null, EmbeddedId.class);
@@ -1655,36 +1705,22 @@ public abstract class GenericDAO<T, K extends Serializable>{
 		
 		if(flds.size() == 1){
 			Field fldId = flds.get(0);
-			criteriaQuery.select((Selection) criteriaBuilder.tuple(criteriaBuilder.countDistinct(root.get(fldId.getName())).alias(fldId.getName())));
+			criteriaQuery.select((Selection) criteriaBuilder.tuple(criteriaBuilder.count(root.get(fldId.getName())).alias(fldId.getName())));
 		} else if(existEmbeddedId){
-			criteriaQuery.select((Selection) criteriaBuilder.tuple(criteriaBuilder.countDistinct(root)));
+			criteriaQuery.select((Selection) criteriaBuilder.tuple(criteriaBuilder.count(root)));
 		} else{
-			criteriaQuery.select((Selection) criteriaBuilder.countDistinct(root));
+			criteriaQuery.select((Selection) criteriaBuilder.count(root));
 		}
 		
-		Long qtdeReg = getSingleResult(Long.class, criteriaQuery);
+		Long qtdeReg = getSingleResult(Long.class, criteriaQuery);*/
+		Long qtdeReg = this.getCountResult(criteriaQuery, root, false);
 		
 		Page<E> paginacao = new Page<E>(qtdeReg, limit, page);
 		
 		if(qtdeReg > 0){			
-			criteriaQuery.select((Selection) sel);
-			criteriaQuery.orderBy(orderList);
-			/*
-			for(Iterator<Expression<?>> itExp = groupList.iterator(); itExp.hasNext();) {
-				Expression expAux = itExp.next();
-				boolean findSel = false;
-				for(Selection selAux : sel.getCompoundSelectionItems()) {
-					if(expAux.getAlias() != null && selAux.getAlias() != null && expAux.getAlias().equals(selAux.getAlias())) {
-						findSel = true;
-						break;
-					}
-				}
-				if(!findSel) {
-					itExp.remove();
-				}
-			}*/
-
-			criteriaQuery.groupBy(groupList);
+			//criteriaQuery.select((Selection) sel);
+			//criteriaQuery.orderBy(orderList);
+			///criteriaQuery.groupBy(groupList);
 			
 			List<SimpleEntry<?, E>> returnList = getPreparedResultList(returnClass, criteriaQuery, page, limit);
 			
