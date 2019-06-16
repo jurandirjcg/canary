@@ -63,7 +63,7 @@ public class PessoaDAO extends GenericDAO<Pessoa, Long>{
 	.
 	.
 
-	public Pagination<Pessoa> paginarPessoa(){
+	public Page<Pessoa> paginarPessoa(){
 		Pessoa pessoa = new Pessoa();
 		pessoa.setNome("d");
 		pessoa.setSexo(Sexo.MASCULINO);
