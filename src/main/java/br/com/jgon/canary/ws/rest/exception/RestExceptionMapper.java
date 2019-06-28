@@ -13,6 +13,7 @@
  */
 package br.com.jgon.canary.ws.rest.exception;
 
+import javax.validation.ConstraintViolation;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -59,8 +60,10 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 			retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception);
 		}else if(exception.getCause() instanceof ApplicationRuntimeException){
 			retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception.getCause());
-		}else if(exception instanceof WebApplicationException){
-			return configWebApplicationException((WebApplicationException) exception);
+		}else  if(exception instanceof ConstraintViolation){
+			retorno = configConstraintViolationException((ConstraintViolation<?>) exception);
+		}else  if(exception instanceof WebApplicationException){
+			return ((WebApplicationException) exception).getResponse();
 		}else  if(exception instanceof Failure){
 			return ((Failure) exception).getResponse();
 		}else{
@@ -70,11 +73,17 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 		return Response.status(retorno.getStatus()).entity(retorno).header("Content-type", "application/json").build();
 	}
 		
+	public ResponseError configConstraintViolationException(ConstraintViolation<?> constraintViolation) {
+		ResponseError retorno = null;		
+		retorno = new ResponseError(Status.BAD_REQUEST, constraintViolation.getMessage(), MessageSeverity.WARN);
+		return retorno;
+	}
+	
 	public ResponseError configApplicationException(ApplicationException exception) {
 		ResponseError retorno = null;
 		
 		retorno = new ResponseError(getStatusFromMessageSeverity(exception.getMessageSeverity()), exception.getMessage(), exception.getMessageSeverity());
-		if(exception.getMessageSeverity().equals(MessageSeverity.ERROR) || exception.getMessageSeverity().equals(MessageSeverity.FATAL)){
+		if(exception.getCause() != null && (exception.getMessageSeverity().equals(MessageSeverity.ERROR) || exception.getMessageSeverity().equals(MessageSeverity.FATAL))){
 			logger.error("[configApplicationException]", exception.getCause().getMessage());
 		}
 		return retorno;
@@ -87,15 +96,10 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 	public ResponseError configApplicationRuntimeException(ApplicationRuntimeException exception) {
 		ResponseError retorno = null;
 		retorno = new ResponseError(getStatusFromMessageSeverity(exception.getMessageSeverity()), exception.getMessage(), exception.getMessageSeverity());
-		if(exception.getMessageSeverity().equals(MessageSeverity.ERROR) || exception.getMessageSeverity().equals(MessageSeverity.FATAL)){
+		if(exception.getCause() != null && (exception.getMessageSeverity().equals(MessageSeverity.ERROR) || exception.getMessageSeverity().equals(MessageSeverity.FATAL))){
 			logger.error("[configApplicationRuntimeException]", exception.getCause().getMessage());
 		}
 		return retorno;
-	}
-	
-	public Response configWebApplicationException(WebApplicationException exception) {
-		WebApplicationException wa = (WebApplicationException) exception;
-		return wa.getResponse();
 	}
 	
 	protected Status getStatusFromMessageSeverity(MessageSeverity messageSeverity) {

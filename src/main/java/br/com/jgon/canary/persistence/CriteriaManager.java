@@ -158,22 +158,26 @@ class CriteriaManager<T> {
 	
 		this.rootEntry = query.from(entityClass);
 		
-		//JOINS
-		for(String key : criteriaFilter.getListJoin().keySet()){
-			if(key.contains(".")){
-				From<?, ?> lastFrom = rootEntry;
-				String lastAttribute = key;
-				String[] assAux = key.split("\\.");
-				lastAttribute = null;
-				for(int i=0; i < assAux.length; i++){
-					lastFrom = configAssociation(assAux[i], lastAttribute, lastFrom);
-					lastAttribute = StringUtils.isBlank(lastAttribute) ? assAux[i] : lastAttribute.concat(".").concat(assAux[i]);
-				}
-				lastAttribute = assAux[assAux.length - 1];
-			}else{
-				configAssociation(key, null, rootEntry);
-			}
-		}
+		//JOINS //String key : criteriaFilter.getListJoin().keySet()
+//		for(Iterator<Entry<String, JoinMapper>> it = criteriaFilter.getListJoin().entrySet().iterator(); it.hasNext(); ){
+//			Entry<String, JoinMapper> entryJoin = it.next();
+//			if(entryJoin.getValue().getForce()) {
+//				if(entryJoin.getKey().contains(".")){
+//					From<?, ?> lastFrom = rootEntry;
+//					String lastAttribute = entryJoin.getKey();
+//					String[] assAux = entryJoin.getKey().split("\\.");
+//					lastAttribute = null;
+//					for(int i=0; i < assAux.length; i++){
+//						lastFrom = configAssociation(assAux[i], lastAttribute, lastFrom);
+//						lastAttribute = StringUtils.isBlank(lastAttribute) ? assAux[i] : lastAttribute.concat(".").concat(assAux[i]);
+//					}
+//					lastAttribute = assAux[assAux.length - 1];
+//				}else{
+//					configAssociation(entryJoin.getKey(), null, rootEntry);
+//				}
+//			}
+//		}
+		this.configForcedAssociations();
 		
 		//SELECT
 		query.select(configSelections(rootEntry));
@@ -223,12 +227,40 @@ class CriteriaManager<T> {
 	
 		criteriaQuery = query;
 	}
+	
+	/**
+	 * 
+	 * @since 24/06/2019
+	 */
+	private void configForcedAssociations() {
+		for(Iterator<Entry<String, JoinMapper>> it = criteriaFilter.getListJoin().entrySet().iterator(); it.hasNext(); ){
+			Entry<String, JoinMapper> entryJoin = it.next();
+			if(entryJoin.getValue().getForce()) {
+				if(entryJoin.getKey().contains(".")){
+					From<?, ?> lastFrom = rootEntry;
+					String lastAttribute = entryJoin.getKey();
+					String[] assAux = entryJoin.getKey().split("\\.");
+					lastAttribute = null;
+					for(int i=0; i < assAux.length; i++){
+						lastFrom = configAssociation(assAux[i], lastAttribute, lastFrom);
+						lastAttribute = StringUtils.isBlank(lastAttribute) ? assAux[i] : lastAttribute.concat(".").concat(assAux[i]);
+					}
+					lastAttribute = assAux[assAux.length - 1];
+				}else{
+					configAssociation(entryJoin.getKey(), null, rootEntry);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * @throws ApplicationException
 	 */
 	public CriteriaUpdate<T> getCriteriaUpdate() throws ApplicationException{
 		T obj = criteriaFilter.getObjBase();
+		
+		this.configForcedAssociations();
 			
 		this.criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaUpdate<T> update = criteriaBuilder.createCriteriaUpdate(entityClass);
@@ -255,6 +287,8 @@ class CriteriaManager<T> {
 	 */
 	public CriteriaDelete<T> getCriteriaDelete() throws ApplicationException{
 		T obj = criteriaFilter.getObjBase();
+		
+		this.configForcedAssociations();
 		
 		this.criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaDelete<T> delete = criteriaBuilder.createCriteriaDelete(entityClass);
@@ -459,13 +493,13 @@ class CriteriaManager<T> {
 		String nomeAs = StringUtils.isBlank(parentAttribute) ? attribute : parentAttribute.concat(".").concat(attribute);
 		
 		if(criteriaFilter != null && !criteriaAssociations.exists(nomeAs)){
-			SimpleEntry<JoinType, Boolean> joinType = criteriaFilter.getListJoin().get(nomeAs);
+			JoinMapper joinMapper = criteriaFilter.getListJoin().get(nomeAs);
 			Join<?, ?> childEntry;
 			
-			if(joinType == null || !joinType.getValue()){
-				childEntry = parentEntry.join(attribute, joinType == null ? JoinType.INNER : joinType.getKey());
+			if(joinMapper == null || !joinMapper.getFetch()){
+				childEntry = parentEntry.join(attribute, joinMapper == null ? JoinType.INNER : joinMapper.getJoinType());
 			}else{
-				childEntry = (Join<?, ?>) parentEntry.fetch(attribute, joinType == null ? JoinType.INNER : joinType.getKey());
+				childEntry = (Join<?, ?>) parentEntry.fetch(attribute, joinMapper == null ? JoinType.INNER : joinMapper.getJoinType());
 			}
 
 			criteriaAssociations.add(nomeAs, childEntry);
@@ -864,7 +898,7 @@ class CriteriaManager<T> {
 	 */
 	private <E> List<Predicate> configComplexPredicates(Class<E> obj, String attributeParent, From<?, ?> pathEntry){
 		List<Predicate> predicates = new ArrayList<Predicate>();
-		
+	
 		String attributeName;
 		Boolean isEntityType;
 		Boolean isCollectionEntity;
@@ -895,10 +929,19 @@ class CriteriaManager<T> {
 				
 				if(isEntityType || isCollectionEntity){
 					boolean contains = false;
-					for(String k : criteriaFilter.getWhereRestriction().getRestrictions().keySet()){
-						if(k.contains(StringUtils.isNotBlank(attributeParent) ? attributeName.concat(".") : field.getName().concat("."))){
-							contains = true;
-							break;
+					for(Iterator<Entry<String, List<SimpleEntry<Where, ?>>>> it = criteriaFilter.getWhereRestriction().getRestrictions().entrySet().iterator(); it.hasNext(); ){
+						Entry<String, List<SimpleEntry<Where, ?>>> entry = it.next();
+						
+						if(entry.getKey().contains(StringUtils.isNotBlank(attributeParent) ? attributeName.concat(".") : field.getName().concat("."))){
+							for(SimpleEntry<Where, ?> sEntry: entry.getValue()) {
+								if(entry.getValue() != null || (sEntry.getKey().equals(Where.IS_NULL) || sEntry.getKey().equals(Where.IS_NOT_NULL))) {
+									contains = true;
+									break;
+								}
+							}
+							if(contains) {
+								break;
+							}
 						}
 					}
 					if(contains){

@@ -693,6 +693,10 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	@Override
 	public CriteriaFilterMetamodel<T> addJoin(String field);
 	/**
+	 * 
+	 */
+	public CriteriaFilter<T> addJoin(String field, JoinType joinType, boolean fetch, boolean force);
+	/**
 	 * @param attribute
 	 * @param value
 	 * @param matchMode  {@link MatchMode}
@@ -1517,6 +1521,22 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @return
 	 */
 	public CriteriaFilterMetamodel<T> addJoin(Attribute<?, ?> attribute, JoinType joinType);
+	/**
+	 * 
+	 * @param attribute
+	 * @param joinType
+	 * @return
+	 */
+	public CriteriaFilterMetamodel<T> addJoin(ComplexAttribute attribute, JoinType joinType, boolean fetch, boolean force);
+	/**
+	 * 
+	 * @param attribute
+	 * @param joinType
+	 * @param fetch
+	 * @param force
+	 * @return
+	 */
+	public CriteriaFilter<T> addJoin(Attribute<?, ?> attribute, JoinType joinType, boolean fetch, boolean force);
 	/**
 	 * 
 	 * @param attribute

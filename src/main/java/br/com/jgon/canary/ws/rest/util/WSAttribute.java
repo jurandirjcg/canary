@@ -41,7 +41,7 @@ public @interface WSAttribute {
 	 */
 	boolean fixed() default false;
 	/**
-	 * Indica se deverá se o atributo devera ser mapeado caso o somente o pai seja declarado - default true
+	 * Indica se deverá se o atributo devera ser mapeado caso o pai seja declarado - default true
 	 * Ex. atributo pai "pessoa" possui atributo "nome", se no servico for filtrado somente  "pessoa" este atributo indica o mapeamento tambem do atributo "nome", retornando no parse o valor pessoa.nome
 	 */
 	boolean autoInclude() default true;

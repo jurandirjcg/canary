@@ -50,7 +50,7 @@ public abstract class CanaryRestResources {
 	}
 
 	/**
-	 * Adiciona classes de tratamento de chamadas REST
+	 * Adiciona classes de tratamento de exeção de chamadas REST
 	 * @param checkException: adicionar tratamento de excecoes ({@link ApplicationException} {@link ApplicationRuntimeException} {@link ValidationException} {@link WebApplicationException} {@link Exception}
 	 * @return
 	 */

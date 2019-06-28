@@ -40,6 +40,7 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
 import javax.transaction.Transactional;
@@ -456,6 +457,42 @@ public abstract class GenericDAO<T, K extends Serializable>{
 		}
 		CriteriaManager<T> criteriaManager = getCriteriaManager(resultClass, (CriteriaFilterImpl<T>) criteriaFilter);
 		return criteriaManager.getCriteriaQuery();
+	}
+	
+	/**
+	 * 
+	 * @since 17/06/2019
+	 * @author Jurandir C. Gonçalves
+	 * @param <T>
+	 * @param criteriaQuery
+	 * @return
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected Root<T> getRootFromCriteriaQuery(CriteriaQuery<?> criteriaQuery) {
+		for(Root rAux : criteriaQuery.getRoots()) {
+			if(rAux.getJavaType().equals(getPrimaryClass())) {
+				return rAux;
+			}
+		}
+		return null;
+	}
+	/**
+	 * 
+	 * @since 17/06/2019
+	 * @author Jurandir C. Gonçalves
+	 * @param criteriaQuery
+	 * @param restriction
+	 * @return
+	 */
+	protected CriteriaQuery<?> addRestrictionInCriteriaQuery(CriteriaQuery<?> criteriaQuery, Predicate restriction) {
+		Predicate predicateAux = criteriaQuery.getRestriction();
+		if(predicateAux != null) {
+			criteriaQuery.where(predicateAux, restriction);
+		}else {
+			criteriaQuery.where(restriction);
+		}
+		
+		return criteriaQuery;
 	}
 	
 	/**

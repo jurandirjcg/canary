@@ -146,7 +146,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 	private Map<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>> collectionSelection = new LinkedHashMap<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>>();
 	private Map<String, Order> listOrder = new LinkedHashMap<String, Order>(0);
 	private Set<String> listGroupBy = new LinkedHashSet<String>();
-	private Map<String, SimpleEntry<JoinType, Boolean>> listJoin = new LinkedHashMap<String, SimpleEntry<JoinType, Boolean>>();
+	private Map<String, JoinMapper> listJoin = new LinkedHashMap<String, JoinMapper>();
 	private Map<String, Object> listUpdate = new LinkedHashMap<String, Object>();
 	private T objBase;
 	private Class<T> objClass;
@@ -250,7 +250,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 	 * 
 	 * @return
 	 */
-	public Map<String, SimpleEntry<JoinType, Boolean>> getListJoin(){
+	public Map<String, JoinMapper> getListJoin(){
 		return this.listJoin;
 	}
 	/**
@@ -851,7 +851,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 	 * @param listJoin
 	 * @return
 	 */
-	public CriteriaFilterImpl<T> addAllJoin(Map<String, SimpleEntry<JoinType, Boolean>> listJoin){
+	public CriteriaFilterImpl<T> addAllJoin(Map<String, JoinMapper> listJoin){
 		this.listJoin.putAll(listJoin);
 		return this;
 	}
@@ -1169,12 +1169,12 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 	}
 	@Override
 	public CriteriaFilterImpl<T> addJoin(String field, JoinType joinType, boolean fetch){
-		this.listJoin.put(field, new SimpleEntry<JoinType, Boolean>(joinType, fetch));
+		this.listJoin.put(field, new JoinMapper(joinType, fetch, false));
 		return this;
 	}
 	@Override
 	public CriteriaFilterImpl<T> addJoin(Attribute<?, ?> attribute, JoinType joinType, boolean fetch){
-		this.listJoin.put(attribute.getName(), new SimpleEntry<JoinType, Boolean>(joinType, fetch));
+		this.listJoin.put(attribute.getName(), new JoinMapper(joinType, fetch, false));
 		return this;
 	}
 	@Override
@@ -1697,6 +1697,21 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 	@Override
 	public <E> CriteriaFilterImpl<T> addUpdate(Attribute<?, ?> attribute, E value){
 		this.listUpdate.put(attribute.getName(), value);
+		return this;
+	}
+	@Override
+	public CriteriaFilterImpl<T> addJoin(String field, JoinType joinType, boolean fetch, boolean force) {
+		this.listJoin.put(field, new JoinMapper(joinType, fetch, force));
+		return this;
+	}
+	@Override
+	public CriteriaFilterImpl<T> addJoin(ComplexAttribute attribute, JoinType joinType, boolean fetch, boolean force) {
+		this.addJoin(attribute.getName(), joinType, fetch, force);
+		return this;
+	}
+	@Override
+	public CriteriaFilterImpl<T> addJoin(Attribute<?, ?> attribute, JoinType joinType, boolean fetch, boolean force) {
+		this.addJoin(attribute.getName(), joinType, fetch, force);
 		return this;
 	}
 }
