@@ -1243,7 +1243,6 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T>{
 
 	/**
 	 * 
-	 * @autor jurandirjcg
 	 * @param attribute
 	 * @param anotherAttribute
 	 * @return
@@ -1252,7 +1251,6 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T>{
 
 	/**
 	 * 
-	 * @autor jurandirjcg
 	 * @param attribute
 	 * @param anotherAttribute
 	 * @return

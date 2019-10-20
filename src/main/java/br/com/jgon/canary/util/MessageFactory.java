@@ -61,8 +61,8 @@ public class MessageFactory {
     }
 	/**
 	 * 	
-	 * @param key
-	 * @return
+	 * @param key - chave da mensagem
+	 * @return {@link String}
 	 */
 	public static String getMessage(String key) {
 		String msg = null;
@@ -85,18 +85,18 @@ public class MessageFactory {
 	}
 	/**
 	 * 
-	 * @param key
-	 * @param params
-	 * @return
+	 * @param key - cheve da mensagem
+	 * @param params - parametros para serem adicionados na mensagem
+	 * @return {@link String}
 	 */
 	public static String getMessage(String key, String... params) {
 		return messageFormat(getMessage(key), params);
 	}
 	/**
 	 * 
-	 * @param resourceBundle
-	 * @param key
-	 * @return
+	 * @param resourceBundle - arquivo de mensagens
+	 * @param key - chave da mensagem
+	 * @return {@link String}
 	 */
 	public static String getMessage(ResourceBundle resourceBundle, String key){
 		String msg = null;
@@ -111,19 +111,19 @@ public class MessageFactory {
 	}
 	/**
 	 * 
-	 * @param resourceBundle
-	 * @param key
-	 * @param args
-	 * @return
+	 * @param resourceBundle - arquivo de mensagens
+	 * @param key - chave da mensagem 
+	 * @param params - parametros para serem adicionados na mensagem
+	 * @return {@link String}
 	 */
-	public static String getMessage(ResourceBundle resourceBundle, String key, String... args) {
-		return messageFormat(getMessage(resourceBundle, key), args);
+	public static String getMessage(ResourceBundle resourceBundle, String key, String... params) {
+		return messageFormat(getMessage(resourceBundle, key), params);
 	}
 	/**
 	 * 
-	 * @param msg
-	 * @param params
-	 * @return
+	 * @param msg - String de mensagem
+	 * @param params - parametros para serem adicionados na mensagem
+	 * @return {@link String}
 	 */
 	private static String messageFormat(String msg, String... params){
 		if ("".equals(msg)){
@@ -145,21 +145,21 @@ public class MessageFactory {
 	}
 	/**
 	 * 
-	 * @param resourceBundleLocation
-	 * @param key
-	 * @return
+	 * @param resourceBundleLocation - arquivo de mensagens
+	 * @param key - chave da mensagem
+	 * @return {@link String}
 	 */
 	public static String getMessageFromResource(String resourceBundleLocation, String key){
 		return getMessage(ResourceBundle.getBundle(resourceBundleLocation), key);
 	}
 	/**
 	 * 
-	 * @param resourceBundleLocation
-	 * @param key
-	 * @param args
-	 * @return
+	 * @param resourceBundleLocation - arquivo de mensagens
+	 * @param key - chave da mensagem
+	 * @param params - parametros para serem adicionados na mensagem
+	 * @return {@link String}
 	 */
-	public static String getMessageFromResource(String resourceBundleLocation, String key, String... args){
-		return getMessage(ResourceBundle.getBundle(resourceBundleLocation), key, args);
+	public static String getMessageFromResource(String resourceBundleLocation, String key, String... params){
+		return getMessage(ResourceBundle.getBundle(resourceBundleLocation), key, params);
 	}
 }

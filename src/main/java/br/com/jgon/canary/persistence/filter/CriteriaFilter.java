@@ -641,7 +641,6 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T>{
 	 * @param fetch
 	 * @param force
 	 * @return
-	 * @rastreabilidade_requisito
 	 */
 	public CriteriaFilter<T> addJoin(String field, JoinType joinType, boolean fetch, boolean force);
 		

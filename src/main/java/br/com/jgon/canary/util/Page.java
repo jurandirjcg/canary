@@ -21,7 +21,7 @@ import java.util.Collection;
  * 
  * @version 1.0
  *
- * @param <T>
+ * @param <T> - Tipo do objeto
  */
 public class Page<T> {
 	private Long totalElements;

@@ -40,8 +40,8 @@ public class CriteriaAssociations {
 		}
 		/**
 		 * 
-		 * @param field
-		 * @return
+		 * @param field - atributo associado
+		 * @return {@link From}
 		 */
 		public From<?, ?> getAssociation(String field){
 			return listAssociation.get(field);

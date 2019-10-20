@@ -406,7 +406,6 @@ public class ValidatorFactory {
 
 	/**
 	 * 
-	 * @autor jurandirjcg
 	 * @param obj
 	 * @param campoMsg
 	 * @return

@@ -45,7 +45,7 @@ public abstract class GenericConteudoTree implements Serializable{
 	
 	/**
 	 * Identificacao do conteúdo
-	 * @return
+	 * @return {@link String}
 	 */
 	public String getLabel() {
 		return label;
@@ -53,7 +53,7 @@ public abstract class GenericConteudoTree implements Serializable{
 
 	/**
 	 * Identificacao do conteúdo
-	 * @param label
+	 * @param label - identificação
 	 */
 	public void setLabel(String label) {
 		this.label = label;

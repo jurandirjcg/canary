@@ -61,9 +61,9 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	private T conteudo;
 	
 	/**
-	 * @param nodeName
-	 * @param conteudo
-	 * @param parent
+	 * @param nodeName - nome do node atual
+	 * @param conteudo - conteudo do node
+	 * @param parent - node pai
 	 */
 	public GenericTree(String nodeName, T conteudo, GenericTree<T> parent){
 		this.nodeName = nodeName;
@@ -213,7 +213,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	
 	/**
 	 * Retorna o node pai
-	 * @return
+	 * @return {@link GenericTree}
 	 */
 	public GenericTree<T> getParent() {
 		return parent;
@@ -221,7 +221,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 
 	/**
 	 * Seta um node pai
-	 * @param parent
+	 * @param parent - node pai
 	 */
 	public void setParent(GenericTree<T> parent) {
 		this.parent = parent;
@@ -229,7 +229,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 
 	/**
 	 * Retorna o nome do node
-	 * @return
+	 * @return {@link String}
 	 */
 	public String getNodeName() {
 		return this.getNodeName(false);
@@ -238,8 +238,8 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	/**
 	 * Retorna o ultimo valor adicionado ao node
 	 * Ex: root_node1_node2_node3 - retorna o node3
-	 * @param ultimoNodeName
-	 * @return
+	 * @param ultimoNodeName - nome do último node
+	 * @return {@link String}
 	 */
 	public String getNodeName(boolean ultimoNodeName) {
 		if(ultimoNodeName){
@@ -252,7 +252,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 
 	/**
 	 * Seta o nome do node
-	 * @param nodeName
+	 * @param nodeName - nome do node
 	 */
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
@@ -260,7 +260,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 
 	/**
 	 * Retorna os nodes filhos
-	 * @return
+	 * @return {@link List}
 	 */
 	public List<GenericTree<T>> getNodesFilhos() {
 		return nodesFilhos;
@@ -268,7 +268,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 
 	/**
 	 * Seta os nodes filhos
-	 * @param nodesFilhos
+	 * @param nodesFilhos - lista de nodes filhos
 	 */
 	public void setNodesFilhos(LinkedList<GenericTree<T>> nodesFilhos) {
 		this.nodesFilhos = nodesFilhos;
@@ -276,7 +276,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 
 	/**
 	 * Retorna o conteúdo do node
-	 * @return
+	 * @return T
 	 */
 	public T getConteudo() {
 		return conteudo;
@@ -284,7 +284,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 
 	/**
 	 * Seta o conteudo do node
-	 * @param conteudo
+	 * @param conteudo - conteúdo
 	 */
 	public void setConteudo(T conteudo) {
 		this.conteudo = conteudo;
@@ -292,9 +292,9 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 
 	/**
 	 * Seta conteudo no node informado, caso nao exista cria um nodeFilho no nodeParent
-	 * @param nodeParent
-	 * @param node
-	 * @param conteudo
+	 * @param nodeParent - node pai
+	 * @param node - node atual
+	 * @param conteudo - conteúdo do node
 	 * @param alteraConteudo - true para sobrescrever se o conteudo nao for nulo
 	 * @return - true se adicionou e false caso contrario
 	 */
@@ -323,7 +323,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	 * Adiciona um novo node com conteudo
 	 * @param node - nome do node
 	 * @param conteudo - conteúdo do node
-	 * @return
+	 * @return {@link Boolean}
 	 */
 	public boolean addNodeFilho(String node, T conteudo){
 		return nodesFilhos.add(new GenericTree<T>(node, conteudo, this));
@@ -331,8 +331,8 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	
 	/**
 	 * Adiciona um novo node sem conteúdo
-	 * @param node
-	 * @return
+	 * @param node - nome do node
+	 * @return {@link Boolean}
 	 */
 	public boolean addNodeFilho(String node){
 		return addNodeFilho(node, null);
@@ -341,7 +341,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	/**
 	 * Verifica se existe o node
 	 * @param nodeName - nome do node a ser pesquisado
-	 * @return
+	 * @return {@link Boolean}
 	 */
 	public boolean existNode(String nodeName){
 		if(getNode(nodeName) != null)
@@ -351,9 +351,9 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	}
 	/**
 	 * Retorna true se node foi adicionado ou ja existe e false se nao foi adicionado
-	 * @param nodeParent
-	 * @param node
-	 * @return
+	 * @param nodeParent - nome do node pai
+	 * @param node - nome do node atual
+	 * @return {@link Boolean}
 	 */
 	public boolean addNode(String nodeParent, String node, T conteudo){
 		boolean adicionou = false;
@@ -371,8 +371,8 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	}
 	/**
 	 * Remove um node filho pelo nome
-	 * @param nodeName
-	 * @return
+	 * @param nodeName - nome do node
+	 * @return {@link Boolean}
 	 */
 	public boolean removeNodeFilho(String nodeName){
 		for(Iterator<GenericTree<T>> itGt = nodesFilhos.iterator(); itGt.hasNext(); ){
@@ -387,8 +387,8 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	}
 	/**
 	 * Retorna o node atraves do nome, null se nao encontrar, deve ser dependente do node principal
-	 * @param nodeName
-	 * @return
+	 * @param nodeName - nome do node
+	 * @return {@link GenericTree}
 	 */
 	public GenericTree<T> getNode(String nodeName){
 		return getNode(this, nodeName, true);
@@ -399,7 +399,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	 * @param genericTree - árvore a ser pesquisada
 	 * @param nodeName - nome do node
 	 * @param fullName - Pesquisa por nome completo do node.
-	 * @return
+	 * @return {@link GenericTree}
 	 */
 	private GenericTree<T> getNode(GenericTree<T> genericTree, String nodeName, boolean fullName){
 		if(fullName && genericTree.getNodeName().equals(nodeName))

@@ -54,7 +54,7 @@ public class ValidationException extends RuntimeException{
 	/**
 	 * 
 	 * @since 18/06/2019
-	 * @param listConstraintViolation
+	 * @param constraintViolation
 	 */
 	public void add(ConstraintViolation<?> constraintViolation){
 		listConstraintViolation.add(constraintViolation);
@@ -79,10 +79,7 @@ public class ValidationException extends RuntimeException{
 	
 	/**
 	 * 
-	 * @since 18/06/2019
-	 * @author Jurandir C. Gonçalves
-	 * @return
-	 * @rastreabilidade_requisito
+	 * @return {@link List}
 	 */
 	public List<ConstraintViolation<?>> getListConstraintViolation() {
 		return listConstraintViolation;

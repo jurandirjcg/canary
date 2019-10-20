@@ -1798,7 +1798,6 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 
 	/**
 	 * 
-	 * @autor jurandirjcg
 	 * @param attribute
 	 * @param anotherAttribute
 	 * @return
@@ -1807,7 +1806,6 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 
 	/**
 	 * 
-	 * @autor jurandirjcg
 	 * @param attribute
 	 * @param anotherAttribute
 	 * @return

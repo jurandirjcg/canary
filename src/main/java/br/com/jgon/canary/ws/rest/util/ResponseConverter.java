@@ -24,7 +24,6 @@ import br.com.jgon.canary.util.Page;
  * @author jurandir
  *
  * @param <O> - Origem
- * @param <N> - Destino
  */
 public abstract class ResponseConverter<O> {
 

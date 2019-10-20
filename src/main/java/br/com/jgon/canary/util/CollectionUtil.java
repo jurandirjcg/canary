@@ -37,7 +37,7 @@ public class CollectionUtil {
 	 * @param <T> - Tipo do retorno esperado
 	 * @param classe - Classe do retorno
 	 * @param arrays - Arrays, [], dos objetos
-	 * @return
+	 * @return T[]
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T[] concat (Class<T> classe, T[]... arrays) {  
@@ -55,8 +55,8 @@ public class CollectionUtil {
 	
 	/**
 	 * Concatena arrays do tipo int
-	 * @param arrays
-	 * @return
+	 * @param arrays - arrays para concatenar
+	 * @return {@link Integer}
 	 */
 	public static int[] concat (int[]... arrays) {  
 		int length = 0;  
@@ -72,8 +72,8 @@ public class CollectionUtil {
 	}  
 	/**
 	 * Concatena arrays do tipo double
-	 * @param arrays
-	 * @return
+	 * @param arrays - arrays para concatenar
+	 * @return {@link Double}
 	 */
 	public static double[] concat (double[]... arrays) {  
 		int length = 0;  
@@ -90,8 +90,9 @@ public class CollectionUtil {
 	
 	/**
 	 * Converte colecao Set para List
-	 * @param colSet
-	 * @return
+	 * @param <T> - tipo
+	 * @param colSet - coleção
+	 * @return {@link List}
 	 */
 	public static <T> List<T> convertSetToList(Set<T> colSet){
 		return new ArrayList<T>(colSet);
@@ -99,8 +100,9 @@ public class CollectionUtil {
 	
 	/**
 	 * Converte colecao List para Set
-	 * @param colList
-	 * @return
+	 * @param <T> - tipo
+	 * @param colList - coleção
+	 * @return {@link Set}
 	 */
 	public static <T> Set<T> convertListToSet(List<T> colList){
 		return new HashSet<T>(colList);
@@ -108,8 +110,9 @@ public class CollectionUtil {
 	
 	/**
 	 * Converte um array[] em List
-	 * @param array
-	 * @return
+	 * @param <T> - tipo
+	 * @param array - array
+	 * @return {@link List}
 	 */
 	public static <T> List<T> convertArrayToList(T[] array){
 		if(array == null){
@@ -120,10 +123,10 @@ public class CollectionUtil {
 	
 	/**
 	 * Converte Set em List ordenado com base no Comparator
-	 * @param <T>
-	 * @param colSet
-	 * @param comparator
-	 * @return
+	 * @param <T> - tipo
+	 * @param colSet - coleção
+	 * @param comparator - comparador para ordenação
+	 * @return {@link List}
 	 */
 	public static <T> List<T> convertSetToListShort(Set<T> colSet, Comparator<T> comparator){
 		List<T> listAux = convertSetToList(colSet);
@@ -133,10 +136,10 @@ public class CollectionUtil {
 	
 	/**
 	 * Converte qualquer colecao (List, Set, ArrayList ou outra que implemente a interface Collection em array simples [] 
-	 * @param <T>
+	 * @param <T> - tipo
 	 * @param klass - tipo do array. Ex String[], Object[]
 	 * @param collection - colecao de objetos
-	 * @return
+	 * @return T[]
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T[] convertCollectionToArray(Class<T> klass, Collection<T> collection){
@@ -151,8 +154,8 @@ public class CollectionUtil {
 	
 	/**
 	 * Converte colecao de Object em colecao de String 
-	 * @param collection
-	 * @return
+	 * @param collection - colecão
+	 * @return {@link Collection}
 	 */
 	public static <T> Collection<String> convertToCollectionString(Collection<T> collection){
 		Collection<String> colAux = new ArrayList<String>(collection.size());
@@ -164,8 +167,8 @@ public class CollectionUtil {
 	
 	/**
 	 * Converte colecao de String em colecao de Integer
-	 * @param collection
-	 * @return
+	 * @param collection - coleção
+	 * @return {@link Collection}
 	 */
 	public static Collection<Integer> convertToCollectionInteger(Collection<String> collection){
 		Collection<Integer> colAux = new ArrayList<Integer>(collection.size());
@@ -176,9 +179,9 @@ public class CollectionUtil {
 	}
 	/**
 	 * 
-	 * @param list
-	 * @param value
-	 * @return
+	 * @param list - coleção a ser percorrida
+	 * @param value - valor a ser buscado
+	 * @return {@link Boolean}
 	 */
 	public static boolean constainsValue(Collection<String> list, String value){
 		if(list == null) {

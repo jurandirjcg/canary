@@ -46,19 +46,19 @@ public @interface FieldGenericTree {
 	}
 	/**
 	 * Posicao do node
-	 * @return
+	 * @return {@link Integer} - default -1
 	 */
 	int posicaoNode() default -1;
 	
 	/**
 	 * Indica se o atributo será mapeado
-	 * @return
+	 * @return {@link Boolean} - default true
 	 */
 	boolean mapearAtributo() default true; 
 	
 	/**
 	 * Localizacao do atributo - Linha ou Coluna
-	 * @return
+	 * @return {@link PositionTree} - default PositionTree.NONE;
 	 */
 	PositionTree posicaoTree() default PositionTree.NONE;
 }

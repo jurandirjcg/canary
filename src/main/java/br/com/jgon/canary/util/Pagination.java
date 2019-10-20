@@ -21,7 +21,7 @@ import java.util.Collection;
  * 
  * @version 1.0
  *
- * @param <T>
+ * @param <T> - tipo
  */
 public class Pagination<T> {
 	private Long totalElements;
