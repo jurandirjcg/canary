@@ -216,6 +216,18 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T>{
 	 */
 	public CriteriaFilter<T> addOrderDesc(String field);
 	/**
+	 * Ex: id:asc or id:desc - default :asc
+	 * @param fields
+	 * @return
+	 */
+	public CriteriaFilter<T> addOrderAsc(List<String> fields);
+	/**
+	 * Ex: id:asc or id:desc - default :asc
+	 * @param fields
+	 * @return
+	 */
+	public CriteriaFilter<T> addOrderDesc(List<String> fields);
+	/**
 	 * 
 	 * @param field
 	 * @return
@@ -632,5 +644,5 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T>{
 	 * @rastreabilidade_requisito
 	 */
 	public CriteriaFilter<T> addJoin(String field, JoinType joinType, boolean fetch, boolean force);
-	
+		
 }

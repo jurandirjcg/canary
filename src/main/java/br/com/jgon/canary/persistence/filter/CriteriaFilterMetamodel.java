@@ -208,7 +208,7 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	@Override
 	public CriteriaFilterMetamodel<T> addOrder(Class<?> returnType, List<String> order) throws ApplicationException;
 	/**
-	 * 
+	 *
 	 * @param order
 	 * @return
 	 */
@@ -235,7 +235,22 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @param field
 	 * @return
 	 */
+	@Override
 	public CriteriaFilterMetamodel<T> addOrderDesc(String field);
+	/**
+	 * 
+	 * @param fields
+	 * @return
+	 */
+	@Override
+	public CriteriaFilterMetamodel<T> addOrderAsc(List<String> fields);
+	/**
+	 * 
+	 * @param fields
+	 * @return
+	 */
+	@Override
+	public CriteriaFilterMetamodel<T> addOrderDesc(List<String> fields);
 	/**
 	 * 
 	 * @param field
@@ -1010,6 +1025,18 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @return
 	 */
 	public CriteriaFilterMetamodel<T> addOrderAsc(ComplexAttribute attribute);
+	/**
+	 * 
+	 * @param fields
+	 * @return
+	 */
+	public CriteriaFilterMetamodel<T> addOrderAsc(Attribute<?, ?>... fields);
+	/**
+	 * 
+	 * @param fields
+	 * @return
+	 */
+	public CriteriaFilterMetamodel<T> addOrderDesc(Attribute<?, ?>... fields);
 	/**
 	 * 
 	 * @param attribute

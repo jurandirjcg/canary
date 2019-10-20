@@ -494,6 +494,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 					addOrderAsc(o.substring(0, aux));
 				}else if((aux = o.indexOf(":desc")) > 0){
 					addOrderDesc(o.substring(0, aux));
+				}else {
+					addOrderAsc(o);
 				}
 			}		
 		}
@@ -520,6 +522,42 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 	@Override
 	public CriteriaFilterImpl<T> addOrderDesc(Attribute<?, ?> attribute){
 		return addOrderDesc(attribute.getName());
+	}
+	@Override
+	public CriteriaFilterImpl<T> addOrderAsc(List<String> fields) {
+		if(fields != null){
+			for(String o : fields){
+				addOrderAsc(o);
+			}		
+		}
+		return this;
+	}
+	@Override
+	public CriteriaFilterImpl<T> addOrderDesc(List<String> fields) {
+		if(fields != null){
+			for(String o : fields){
+				addOrderDesc(o);
+			}		
+		}
+		return this;
+	}
+	@Override
+	public CriteriaFilterImpl<T> addOrderAsc(Attribute<?, ?>... fields) {
+		if(fields != null){
+			for(Attribute<?,?> o : fields){
+				addOrderAsc(o);
+			}		
+		}
+		return this;
+	}
+	@Override
+	public CriteriaFilterImpl<T> addOrderDesc(Attribute<?, ?>... fields) {
+		if(fields != null){
+			for(Attribute<?,?> o : fields){
+				addOrderDesc(o);
+			}		
+		}
+		return this;
 	}
 	@Override
 	public CriteriaFilterImpl<T> addWhereEqual(String field){
