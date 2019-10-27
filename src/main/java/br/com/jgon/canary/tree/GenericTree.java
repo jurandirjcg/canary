@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +90,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 			throw new ApplicationException(MessageSeverity.ERROR, "error.tree.node", e);
 		}
 		//Remove Formacacao
-		return StringUtils.stripAccents(StringUtils.replacePattern(nodeResAux, "[.-\\s/\\]", ""));
+		return StringUtils.stripAccents(RegExUtils.replacePattern(nodeResAux, "[.-\\s/\\]", ""));
 	}
 	
 	/**
@@ -150,7 +151,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 							}
 							
 							//Remove Formatacao
-							nodeAtual += StringUtils.replacePattern((res != null ? SEPARATOR_NODE + String.valueOf(res) : ""), "[.-\\s/\\]", "");
+							nodeAtual += RegExUtils.replacePattern((res != null ? SEPARATOR_NODE + String.valueOf(res) : ""), "[.-\\s/\\]", "");
 							
 							if(j < i)
 								nodeParent = nodeAtual;
@@ -163,7 +164,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 						if(genTreeNodeAux instanceof ComplexTreeNode){
 							//Monta o novo node que vai ser inserido
 							String nodeOperAux = this.configNodesConteudo(dd, ((ComplexTreeNode) genTreeNodeAux).getNodesOperation());							
-							nodeOperAux = StringUtils.replacePattern(nodeOperAux, "[.-\\s/\\]", "");
+							nodeOperAux = RegExUtils.replacePattern(nodeOperAux, "[.-\\s/\\]", "");
 							
 							//Verifica se existe o node da consulta
 							if(existNode(nodeAtual))
@@ -176,7 +177,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 								
 								String nodeAux;
 								String nodeResAux = this.configNodesConteudo(dd, genTreeNodeAux.getNodesCaseNull());
-								Object res = StringUtils.isEmpty(nodeResAux) ? null : StringUtils.replacePattern(nodeResAux, "[.-\\s/\\]", "");
+								Object res = StringUtils.isEmpty(nodeResAux) ? null : RegExUtils.replacePattern(nodeResAux, "[.-\\s/\\]", "");
 								nodeAux = String.valueOf(res);
 								GenericTree<T> gtAux = getNode(this, nodeAux, false);
 								/*
