@@ -17,9 +17,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.json.bind.annotation.JsonbTypeSerializer;
 import javax.ws.rs.core.Link;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import br.com.jgon.canary.ws.rest.link.LinkEntity;
 
@@ -31,7 +30,7 @@ import br.com.jgon.canary.ws.rest.link.LinkEntity;
  * @version 1.0
  *
  */
-@JsonSerialize(using=JsonCollectionLinkEntitySerializer.class)
+@JsonbTypeSerializer(JsonCollectionLinkEntitySerializer.class)
 public class JsonCollectionLinkEntity {
 
 	private boolean isHalLink;

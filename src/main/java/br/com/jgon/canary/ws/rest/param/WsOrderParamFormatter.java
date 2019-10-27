@@ -16,10 +16,10 @@ package br.com.jgon.canary.ws.rest.param;
 import java.lang.annotation.Annotation;
 
 import org.jboss.resteasy.spi.StringParameterUnmarshaller;
-import org.jboss.resteasy.util.FindAnnotation;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
+import br.com.jgon.canary.util.ReflectionUtil;
 
 /**
  * Intercepta a requisicao para tratamento da ordenacao
@@ -35,7 +35,7 @@ public class WsOrderParamFormatter implements StringParameterUnmarshaller<WSSort
 	
 	@Override
 	public void setAnnotations(Annotation[] annotations) {
-		returnType = FindAnnotation.findAnnotation(annotations, WSParamFormat.class).value();
+		returnType = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class).value();
 	}
 
 	@Override

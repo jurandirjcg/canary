@@ -26,7 +26,6 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 
 import org.jboss.resteasy.spi.StringParameterUnmarshaller;
-import org.jboss.resteasy.util.FindAnnotation;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
@@ -56,7 +55,7 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
 	
 	@Override
 	public void setAnnotations(Annotation[] annotations) {
-		WSParamFormat wsParamFormat = FindAnnotation.findAnnotation(annotations, WSParamFormat.class);
+		WSParamFormat wsParamFormat = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class);
 		
 		returnType = wsParamFormat.value();
 		forceFields = wsParamFormat.forceFields();

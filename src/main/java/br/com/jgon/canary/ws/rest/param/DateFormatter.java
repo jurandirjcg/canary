@@ -19,11 +19,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.jboss.resteasy.spi.StringParameterUnmarshaller;
-import org.jboss.resteasy.util.FindAnnotation;
 
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
+import br.com.jgon.canary.util.ReflectionUtil;
 /**
  * Intercepta requisicao para configuracao do campo data
  *
@@ -38,7 +38,7 @@ public class DateFormatter implements StringParameterUnmarshaller<Date> {
 	
 	@Override
 	public void setAnnotations(Annotation[] annotations) {
-		 DateFormat format = FindAnnotation.findAnnotation(annotations, DateFormat.class);
+		 DateFormat format = ReflectionUtil.findAnnotation(annotations, DateFormat.class);
 		 if(format == null){
 			 formatter = new SimpleDateFormat("yyyy-MM-dd");
 		 }else{

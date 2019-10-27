@@ -34,7 +34,7 @@ import org.apache.commons.lang3.StringUtils;
  * @version 1.0
  *
  */
-public class ReflectionUtil {
+public final class ReflectionUtil {
 	
 	private static final String REG_EXP_METHOD_GET = "(get){1}[A-Z]+.*";
 	private static final String REG_EXP_METHOD_SET = "(set){1}[A-Z]+.*";
@@ -919,4 +919,30 @@ public class ReflectionUtil {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * Extraido da biblioteca resteasy
+	 * @author Jurandir C. Gonçalves
+	 * @since 26/10/2019
+	 *
+	 * @param <T>
+	 * @param searchList
+	 * @param annotation
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T findAnnotation(Annotation[] searchList, Class<T> annotation)
+	{
+		if (searchList == null) return null;
+		for (Annotation ann : searchList)
+		{
+			if (ann.annotationType().equals(annotation))
+			{
+				return (T) ann;
+			}
+		}
+		return null;
+	}
+	
 }

@@ -16,10 +16,8 @@ package br.com.jgon.canary.ws.rest.util.json;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.json.bind.annotation.JsonbProperty;
 import javax.ws.rs.core.Link;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import br.com.jgon.canary.ws.rest.link.LinkEntity;
 
@@ -33,9 +31,9 @@ import br.com.jgon.canary.ws.rest.link.LinkEntity;
  */
 public class JsonLinkEntity {
 	
-	@JsonUnwrapped
+	//@JsonUnwrapped
 	private Object entity;
-	@JsonProperty("_links")
+	@JsonbProperty("_links")
 	private List<LinkEntity> listLink = new ArrayList<LinkEntity>();
 	
 	public JsonLinkEntity(){

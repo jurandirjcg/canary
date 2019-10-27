@@ -13,45 +13,33 @@
  */
 package br.com.jgon.canary.ws.rest.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.json.bind.annotation.JsonbProperty;
-import javax.ws.rs.core.Link;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ *
  * @author Jurandir C. Goncalves
  * 
  * @version 1.0
  *
- * @param <T>
  */
-public class ResponseList<T> {
-
-	private Collection<T> data;
-	@JsonbProperty("_link")
-	private List<Link> link = new ArrayList<Link>(0);
-
-	public ResponseList(){
-
-	}
-
-	public ResponseList(Collection<T> data){
-		this.data = data;
-	}
-
-	public Collection<T> getData() {
-		return data;
-	}
-	public void setData(Collection<T> data) {
-		this.data = data;
-	}
-	public List<Link> getLink() {
-		return link;
-	}
-	public void setLink(List<Link> link) {
-		this.link = link;
-	}
-
+@Retention (RetentionPolicy.RUNTIME)
+@Target ({ElementType.FIELD})
+@Inherited
+public @interface ConverterAttribute {
+	
+	/**
+	 * Nome do atributo na base
+	 * @return
+	 */
+	String value() default "";
+	
+	/**
+	 * Ignora o atributo
+	 * @return
+	 */
+	boolean ignore() default false;
 }

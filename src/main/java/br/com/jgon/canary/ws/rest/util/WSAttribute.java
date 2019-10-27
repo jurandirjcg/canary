@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  *
  */
 @Retention (RetentionPolicy.RUNTIME)
-@Target ({ElementType.FIELD, })
+@Target ({ElementType.FIELD})
 @Inherited
 public @interface WSAttribute {
 	

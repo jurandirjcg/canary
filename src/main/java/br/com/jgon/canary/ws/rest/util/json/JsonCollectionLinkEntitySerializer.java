@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
 
 import br.com.jgon.canary.ws.rest.link.LinkEntity;
 
@@ -19,14 +20,45 @@ import br.com.jgon.canary.ws.rest.link.LinkEntity;
  * @version 1.0
  *
  */
-public class JsonCollectionLinkEntitySerializer extends JsonSerializer<JsonCollectionLinkEntity>{
+public class JsonCollectionLinkEntitySerializer implements JsonbSerializer<JsonCollectionLinkEntity>{
 
+	private Jsonb builder;
+	
 	public JsonCollectionLinkEntitySerializer() {
-		
+		builder = JsonbBuilder.create();
 	}
 	
+	/**
+	 * 
+	 * @param listLink
+	 * @param gen
+	 * @throws IOException
+	 */
+	private void serializeHalLink(List<LinkEntity> listLink, JsonGenerator gen){
+		gen.writeStartObject("_links");
+		for(LinkEntity le : listLink){
+			String relValue = le.getRel();
+			le.setRel(null);
+			gen.write(relValue, builder.toJson(le));
+		}
+		gen.writeEnd();
+	}
+	/**
+	 * 
+	 * @param listLink
+	 * @param gen
+	 * @throws IOException
+	 */
+	private void serializeLink(List<LinkEntity> listLink, JsonGenerator gen){
+		gen.writeStartArray("_links");
+		for(LinkEntity le : listLink){
+			gen.write(builder.toJson(le));
+		}
+		gen.writeEnd();
+	}
+
 	@Override
-	public void serialize(JsonCollectionLinkEntity entity, JsonGenerator gen, SerializerProvider arg2) throws IOException, JsonProcessingException {		
+	public void serialize(JsonCollectionLinkEntity entity, JsonGenerator gen, SerializationContext ctx) {
 		gen.writeStartObject();
 		if(entity.isHalLink() 
 				&& entity.getTotalElements() != null
@@ -34,18 +66,17 @@ public class JsonCollectionLinkEntitySerializer extends JsonSerializer<JsonColle
 				&& entity.getCurrentPage() != null
 				&& entity.getTotalPages() != null){
 			
-			gen.writeObjectField("currentPage", entity.getCurrentPage());
-			gen.writeObjectField("elementsPerPage", entity.getElementsPerPage());
-			gen.writeObjectField("totalElements", entity.getTotalElements());
-			gen.writeObjectField("totalPages", entity.getTotalPages());
+			gen.write("currentPage", entity.getCurrentPage());
+			gen.write("elementsPerPage", entity.getElementsPerPage());
+			gen.write("totalElements", entity.getTotalElements());
+			gen.write("totalPages", entity.getTotalPages());
 		}
-		
 		if(entity.getEmbedded() instanceof Collection<?>){
-			gen.writeObjectFieldStart("_embedded");
+			gen.writeStartObject("_embedded");
 			if(!entity.getEmbedded().isEmpty()){
-				gen.writeObjectField(entity.getItemsName(), entity.getEmbedded());
+				gen.write(entity.getItemsName(), JsonbBuilder.create().toJson(entity.getEmbedded()));
 			}
-			gen.writeEndObject();
+			gen.writeEnd();
 		}else{
 			throw new IllegalArgumentException("Objeto não é uma coleção");
 		}
@@ -54,34 +85,6 @@ public class JsonCollectionLinkEntitySerializer extends JsonSerializer<JsonColle
 		}else{
 			serializeLink(entity.getListLink(), gen);
 		}
-		gen.writeEndObject();
-	}
-	/**
-	 * 
-	 * @param listLink
-	 * @param gen
-	 * @throws IOException
-	 */
-	private void serializeHalLink(List<LinkEntity> listLink, JsonGenerator gen) throws IOException{
-		gen.writeObjectFieldStart("_links");
-		for(LinkEntity le : listLink){
-			String relValue = le.getRel();
-			le.setRel(null);
-			gen.writeObjectField(relValue, le);
-		}
-		gen.writeEndObject();
-	}
-	/**
-	 * 
-	 * @param listLink
-	 * @param gen
-	 * @throws IOException
-	 */
-	private void serializeLink(List<LinkEntity> listLink, JsonGenerator gen) throws IOException{
-		gen.writeArrayFieldStart("_links");
-		for(LinkEntity le : listLink){
-			gen.writeObject(le);
-		}
-		gen.writeEndArray();
+		gen.writeEnd();
 	}
 }

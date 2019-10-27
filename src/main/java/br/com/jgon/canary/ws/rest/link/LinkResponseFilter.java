@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.json.bind.annotation.JsonbProperty;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -32,9 +33,6 @@ import javax.ws.rs.ext.Provider;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.annotation.JsonRootName;
-//import com.google.common.base.CaseFormat;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
@@ -768,8 +766,8 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     			Class<?> klass = obj.getClass();
     			if(klass.isAnnotationPresent(HalJsonRootName.class)){
     				return klass.getAnnotation(HalJsonRootName.class).value();
-    			}else if(klass.isAnnotationPresent(JsonRootName.class)){
-    				return klass.getAnnotation(JsonRootName.class).value();
+    			}else if(klass.isAnnotationPresent(JsonbProperty.class)){
+    				return klass.getAnnotation(JsonbProperty.class).value();
     			}
     			return obj.getClass().getSimpleName();
     		}

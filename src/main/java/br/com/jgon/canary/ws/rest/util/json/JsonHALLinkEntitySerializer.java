@@ -13,13 +13,12 @@
  */
 package br.com.jgon.canary.ws.rest.util.json;
 
-import java.io.IOException;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
 
 import br.com.jgon.canary.ws.rest.link.LinkEntity;
 /**
@@ -30,20 +29,22 @@ import br.com.jgon.canary.ws.rest.link.LinkEntity;
  * @version 1.0
  *
  */
-public class JsonHALLinkEntitySerializer extends JsonSerializer<List<LinkEntity>>{
+public class JsonHALLinkEntitySerializer implements JsonbSerializer<List<LinkEntity>>{
 
+	private Jsonb builder;
+	
 	public JsonHALLinkEntitySerializer() {
-		
+		builder = JsonbBuilder.create();
 	}
 	
 	@Override
-	public void serialize(List<LinkEntity> linkEntity, JsonGenerator gen, SerializerProvider arg2) throws IOException, JsonProcessingException {		
+	public void serialize(List<LinkEntity> linkEntity, javax.json.stream.JsonGenerator gen, SerializationContext ctx) {
 		gen.writeStartObject();
 		for(LinkEntity le : linkEntity){
 			String relValue = le.getRel();
 			le.setRel(null);
-			gen.writeObjectField(relValue, le);
+			gen.write(relValue, builder.toJson(le));
 		}
-		gen.writeEndObject();
+		gen.writeEnd();
 	}
 }

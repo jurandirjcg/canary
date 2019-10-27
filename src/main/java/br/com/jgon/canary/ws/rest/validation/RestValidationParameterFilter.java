@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
@@ -52,10 +54,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
@@ -328,15 +326,16 @@ public class RestValidationParameterFilter implements ContainerRequestFilter{
 	 * @throws JsonMappingException
 	 */
 	private Object getObjectParameter(Class<?> parameterType, ContainerRequestContext requestContext)
-			throws IOException, JsonParseException, JsonMappingException {
+			throws IOException {
 		Object obj= null;
 		BufferedInputStream bufferedInputStream = new BufferedInputStream(requestContext.getEntityStream());
 		bufferedInputStream.mark(0);
 		String json = IOUtils.toString(bufferedInputStream, StandardCharsets.UTF_8);
 		bufferedInputStream.reset();
 		requestContext.setEntityStream(bufferedInputStream);
-		ObjectMapper mapper = new ObjectMapper();
-		obj = mapper.readValue(json, parameterType);
+		
+		Jsonb mapper = JsonbBuilder.create();
+		obj = mapper.fromJson(json, parameterType);
 		return obj;
 	}
 	/**

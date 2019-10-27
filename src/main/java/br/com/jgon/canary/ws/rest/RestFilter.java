@@ -16,6 +16,8 @@ package br.com.jgon.canary.ws.rest;
 import java.io.IOException;
 import java.util.Collections;
 
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -26,9 +28,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.jgon.canary.util.Page;
 import br.com.jgon.canary.ws.rest.util.DominiosRest;
@@ -42,23 +41,19 @@ import br.com.jgon.canary.ws.rest.util.DominiosRest;
  *
  */
 @Provider
-public class RestFilter implements ContainerResponseFilter, ContextResolver<ObjectMapper> {
-
-	private final ObjectMapper mapper;
+public class RestFilter implements ContainerResponseFilter, ContextResolver<Jsonb> {
 	
 	@Context
 	private ResourceInfo resourceInfo;
 	
 	public RestFilter() {
-		mapper = new ObjectMapper();
-		//mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-		mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-		//Quem esta chamando o WS deve saber os parametros aceitos
-		//mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		
 	}
 
 	@Override
-	public ObjectMapper getContext(Class<?> type) {
+	public Jsonb getContext(Class<?> type) {
+		//https://javaee.github.io/jsonb-spec/users-guide.html
+		Jsonb mapper = JsonbBuilder.create();
 		return mapper;
 	}
 	

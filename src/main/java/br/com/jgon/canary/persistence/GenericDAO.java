@@ -348,7 +348,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 */
 	@SuppressWarnings("unchecked")
 	protected Class<T> getPrimaryClass() {
-		ParameterizedType type = (ParameterizedType) getClass().getGenericSuperclass();
+		ParameterizedType type = (ParameterizedType) this.getClass().getGenericSuperclass();
 		return (Class<T>) type.getActualTypeArguments()[0];
 	}
 

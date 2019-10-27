@@ -27,6 +27,14 @@ import br.com.jgon.canary.util.Page;
  */
 public abstract class ResponseConverter<O> {
 
+	public ResponseConverter(){
+		
+	}
+	
+	public ResponseConverter(O obj){
+		
+	}
+	
 	public abstract <N extends ResponseConverter<O>> N converter(O obj);
 	/**
 	 * 
@@ -60,4 +68,5 @@ public abstract class ResponseConverter<O> {
 		
 		return pRetorno;
 	}
+	
 }
