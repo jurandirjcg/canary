@@ -16,6 +16,7 @@ package br.com.jgon.canary.ws.rest.exception;
 
 import java.io.Serializable;
 
+import javax.annotation.Priority;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
@@ -35,6 +36,7 @@ import br.com.jgon.canary.ws.rest.util.ResponseError;
  */
 @RestExceptionHandler
 @Interceptor
+@Priority(javax.interceptor.Interceptor.Priority.LIBRARY_AFTER)
 public class RestExceptionHandlerInterceptor implements Serializable {
 
 	private static final long serialVersionUID = -4500048022362783846L;

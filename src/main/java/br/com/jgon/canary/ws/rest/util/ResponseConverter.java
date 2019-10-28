@@ -31,7 +31,6 @@ import br.com.jgon.canary.util.ReflectionUtil;
  *
  * @param <O> - Origem
  */
-//TODO implementar no Canary
 public abstract class ResponseConverter<O> {
 	
 	public ResponseConverter() {

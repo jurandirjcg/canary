@@ -27,7 +27,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Provider;
 
 import br.com.jgon.canary.util.Page;
 import br.com.jgon.canary.ws.rest.util.DominiosRest;
@@ -40,7 +39,7 @@ import br.com.jgon.canary.ws.rest.util.DominiosRest;
  * @version 1.0
  *
  */
-@Provider
+//@Provider
 public class RestFilter implements ContainerResponseFilter, ContextResolver<Jsonb> {
 	
 	@Context

@@ -20,7 +20,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
 
 import org.jboss.resteasy.spi.Failure;
 import org.slf4j.Logger;
@@ -42,7 +41,7 @@ import br.com.jgon.canary.ws.rest.util.ResponseError;
  * @version 1.0
  *
  */
-@Provider
+//@Provider
 public class RestExceptionMapper implements ExceptionMapper<Exception>{
 
 	private Logger logger = LoggerFactory.getLogger(RestExceptionMapper.class);

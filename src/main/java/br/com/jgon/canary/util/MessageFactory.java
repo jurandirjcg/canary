@@ -50,7 +50,7 @@ public class MessageFactory {
 		try {
 			customMessageResource = ResourceBundle.getBundle(CUSTOM_MESSAGE_RESOURCE, Locale.getDefault(), MessageFactory.class.getClassLoader());
 		} catch (MissingResourceException e) {
-			logger.error("[sraric] - Arquivo ApplicationMessages não encontrado", e);
+			logger.error("[static] - Arquivo ApplicationMessages não encontrado", e);
 			//Nao e necessario lancar execao pois aplicacao sempre apresentara mensagem de erro generica
 		}
 		
