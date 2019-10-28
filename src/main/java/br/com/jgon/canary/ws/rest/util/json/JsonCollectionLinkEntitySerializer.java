@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
@@ -21,11 +19,9 @@ import br.com.jgon.canary.ws.rest.link.LinkEntity;
  *
  */
 public class JsonCollectionLinkEntitySerializer implements JsonbSerializer<JsonCollectionLinkEntity>{
-
-	private Jsonb builder;
 	
 	public JsonCollectionLinkEntitySerializer() {
-		builder = JsonbBuilder.create();
+
 	}
 	
 	/**
@@ -34,12 +30,12 @@ public class JsonCollectionLinkEntitySerializer implements JsonbSerializer<JsonC
 	 * @param gen
 	 * @throws IOException
 	 */
-	private void serializeHalLink(List<LinkEntity> listLink, JsonGenerator gen){
+	private void serializeHalLink(List<LinkEntity> listLink, JsonGenerator gen, SerializationContext ctx){
 		gen.writeStartObject("_links");
 		for(LinkEntity le : listLink){
 			String relValue = le.getRel();
 			le.setRel(null);
-			gen.write(relValue, builder.toJson(le));
+			ctx.serialize(relValue, le, gen);
 		}
 		gen.writeEnd();
 	}
@@ -49,10 +45,10 @@ public class JsonCollectionLinkEntitySerializer implements JsonbSerializer<JsonC
 	 * @param gen
 	 * @throws IOException
 	 */
-	private void serializeLink(List<LinkEntity> listLink, JsonGenerator gen){
+	private void serializeLink(List<LinkEntity> listLink, JsonGenerator gen, SerializationContext ctx){
 		gen.writeStartArray("_links");
 		for(LinkEntity le : listLink){
-			gen.write(builder.toJson(le));
+			ctx.serialize(le, gen);
 		}
 		gen.writeEnd();
 	}
@@ -74,16 +70,16 @@ public class JsonCollectionLinkEntitySerializer implements JsonbSerializer<JsonC
 		if(entity.getEmbedded() instanceof Collection<?>){
 			gen.writeStartObject("_embedded");
 			if(!entity.getEmbedded().isEmpty()){
-				gen.write(entity.getItemsName(), JsonbBuilder.create().toJson(entity.getEmbedded()));
+				ctx.serialize(entity.getItemsName(), entity.getEmbedded(), gen);
 			}
 			gen.writeEnd();
 		}else{
 			throw new IllegalArgumentException("Objeto não é uma coleção");
 		}
 		if(entity.isHalLink()){
-			serializeHalLink(entity.getListLink(), gen);
+			serializeHalLink(entity.getListLink(), gen, ctx);
 		}else{
-			serializeLink(entity.getListLink(), gen);
+			serializeLink(entity.getListLink(), gen, ctx);
 		}
 		gen.writeEnd();
 	}

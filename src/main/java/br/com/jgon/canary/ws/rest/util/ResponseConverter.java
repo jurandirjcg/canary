@@ -13,11 +13,17 @@
  */
 package br.com.jgon.canary.ws.rest.util;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.Page;
+import br.com.jgon.canary.util.ReflectionUtil;
 
 /**
  * Auxlia na conversao do objeto para o objeto de response
@@ -25,17 +31,80 @@ import br.com.jgon.canary.util.Page;
  *
  * @param <O> - Origem
  */
+//TODO implementar no Canary
 public abstract class ResponseConverter<O> {
+	
+	public ResponseConverter() {
+	
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <N extends ResponseConverter<O>> N converter(O obj) {
+		try {
+			N ret = (N) getInstance(this.getClass());
+			
+			List<Field> thisFields = ReflectionUtil.listAttributes(this.getClass());
+			boolean isResponseConverterType = false;
+			
+			Object objAux;
+			for(Field fld : thisFields) {
+				objAux = null;
+				WSTransient wst = ReflectionUtil.getAnnotation(fld, WSTransient.class);
+				if(wst != null) {
+					continue;
+				}
+				WSAttribute wsa = ReflectionUtil.getAnnotation(fld, WSAttribute.class);
+				if(wsa != null) {
+					objAux = ReflectionUtil.getAttributteValue(obj, wsa.value());
+				} else {
+					objAux = ReflectionUtil.getAttributteValue(obj, fld.getName());
+				}
+				
+				isResponseConverterType = ResponseConverter.class.isAssignableFrom(fld.getType());
+				
+				if(!isResponseConverterType) {
+					ReflectionUtil.setFieldValue(ret, fld, objAux);
+				}else if(isResponseConverterType) {
+					ResponseConverter<?> respConv = checkResponse(objAux, fld.getType());
+					ReflectionUtil.setFieldValue(ret, fld, respConv);
+				}
+			}
 
-	public ResponseConverter(){
-		
+			return ret;
+		}catch (Exception e) {
+			throw new ApplicationRuntimeException(MessageSeverity.ERROR, e, "Tratar depois");
+		}
 	}
 	
-	public ResponseConverter(O obj){
+	@SuppressWarnings("unchecked")
+	private <T extends ResponseConverter<E>, E> ResponseConverter<E> checkResponse(E value, Class<?> returnClass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		if(value == null) {
+			return null;
+		}
 		
+		ResponseConverter<E> ret;
+		ret = (ResponseConverter<E>) getInstance(returnClass);
+		ret.converter(value);
+
+		return ret;
 	}
 	
-	public abstract <N extends ResponseConverter<O>> N converter(O obj);
+	@SuppressWarnings("unchecked")
+	private <E> E getInstance(Class<E> klass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		Constructor<?>[] ctors = klass.getDeclaredConstructors();
+		Constructor<?> ctor = null;
+		for (int i = 0; i < ctors.length; i++) {
+			ctor = ctors[i];
+			if (ctor.getGenericParameterTypes().length == 0) {
+				break;
+			}
+		}
+
+		ctor.setAccessible(true);
+		return (E) ctor.newInstance();
+
+	}
+	
 	/**
 	 * 
 	 * @param listObj
@@ -68,5 +137,4 @@ public abstract class ResponseConverter<O> {
 		
 		return pRetorno;
 	}
-	
 }

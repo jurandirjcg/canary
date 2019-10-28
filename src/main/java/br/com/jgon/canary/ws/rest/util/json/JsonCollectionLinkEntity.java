@@ -35,7 +35,7 @@ public class JsonCollectionLinkEntity {
 
 	private boolean isHalLink;
 	private String itemsName;
-	private Collection<Object> embedded;
+	private Collection<?> embedded;
 	private List<LinkEntity> listLink = new ArrayList<LinkEntity>();
 	private Long totalElements;
 	private Integer elementsPerPage;
@@ -100,11 +100,11 @@ public class JsonCollectionLinkEntity {
 		this.isHalLink = isHalLink;
 	}
 
-	public Collection<Object> getEmbedded() {
+	public Collection<?> getEmbedded() {
 		return embedded;
 	}
 
-	public void setEmbedded(Collection<Object> embedded) {
+	public void setEmbedded(Collection<?> embedded) {
 		this.embedded = embedded;
 	}
 

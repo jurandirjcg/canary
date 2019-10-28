@@ -15,10 +15,9 @@ package br.com.jgon.canary.ws.rest.util.json;
 
 import java.util.List;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
 
 import br.com.jgon.canary.ws.rest.link.LinkEntity;
 /**
@@ -30,20 +29,18 @@ import br.com.jgon.canary.ws.rest.link.LinkEntity;
  *
  */
 public class JsonHALLinkEntitySerializer implements JsonbSerializer<List<LinkEntity>>{
-
-	private Jsonb builder;
 	
 	public JsonHALLinkEntitySerializer() {
-		builder = JsonbBuilder.create();
+
 	}
 	
 	@Override
-	public void serialize(List<LinkEntity> linkEntity, javax.json.stream.JsonGenerator gen, SerializationContext ctx) {
+	public void serialize(List<LinkEntity> linkEntity, JsonGenerator gen, SerializationContext ctx) {
 		gen.writeStartObject();
 		for(LinkEntity le : linkEntity){
 			String relValue = le.getRel();
 			le.setRel(null);
-			gen.write(relValue, builder.toJson(le));
+			ctx.serialize(relValue, le, gen);
 		}
 		gen.writeEnd();
 	}

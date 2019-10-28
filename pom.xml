@@ -37,6 +37,20 @@
  </distributionManagement>
   <properties>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<!-- Dependencias -->
+	<commons-lang3.version>3.9</commons-lang3.version>
+	<javaee-api.version>7.0</javaee-api.version>
+	<javax.json.bind-api.version>1.0</javax.json.bind-api.version>
+	<resteasy-core.version>4.3.1.Final</resteasy-core.version>
+	<slf4j-api.version>1.7.13</slf4j-api.version>
+	<yasson.version>1.0.5</yasson.version>
+	<!-- Plugins -->
+	<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+	<maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
+	<maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
+	<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
+	<maven-source-plugin.version>2.2.1</maven-source-plugin.version>
+	<nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
   </properties>
 	
   <dependencies>
@@ -44,35 +58,39 @@
 		<dependency>
 		    <groupId>javax</groupId>
 		    <artifactId>javaee-api</artifactId>
-		    <version>7.0</version>
+		    <version>${javaee-api.version}</version>
 		    <scope>provided</scope>
 		</dependency>
 		<!-- LOG -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.13</version>
+			<version>${slf4j-api.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- RESTEASY -->
 		<dependency>
 		 	<groupId>org.jboss.resteasy</groupId>
 		 	<artifactId>resteasy-core</artifactId>
-		 	<version>4.3.1.Final</version>
-		 	<scope>provided</scope>
+		 	<version>${resteasy-core.version}</version>
 		</dependency>
 		<!-- JSONB -->	
 		<dependency>
 			<groupId>javax.json.bind</groupId>
 		    <artifactId>javax.json.bind-api</artifactId>
-		    <version>1.0</version>
+		    <version>${javax.json.bind-api.version}</version>
 		    <scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse</groupId>
+		    <artifactId>yasson</artifactId>
+		    <version>${yasson.version}</version>
 		</dependency>
 		<!-- COMMONS -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.9</version>
+			<version>${commons-lang3.version}</version>
 		</dependency>
  	</dependencies>
 
@@ -81,7 +99,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<source>1.8</source>
@@ -91,7 +109,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.7</version>
+				<version>${maven-resources-plugin.version}</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
@@ -106,7 +124,7 @@
 					<plugin>
 				      <groupId>org.apache.maven.plugins</groupId>
 				      <artifactId>maven-source-plugin</artifactId>
-				      <version>2.2.1</version>
+				      <version>${maven-source-plugin.version}</version>
 				      <executions>
 				        <execution>
 				          <id>attach-sources</id>
@@ -119,7 +137,7 @@
 				    <plugin>
 				      <groupId>org.apache.maven.plugins</groupId>
 				      <artifactId>maven-javadoc-plugin</artifactId>
-				      <version>2.9.1</version>
+				      <version>${maven-javadoc-plugin.version}</version>
 				      <executions>
 				        <execution>
 				          <id>attach-javadocs</id>
@@ -132,7 +150,7 @@
 					<plugin>
 				      <groupId>org.sonatype.plugins</groupId>
 				      <artifactId>nexus-staging-maven-plugin</artifactId>
-				      <version>1.6.7</version>
+				      <version>${nexus-staging-maven-plugin.version}</version>
 				      <extensions>true</extensions>
 				      <configuration>
 				        <serverId>ossrh</serverId>
@@ -143,7 +161,7 @@
 				    <plugin>
 				      <groupId>org.apache.maven.plugins</groupId>
 				      <artifactId>maven-gpg-plugin</artifactId>
-				      <version>1.5</version>
+				      <version>${maven-gpg-plugin.version}</version>
 				      <executions>
 				        <execution>
 				          <id>sign-artifacts</id>
