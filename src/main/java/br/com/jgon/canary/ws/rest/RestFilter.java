@@ -18,7 +18,6 @@ import java.util.Collections;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -32,9 +31,6 @@ import javax.ws.rs.ext.Provider;
 
 import br.com.jgon.canary.util.Page;
 import br.com.jgon.canary.ws.rest.util.DominiosRest;
-import br.com.jgon.canary.ws.rest.util.json.JsonCollectionLinkEntitySerializer;
-import br.com.jgon.canary.ws.rest.util.json.JsonHALEntitySerializer;
-import br.com.jgon.canary.ws.rest.util.json.JsonHALLinkEntitySerializer;
 
 /**
  * Configura os filtros REST
@@ -57,12 +53,6 @@ public class RestFilter implements ContainerResponseFilter, ContextResolver<Json
 	@Override
 	public Jsonb getContext(Class<?> type) {
 		//https://javaee.github.io/jsonb-spec/users-guide.html
-		JsonbConfig config = new JsonbConfig();
-		config.withSerializers(
-				new JsonHALLinkEntitySerializer(), 
-				new JsonHALEntitySerializer(),
-				new JsonCollectionLinkEntitySerializer());
-		
 		Jsonb mapper = JsonbBuilder.create();
 		return mapper;
 	}

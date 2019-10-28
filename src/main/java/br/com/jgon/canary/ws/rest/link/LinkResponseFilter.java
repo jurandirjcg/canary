@@ -304,8 +304,6 @@ public class LinkResponseFilter implements ContainerResponseFilter {
     				childName = getChildClassName((Collection<Object>) responseContext.getEntity());
     				if(StringUtils.isBlank(childName)){
     					childName = "items";
-    				}else{
-    					childName += "Items";
     				}
     			}
     			    			

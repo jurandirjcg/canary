@@ -44,9 +44,9 @@ public @interface LinkPaginate {
 	String limitParamName();
 	/**
 	 * Define o nome do atributo que contem a colecao paginada
-	 * Default: nome da entidade ou annotation JsonRootName + Items
+	 * Default: nome da entidade (ou annotation JsonbProperty) + Items
 	 */
-	String embeddedCollectionName() default "";
+	String embeddedCollectionName();
 	/**
 	 * Indica qual sera o path inicial do link, default LinkResouceBasePath.COMPLETE
 	 * Ex: /page/recurso ou http://dominio.com/page/recurso
