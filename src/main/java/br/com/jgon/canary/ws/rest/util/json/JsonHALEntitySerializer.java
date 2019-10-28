@@ -50,7 +50,7 @@ public class JsonHALEntitySerializer implements JsonbSerializer<JsonHALLinkEntit
 			processField(fld, entity.getEntity(), gen, ctx);
 		}
 		
-		gen.writeStartObject("_link");
+		gen.writeStartObject("_links");
 	
 		for(LinkEntity le: entity.getListLink()) {
 			String relValue = le.getRel();
