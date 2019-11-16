@@ -21,26 +21,26 @@ import br.com.jgon.canary.util.MessageSeverity;
  * @version 1.0
  *
  */
-public class ApplicationRuntimeException extends RuntimeException{
+public class ApplicationRuntimeException extends RuntimeException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5128286607376795028L;
-	private MessageSeverity messageSeverity;
-	
-	public ApplicationRuntimeException(MessageSeverity severity, Exception e, String message){
-		super(message, e);
-		messageSeverity = severity;
-	}
-	
-	public ApplicationRuntimeException(ApplicationException e){
-		super(e.getMessage(), e);
-		messageSeverity = e.getMessageSeverity();
-	}
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5128286607376795028L;
+    private MessageSeverity messageSeverity;
 
-	public MessageSeverity getMessageSeverity() {
-		return messageSeverity;
-	}
-	
+    public ApplicationRuntimeException(MessageSeverity severity, Exception e, String message) {
+        super(message, e);
+        messageSeverity = severity;
+    }
+
+    public ApplicationRuntimeException(ApplicationException e) {
+        super(e.getMessage(), e);
+        messageSeverity = e.getMessageSeverity();
+    }
+
+    public MessageSeverity getMessageSeverity() {
+        return messageSeverity;
+    }
+
 }

@@ -20,7 +20,9 @@ import java.util.Date;
 
 import org.jboss.resteasy.spi.StringParameterUnmarshaller;
 
+import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
+import br.com.jgon.canary.util.DateUtil;
 import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
@@ -39,9 +41,7 @@ public class DateFormatter implements StringParameterUnmarshaller<Date> {
 	@Override
 	public void setAnnotations(Annotation[] annotations) {
 		 DateFormat format = ReflectionUtil.findAnnotation(annotations, DateFormat.class);
-		 if(format == null){
-			 formatter = new SimpleDateFormat("yyyy-MM-dd");
-		 }else{
+		 if(format != null){
 			 formatter = new SimpleDateFormat(format.value());
 		 }
 	}
@@ -49,8 +49,12 @@ public class DateFormatter implements StringParameterUnmarshaller<Date> {
 	@Override
 	public Date fromString(String str) {
 		 try{
-            return formatter.parse(str);
-         }catch (ParseException e){
+		     if(formatter != null) {
+		         return formatter.parse(str);
+		     }else {
+		         return DateUtil.parseDate(str);
+		     }
+         }catch (ParseException | ApplicationException e){
         	throw new ApplicationRuntimeException(MessageSeverity.ERROR, e, MessageFactory.getMessage("error.parse-date", str));
          }
 	}

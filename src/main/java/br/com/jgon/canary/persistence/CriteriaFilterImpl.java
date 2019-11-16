@@ -31,6 +31,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.Attribute;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
@@ -615,6 +616,9 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 	}
 	@Override
 	public CriteriaFilterImpl<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
+	    if(StringUtils.isBlank(value)) {
+	        return this;
+	    }
 		boolean added = configWhereRegex(field, fieldType, value, regexToAnalyse, defaultIfNotMatch);
 		if(!added && defaultIfNotMatch != null){
 			ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "error.regex-config", value, field);
@@ -779,7 +783,11 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 	}
 	@Override
 	public CriteriaFilterImpl<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException{
-		boolean added = configWhereRegex(attribute.getName(), attribute.getJavaType(), value, regexToAnalyse, defaultIfNotMatch);
+	    if(StringUtils.isBlank(value)) {
+            return this;
+        }
+	    
+	    boolean added = configWhereRegex(attribute.getName(), attribute.getJavaType(), value, regexToAnalyse, defaultIfNotMatch);
 		if(!added && defaultIfNotMatch != null){
 			ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "error.regex-config", value, attribute.getName());
 			logger.error("[addWhereRegex]", ae.getMessage());
