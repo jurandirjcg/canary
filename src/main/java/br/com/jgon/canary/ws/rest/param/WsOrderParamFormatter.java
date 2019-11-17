@@ -15,6 +15,9 @@ package br.com.jgon.canary.ws.rest.param;
 
 import java.lang.annotation.Annotation;
 
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
+
 import org.jboss.resteasy.spi.StringParameterUnmarshaller;
 
 import br.com.jgon.canary.exception.ApplicationException;
@@ -30,20 +33,36 @@ import br.com.jgon.canary.util.ReflectionUtil;
  *
  */
 public class WsOrderParamFormatter implements StringParameterUnmarshaller<WSSortParam> {
-	
-	Class<?> returnType;
-	
-	@Override
-	public void setAnnotations(Annotation[] annotations) {
-		returnType = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class).value();
-	}
 
-	@Override
-	public WSSortParam fromString(String str) {
-		try{
-			return new WSSortParam(returnType, str);
-		}catch (ApplicationException e){
-			throw new ApplicationRuntimeException(e);
-		}
-	}
+    Class<?> returnType;
+
+    @Context
+    private ResourceInfo resourceInfo;
+
+    @Override
+    public void setAnnotations(Annotation[] annotations) {
+        WSParamFormat wsParamFormat = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class);
+
+        if (wsParamFormat != null) {
+            if (wsParamFormat.value() != null) {
+                returnType = wsParamFormat.value();
+            }
+        }
+    }
+
+    @Override
+    public WSSortParam fromString(String str) {
+        try {
+            returnType = resourceInfo.getResourceMethod().getReturnType();
+
+            Class<?> auxReturnType = ReflectionUtil.returnParameterType(resourceInfo.getResourceMethod().getGenericReturnType(), 0);
+            if (auxReturnType != null) {
+                returnType = auxReturnType;
+            }
+            
+            return new WSSortParam(returnType, str);
+        } catch (ApplicationException e) {
+            throw new ApplicationRuntimeException(e);
+        }
+    }
 }

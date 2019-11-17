@@ -14,8 +14,12 @@
 package br.com.jgon.canary.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +31,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Biblioteca de Reflection, baseada na bilioteca de reflection do Framework Pinhão Paraná (http://www.frameworkpinhao.pr.gov.br)
+ * Biblioteca de Reflection, baseada na bilioteca de reflection do Framework
+ * Pinhão Paraná (http://www.frameworkpinhao.pr.gov.br)
  * 
  * @author Jurandir C. Goncalves
  * 
@@ -35,573 +40,605 @@ import org.apache.commons.lang3.StringUtils;
  *
  */
 public final class ReflectionUtil {
-	
-	private static final String REG_EXP_METHOD_GET = "(get){1}[A-Z]+.*";
-	private static final String REG_EXP_METHOD_SET = "(set){1}[A-Z]+.*";
-	private static final String REG_EXP_ALL	= ".*";
-	
-	/**
-	 * Lista os métodos get de um objeto passado como parâmetro.
-	 * @param o - objeto a ser verificado
-	 * @return List - lista de métodos da classe
-	 */
-	public static List<Method> listMethodsGet(Object o) {
-		return listMethods(o, REG_EXP_METHOD_GET);
+
+    private static final String REG_EXP_METHOD_GET = "(get){1}[A-Z]+.*";
+    private static final String REG_EXP_METHOD_SET = "(set){1}[A-Z]+.*";
+    private static final String REG_EXP_ALL = ".*";
+
+    /**
+     * Lista os métodos get de um objeto passado como parâmetro.
+     * 
+     * @param o - objeto a ser verificado
+     * @return List - lista de métodos da classe
+     */
+    public static List<Method> listMethodsGet(Object o) {
+        return listMethods(o, REG_EXP_METHOD_GET);
     }
-        
-	/**
-	 * Lista os métodos set de um objeto passado como parametro
-	 * @param o - objeto a ser verificado
-	 * @return List - lista de matodos da classe
-	 */
-	public static List<Method> listMethodsSet(Object o) {
-		return listMethods(o, REG_EXP_METHOD_SET);
-	}
 
-	/**
-	 * Lista os todos os metodos declarados de um objeto passado como parametro
-	 * @param o - objeto a ser verificado
-	 * @return List - lista de metodos da classe
-	 */
-	public static List<Method> listMethods(Object o) {
-		return listMethods(o, REG_EXP_ALL);
-	}
-	
-	/**
-	 * 
-	 * @param o - objeto
-	 * @param pattern - regex
-	 * @return {@link List}
-	 */
-	public static List<Method> listMethods(Object o, String pattern) {
-		return listMethods(o.getClass(), pattern);
-	}
+    /**
+     * Lista os métodos set de um objeto passado como parametro
+     * 
+     * @param o - objeto a ser verificado
+     * @return List - lista de matodos da classe
+     */
+    public static List<Method> listMethodsSet(Object o) {
+        return listMethods(o, REG_EXP_METHOD_SET);
+    }
 
-	/**
-	 * Retorna os metodos da classe
-	 * @param klass - Classe de busca
-	 * @param pattern - regex
-	 * @return {@link List}
-	 */
-	public static List<Method> listMethods(Class<?> klass, String pattern){
-		List<Method> l = new ArrayList<Method>();
-		
-		Method[] m = klass.getDeclaredMethods();
-   		    
-		for (int i = 0; i < m.length; i++) {
-			if (m[i].getName().matches(pattern))
-				l.add(m[i]);
-		}
-			
-		if(klass.getSuperclass() != null && !klass.getSuperclass().equals(Object.class) && !klass.getSuperclass().equals(Class.class)){
-			l.addAll(listMethods(klass.getSuperclass(), pattern));
-		}
-		
-		return l;
-	}
-	/**
-	 * Lista os todos os atributos declarados de um objeto passado como parametro.
-	 * @param o - objeto a ser verificado
-	 * @return {@link List} - lista de atributos da classe Method 
-	 */
-	public static List<Field> listAttributes(Object o) {
-		return listAttributes(o, REG_EXP_ALL);
-	}
-	
-	/**
-	 * Retorna lista de atributos com tipo declarado no parametro
-	 * @param klass - Classe de pesquisa
-	 * @param attributeType - parametro da pesquisa. Ex String.class
-	 * @return {@link List}
-	 */
-	public static List<Field> listAttributes(Class<?> klass, Class<?> attributeType){
-		List<Field> listFields = new ArrayList<Field>();
-		
-		for(Field field : listAttributes(klass, REG_EXP_ALL)){
-			if(field.getType().equals(attributeType)){
-				listFields.add(field);
-			}
-		}
-		
-		return listFields;
-	}
-	/**
-	 * Devolve uma lista de atributos declarados em um objeto.
-	 * @param o - objeto a ser verificado
-	 * @param pattern - uma expressao regular dos atributos que desejam ser listados
-	 * @return {@link List}
-	 */
-	public static List<Field> listAttributes(Object o, String pattern) {		
-		return listAttributes(o.getClass(), pattern);
-	}
-		
-	/**
-	 * Retorna lista de atributos que contenham o tipo especificado e a annotation
-	 * @param klass - Classe de pesquisa
-	 * @param fieldClass - Tipo do atributo pesquisado
-	 * @param annotationClass - Tipo de annotation a ser localizada
-	 * @return {@link List}
-	 */
-	@SafeVarargs
-	public static List<Field> listAttributes(Class<?> klass, Class<?> fieldClass, Class<? extends Annotation>... annotationClass){
-		List<Field> fields = listAttributes(klass, REG_EXP_ALL);
-		for(Iterator<Field> itField = fields.iterator(); itField.hasNext();){
-			Field fld = itField.next();
-			if(fieldClass != null && !fld.getType().equals(fieldClass)){
-				itField.remove();
-			}else{
-				boolean achou = false;
-				for(Class<? extends Annotation> a : annotationClass){
-					if(getAnnotation(fld, a) != null){
-						achou = true;
-					}
-				}
-				if(!achou) {
-					itField.remove();
-				}
-			}
-		}
-		return fields;
-	}
-	
-	/**
-	 * Retorna lista de atributos que contenham a(s) annotation(s) pesquisa tambem realizada nos metodos
-	 * @param klass - Classe de pesquisa
-	 * @param annotationClass - annotation a ser localizada
-	 * @return {@link List}
-	 */
-	@SafeVarargs
-	public static List<Field> listAttributesByAnnotation(Class<?> klass, Class<? extends Annotation>... annotationClass){
-		return listAttributes(klass, null, annotationClass);
-	}
-	/**
-	 * 
-	 * @param klass - classe de pesquisa
-	 * @return {@link List}
-	 */
-	public static List<Field> listAttributes(Class<?> klass){
-		return listAttributes(klass, REG_EXP_ALL);
-	}
-	/**
-	 * Retorna os atributos da classe
-	 * @param klass - Classe de pesquisa
-	 * @param pattern - uma expressao regular dos atributos que desejam ser listados
-	 * @return {@link List}
-	 */
-	public static List<Field> listAttributes(Class<?> klass, String pattern){
-		List<Field> l = new ArrayList<Field>(0);
-		
-		Field[] f = klass.getDeclaredFields();
- 		
-		Class<?> classObj = klass;
-		while (classObj.getSuperclass() != null){
-			classObj = classObj.getSuperclass();
-			f = ArrayUtils.addAll(f, classObj.getDeclaredFields());
-		}
- 		
-		for (int i = 0; i < f.length; i++) {
-			if (f[i].getName().matches(pattern))
-				l.add(f[i]);
-		}
-   
-		return l;
-	}
+    /**
+     * Lista os todos os metodos declarados de um objeto passado como parametro
+     * 
+     * @param o - objeto a ser verificado
+     * @return List - lista de metodos da classe
+     */
+    public static List<Method> listMethods(Object o) {
+        return listMethods(o, REG_EXP_ALL);
+    }
 
-	/**
-	 * Verifica se determinado field existe na classe. Case Sensitive
-	 * @param klass - classe de pesquisa
-	 * @param name - nome do atributo a ser localizado
-	 * @return {@link Boolean}
-	 */
-	public static boolean existAttribute(Class<?> klass, String name){
-		List<Field> listField = listAttributes(klass, name);
-		boolean exist = false;
-		for(Field fl : listField)
-			if(fl.getName().equals(name)){
-				exist = true;
-				break;
-			}
-				
-		return exist;
-	}
-	/**
-	 * Verifica se o metodo existe na classe
-	 * @param klass - classe de pesquisa
-	 * @param name - nome do metido a ser localizado
-	 * @return {@link Boolean}
-	 */
-	public static boolean existMethod(Class<?> klass, String name){
-		return existMethod(klass, name, REG_EXP_ALL);
-	}
-	
-	/**
-	 * Verifica se o metodo get existe na classe
-	 * @param klass - classe de pesquisa
-	 * @param name - nome do metodo get a ser localizado
-	 * @return {@link Boolean}
-	 */
-	public static boolean existMethodGet(Class<?> klass, String name){
-		return existMethod(klass, name, REG_EXP_METHOD_GET);
-	}
-	
-	/**
-	 * Verifica se o metodo set existe na classe
-	 * @param klass - classe de pesquisa
-	 * @param name - nome do metodo set a ser localizado
-	 * @return {@link Boolean}
-	 */
-	public static boolean existMethodSet(Class<?> klass, String name){
-		return existMethod(klass, name, REG_EXP_METHOD_SET);
-	}
-	
-	/**
-	 * Verifica se o metodo existe na classe, informando pattern
-	 * @param klass - classe de pesquisa
-	 * @param name - nome do metodo
-	 * @param pattern - expressão regular de busca
-	 * @return {@link Boolean}
-	 */
-	public static boolean existMethod(Class<?> klass, String name, String pattern){
-		List<Method> listMethod = listMethods(klass, pattern);
-		boolean exist = false;
-		for(Method mt : listMethod){
-			if(mt.getName().equals(name)){
-				exist = true;
-				break;
-			}
-		}
-		
-		return exist;
-	}
-	/**
-	 * Verifica se existe Annotation no atributo ou metodo Get
-	 * @param klass - Classe de pesquisa
-	 * @param atributoNome - nome do atributo
-	 * @param annotationClass - annotations a ser pesquisada
-	 * @return {@link Boolean}
-	 */
-	public static boolean existAnnotation(Class<?> klass, String atributoNome, Class<? extends Annotation> annotationClass){
-		List<Field> listFields = listAttributes(klass, StringUtils.isBlank(atributoNome) ? REG_EXP_ALL : atributoNome);
-		for(Field atributo : listFields)
-			if(getAnnotation(atributo, annotationClass) != null)
-					return true;
-		
-		return false;
-	}
-	
-	/**
-	 * Verifica se existe Annotation no atributo ou metodo Get
-	 * @param atributo - nome do atributo
-	 * @param annotationClass - annotations a ser pesquisada
-	 * @return {@link Boolean}
-	 */
-	public static boolean existAnnotation(Field atributo, Class<? extends Annotation> annotationClass){
-		return atributo.isAnnotationPresent(annotationClass);
-	}
-	/**
-	 * Retorna annotation tanto do field quanto do method do tipo GET, null caso nao encontre
-	 * @param <T> - tipo do objeto
-	 * @param field - atributo
-	 * @param annotationClass - anotacao de pesquisa
-	 * @return {@link Annotation}
-	 */
-	public static <T extends Annotation> T getAnnotation(Field field, Class<T> annotationClass){
+    /**
+     * 
+     * @param o       - objeto
+     * @param pattern - regex
+     * @return {@link List}
+     */
+    public static List<Method> listMethods(Object o, String pattern) {
+        return listMethods(o.getClass(), pattern);
+    }
 
-		if(field.isAnnotationPresent(annotationClass))
-			return field.getAnnotation(annotationClass);
-		else
-			try {
-			 Method method = getMethodGet(field.getDeclaringClass(), field.getName());
-			if(method.isAnnotationPresent(annotationClass))
-				return method.getAnnotation(annotationClass);
-			
-			} catch (Exception e) {
-				return null;
-			}
-		return null;
-	}
-	
-	/**
-	 * 
-	 * @param <T> - tipo
-	 * @param klass - classe de pesquisa
-	 * @param methodName - nome do metodo
-	 * @param annotationClass - annotation de busca
-	 * @return {@link Annotation}
-	 */
-	public static <T extends Annotation> T getAnnotation(Class<?> klass, String methodName, Class<T> annotationClass){
-		try {
-			for(Method m : klass.getDeclaredMethods()){
-				if(m.getName().equals(methodName) && m.isAnnotationPresent(annotationClass)){
-					return m.getAnnotation(annotationClass);
-				}
-			}
-		} catch (Exception e) {
-			return null;
-		}
-		return null;
-	}
-	/**
-	 * 
-	 * @param klass - classe de pesquisa
-	 * @param methodName - nome do metodo
-	 * @return {@link Method}
-	 */
-	public static Method getMethod(Class<?> klass, String methodName){
-		try {
-			for(Method m : klass.getDeclaredMethods()){
-				if(m.getName().equals(methodName)){
-					return m;
-				}
-			}
-		} catch (Exception e) {
-			return null;
-		}
-		return null;
-	}
-		
-	/**
-	 * @param obj - objeto de pesquisa
-	 * @param atributo - nome do atributo
-	 * @param objParams - parametros
-	 * @return {@link Object}
-	 * @throws Exception - erro ao executar método
-	 */
-	public static Object executeGet(Object obj, String atributo, Object[] objParams) throws Exception {
-		Method method = getMethodGet(obj.getClass(), atributo, objParams);
-		if(!method.isAccessible()){
-			method.setAccessible(true);
-		}
-		if(objParams == null){
-			return method.invoke(obj, (Object[])null);
-		}
-		
-		return method.invoke(obj, objParams);
-	}
-	
-	/**
-	 * Invoca o metodo
-	 * @param klass - classe de pesquisa
-	 * @param metodo - nome do metodo
-	 * @param params - parametros
-	 * @return {@link Object}
-	 * @throws Exception - erro ao executar método
-	 */
-	public static Object executeStaticMethod(Class<?> klass, String metodo, Object... params) throws Exception{
-		Method[] m = klass.getDeclaredMethods();
-		    
-		Method mt = null;
-		for (int i = 0; i < m.length; i++) {
-			if (m[i].getName().equals(metodo)){
-				mt = m[i];
-				break;
-			}
-		}
-		
-		if(mt == null)
-			throw new Exception("Método não encontrado");
-		
-		return mt.invoke(klass, params);
-	}
-	
-	/**
-	 * 
-	 * @param obj - objeto de pesquisa
-	 * @param metodo - nome do metodo
-	 * @param params - parametros
-	 * @return {@link Object}
-	 * @throws Exception - erro ao executar método
-	 */
-	public static Object executeMethod(Object obj, String metodo, Object... params) throws Exception{
-		List<Method> lstMethods = listMethods(obj, metodo);
-		
-		if(lstMethods.isEmpty())
-			throw new Exception("Consulta não retornou resultados, operação não pode ser executada.");
-		if(lstMethods.size() > 1)
-			throw new Exception("Consulta retornou mais de um método, operação não pode ser executada.");
-		
-		Method method = lstMethods.get(0);
-		if(!method.isAccessible()){
-			method.setAccessible(true);
-		}
-		return method.invoke(obj, params);
-	}
-	/**
-	 * Retorna o metodo do tipo get do atributo
-	 * 
-	 * @param klass - classe de pesquisa
-	 * @param atributeName - nome do atributo
-	 * @param objParams - parametros
-	 * @return {@link Method}
-	 * @throws Exception - erro ao executar método
-	 */
-	public static Method getMethodGet(Class<?> klass, String atributeName, Object... objParams) throws Exception{
-		String nomeGetter = "get" + StringUtils.capitalize(atributeName);
-		Method method = null;
-		Class<?>[] tipos = null;
-		try {
-        	if (objParams != null){
-        		int tam = 0;
-        		for (int i=0; i< objParams.length; i++) {
-        			if(objParams[i] != null)
-        				tam++;
-        		}
-        		if(tam > 0){
-        			tipos = new Class[tam];
-        			for (int i=0; i< objParams.length; i++) {
-        				if(objParams[i] != null)
-        					tipos[i] = objParams[i].getClass();
-        			}
-        		}
-        	}
+    /**
+     * Retorna os metodos da classe
+     * 
+     * @param klass   - Classe de busca
+     * @param pattern - regex
+     * @return {@link List}
+     */
+    public static List<Method> listMethods(Class<?> klass, String pattern) {
+        List<Method> l = new ArrayList<Method>();
 
-        	do{
-        		method = klass.getMethod(nomeGetter, tipos);
-        		klass = klass.getSuperclass();
-        	}while(klass.getSuperclass() != null && method == null);
+        Method[] m = klass.getDeclaredMethods();
 
-        	return method;
+        for (int i = 0; i < m.length; i++) {
+            if (m[i].getName().matches(pattern))
+                l.add(m[i]);
+        }
+
+        if (klass.getSuperclass() != null && !klass.getSuperclass().equals(Object.class) && !klass.getSuperclass().equals(Class.class)) {
+            l.addAll(listMethods(klass.getSuperclass(), pattern));
+        }
+
+        return l;
+    }
+
+    /**
+     * Lista os todos os atributos declarados de um objeto passado como parametro.
+     * 
+     * @param o - objeto a ser verificado
+     * @return {@link List} - lista de atributos da classe Method
+     */
+    public static List<Field> listAttributes(Object o) {
+        return listAttributes(o, REG_EXP_ALL);
+    }
+
+    /**
+     * Retorna lista de atributos com tipo declarado no parametro
+     * 
+     * @param klass         - Classe de pesquisa
+     * @param attributeType - parametro da pesquisa. Ex String.class
+     * @return {@link List}
+     */
+    public static List<Field> listAttributes(Class<?> klass, Class<?> attributeType) {
+        List<Field> listFields = new ArrayList<Field>();
+
+        for (Field field : listAttributes(klass, REG_EXP_ALL)) {
+            if (field.getType().equals(attributeType)) {
+                listFields.add(field);
+            }
+        }
+
+        return listFields;
+    }
+
+    /**
+     * Devolve uma lista de atributos declarados em um objeto.
+     * 
+     * @param o       - objeto a ser verificado
+     * @param pattern - uma expressao regular dos atributos que desejam ser listados
+     * @return {@link List}
+     */
+    public static List<Field> listAttributes(Object o, String pattern) {
+        return listAttributes(o.getClass(), pattern);
+    }
+
+    /**
+     * Retorna lista de atributos que contenham o tipo especificado e a annotation
+     * 
+     * @param klass           - Classe de pesquisa
+     * @param fieldClass      - Tipo do atributo pesquisado
+     * @param annotationClass - Tipo de annotation a ser localizada
+     * @return {@link List}
+     */
+    @SafeVarargs
+    public static List<Field> listAttributes(Class<?> klass, Class<?> fieldClass, Class<? extends Annotation>... annotationClass) {
+        List<Field> fields = listAttributes(klass, REG_EXP_ALL);
+        for (Iterator<Field> itField = fields.iterator(); itField.hasNext();) {
+            Field fld = itField.next();
+            if (fieldClass != null && !fld.getType().equals(fieldClass)) {
+                itField.remove();
+            } else {
+                boolean achou = false;
+                for (Class<? extends Annotation> a : annotationClass) {
+                    if (getAnnotation(fld, a) != null) {
+                        achou = true;
+                    }
+                }
+                if (!achou) {
+                    itField.remove();
+                }
+            }
+        }
+        return fields;
+    }
+
+    /**
+     * Retorna lista de atributos que contenham a(s) annotation(s) pesquisa tambem
+     * realizada nos metodos
+     * 
+     * @param klass           - Classe de pesquisa
+     * @param annotationClass - annotation a ser localizada
+     * @return {@link List}
+     */
+    @SafeVarargs
+    public static List<Field> listAttributesByAnnotation(Class<?> klass, Class<? extends Annotation>... annotationClass) {
+        return listAttributes(klass, null, annotationClass);
+    }
+
+    /**
+     * 
+     * @param klass - classe de pesquisa
+     * @return {@link List}
+     */
+    public static List<Field> listAttributes(Class<?> klass) {
+        return listAttributes(klass, REG_EXP_ALL);
+    }
+
+    /**
+     * Retorna os atributos da classe
+     * 
+     * @param klass   - Classe de pesquisa
+     * @param pattern - uma expressao regular dos atributos que desejam ser listados
+     * @return {@link List}
+     */
+    public static List<Field> listAttributes(Class<?> klass, String pattern) {
+        List<Field> l = new ArrayList<Field>(0);
+
+        Field[] f = klass.getDeclaredFields();
+
+        Class<?> classObj = klass;
+        while (classObj.getSuperclass() != null) {
+            classObj = classObj.getSuperclass();
+            f = ArrayUtils.addAll(f, classObj.getDeclaredFields());
+        }
+
+        for (int i = 0; i < f.length; i++) {
+            if (f[i].getName().matches(pattern))
+                l.add(f[i]);
+        }
+
+        return l;
+    }
+
+    /**
+     * Verifica se determinado field existe na classe. Case Sensitive
+     * 
+     * @param klass - classe de pesquisa
+     * @param name  - nome do atributo a ser localizado
+     * @return {@link Boolean}
+     */
+    public static boolean existAttribute(Class<?> klass, String name) {
+        List<Field> listField = listAttributes(klass, name);
+        boolean exist = false;
+        for (Field fl : listField)
+            if (fl.getName().equals(name)) {
+                exist = true;
+                break;
+            }
+
+        return exist;
+    }
+
+    /**
+     * Verifica se o metodo existe na classe
+     * 
+     * @param klass - classe de pesquisa
+     * @param name  - nome do metido a ser localizado
+     * @return {@link Boolean}
+     */
+    public static boolean existMethod(Class<?> klass, String name) {
+        return existMethod(klass, name, REG_EXP_ALL);
+    }
+
+    /**
+     * Verifica se o metodo get existe na classe
+     * 
+     * @param klass - classe de pesquisa
+     * @param name  - nome do metodo get a ser localizado
+     * @return {@link Boolean}
+     */
+    public static boolean existMethodGet(Class<?> klass, String name) {
+        return existMethod(klass, name, REG_EXP_METHOD_GET);
+    }
+
+    /**
+     * Verifica se o metodo set existe na classe
+     * 
+     * @param klass - classe de pesquisa
+     * @param name  - nome do metodo set a ser localizado
+     * @return {@link Boolean}
+     */
+    public static boolean existMethodSet(Class<?> klass, String name) {
+        return existMethod(klass, name, REG_EXP_METHOD_SET);
+    }
+
+    /**
+     * Verifica se o metodo existe na classe, informando pattern
+     * 
+     * @param klass   - classe de pesquisa
+     * @param name    - nome do metodo
+     * @param pattern - expressão regular de busca
+     * @return {@link Boolean}
+     */
+    public static boolean existMethod(Class<?> klass, String name, String pattern) {
+        List<Method> listMethod = listMethods(klass, pattern);
+        boolean exist = false;
+        for (Method mt : listMethod) {
+            if (mt.getName().equals(name)) {
+                exist = true;
+                break;
+            }
+        }
+
+        return exist;
+    }
+
+    /**
+     * Verifica se existe Annotation no atributo ou metodo Get
+     * 
+     * @param klass           - Classe de pesquisa
+     * @param atributoNome    - nome do atributo
+     * @param annotationClass - annotations a ser pesquisada
+     * @return {@link Boolean}
+     */
+    public static boolean existAnnotation(Class<?> klass, String atributoNome, Class<? extends Annotation> annotationClass) {
+        List<Field> listFields = listAttributes(klass, StringUtils.isBlank(atributoNome) ? REG_EXP_ALL : atributoNome);
+        for (Field atributo : listFields)
+            if (getAnnotation(atributo, annotationClass) != null)
+                return true;
+
+        return false;
+    }
+
+    /**
+     * Verifica se existe Annotation no atributo ou metodo Get
+     * 
+     * @param atributo        - nome do atributo
+     * @param annotationClass - annotations a ser pesquisada
+     * @return {@link Boolean}
+     */
+    public static boolean existAnnotation(Field atributo, Class<? extends Annotation> annotationClass) {
+        return atributo.isAnnotationPresent(annotationClass);
+    }
+
+    /**
+     * Retorna annotation tanto do field quanto do method do tipo GET, null caso nao
+     * encontre
+     * 
+     * @param <T>             - tipo do objeto
+     * @param field           - atributo
+     * @param annotationClass - anotacao de pesquisa
+     * @return {@link Annotation}
+     */
+    public static <T extends Annotation> T getAnnotation(Field field, Class<T> annotationClass) {
+
+        if (field.isAnnotationPresent(annotationClass))
+            return field.getAnnotation(annotationClass);
+        else
+            try {
+                Method method = getMethodGet(field.getDeclaringClass(), field.getName());
+                if (method.isAnnotationPresent(annotationClass))
+                    return method.getAnnotation(annotationClass);
+
+            } catch (Exception e) {
+                return null;
+            }
+        return null;
+    }
+
+    /**
+     * 
+     * @param <T>             - tipo
+     * @param klass           - classe de pesquisa
+     * @param methodName      - nome do metodo
+     * @param annotationClass - annotation de busca
+     * @return {@link Annotation}
+     */
+    public static <T extends Annotation> T getAnnotation(Class<?> klass, String methodName, Class<T> annotationClass) {
+        try {
+            for (Method m : klass.getDeclaredMethods()) {
+                if (m.getName().equals(methodName) && m.isAnnotationPresent(annotationClass)) {
+                    return m.getAnnotation(annotationClass);
+                }
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
+    }
+
+    /**
+     * 
+     * @param klass      - classe de pesquisa
+     * @param methodName - nome do metodo
+     * @return {@link Method}
+     */
+    public static Method getMethod(Class<?> klass, String methodName) {
+        try {
+            for (Method m : klass.getDeclaredMethods()) {
+                if (m.getName().equals(methodName)) {
+                    return m;
+                }
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
+    }
+
+    /**
+     * @param obj       - objeto de pesquisa
+     * @param atributo  - nome do atributo
+     * @param objParams - parametros
+     * @return {@link Object}
+     * @throws Exception - erro ao executar método
+     */
+    public static Object executeGet(Object obj, String atributo, Object[] objParams) throws Exception {
+        Method method = getMethodGet(obj.getClass(), atributo, objParams);
+        if (!method.isAccessible()) {
+            method.setAccessible(true);
+        }
+        if (objParams == null) {
+            return method.invoke(obj, (Object[]) null);
+        }
+
+        return method.invoke(obj, objParams);
+    }
+
+    /**
+     * Invoca o metodo
+     * 
+     * @param klass  - classe de pesquisa
+     * @param metodo - nome do metodo
+     * @param params - parametros
+     * @return {@link Object}
+     * @throws Exception - erro ao executar método
+     */
+    public static Object executeStaticMethod(Class<?> klass, String metodo, Object... params) throws Exception {
+        Method[] m = klass.getDeclaredMethods();
+
+        Method mt = null;
+        for (int i = 0; i < m.length; i++) {
+            if (m[i].getName().equals(metodo)) {
+                mt = m[i];
+                break;
+            }
+        }
+
+        if (mt == null)
+            throw new Exception("Método não encontrado");
+
+        return mt.invoke(klass, params);
+    }
+
+    /**
+     * 
+     * @param obj    - objeto de pesquisa
+     * @param metodo - nome do metodo
+     * @param params - parametros
+     * @return {@link Object}
+     * @throws Exception - erro ao executar método
+     */
+    public static Object executeMethod(Object obj, String metodo, Object... params) throws Exception {
+        List<Method> lstMethods = listMethods(obj, metodo);
+
+        if (lstMethods.isEmpty())
+            throw new Exception("Consulta não retornou resultados, operação não pode ser executada.");
+        if (lstMethods.size() > 1)
+            throw new Exception("Consulta retornou mais de um método, operação não pode ser executada.");
+
+        Method method = lstMethods.get(0);
+        if (!method.isAccessible()) {
+            method.setAccessible(true);
+        }
+        return method.invoke(obj, params);
+    }
+
+    /**
+     * Retorna o metodo do tipo get do atributo
+     * 
+     * @param klass        - classe de pesquisa
+     * @param atributeName - nome do atributo
+     * @param objParams    - parametros
+     * @return {@link Method}
+     * @throws Exception - erro ao executar método
+     */
+    public static Method getMethodGet(Class<?> klass, String atributeName, Object... objParams) throws Exception {
+        String nomeGetter = "get" + StringUtils.capitalize(atributeName);
+        Method method = null;
+        Class<?>[] tipos = null;
+        try {
+            if (objParams != null) {
+                int tam = 0;
+                for (int i = 0; i < objParams.length; i++) {
+                    if (objParams[i] != null)
+                        tam++;
+                }
+                if (tam > 0) {
+                    tipos = new Class[tam];
+                    for (int i = 0; i < objParams.length; i++) {
+                        if (objParams[i] != null)
+                            tipos[i] = objParams[i].getClass();
+                    }
+                }
+            }
+
+            do {
+                method = klass.getMethod(nomeGetter, tipos);
+                klass = klass.getSuperclass();
+            } while (klass.getSuperclass() != null && method == null);
+
+            return method;
 
         } catch (Exception e) {
-        	throw e;
+            throw e;
         }
-	}
-	
-	/**
-	 * 
-	 * @param klass - classe de pesquisa
-	 * @param methodName - nome do metodo
-	 * @param objParams - parametros
-	 * @return {@link Method}
-	 * @throws Exception - erro ao executar método
-	 */
-	public static Method getMethod(Class<?> klass, String methodName, Object... objParams) throws Exception{
-		Method method = null;
-		Class<?>[] tipos = null;
-		try {
-        	if (objParams != null){
-        		int tam = 0;
-        		for (int i=0; i< objParams.length; i++) {
-        			if(objParams[i] != null)
-        				tam++;
-        		}
-        		if(tam > 0){
-        			tipos = new Class[tam];
-        			for (int i=0; i< objParams.length; i++) {
-        				if(objParams[i] != null)
-        					tipos[i] = objParams[i].getClass();
-        			}
-        		}
-        	}
+    }
 
-        	do{
-        		method = klass.getMethod(methodName, tipos);
-        		klass = klass.getSuperclass();
-        	}while(klass.getSuperclass() != null && method == null);
+    /**
+     * 
+     * @param klass      - classe de pesquisa
+     * @param methodName - nome do metodo
+     * @param objParams  - parametros
+     * @return {@link Method}
+     * @throws Exception - erro ao executar método
+     */
+    public static Method getMethod(Class<?> klass, String methodName, Object... objParams) throws Exception {
+        Method method = null;
+        Class<?>[] tipos = null;
+        try {
+            if (objParams != null) {
+                int tam = 0;
+                for (int i = 0; i < objParams.length; i++) {
+                    if (objParams[i] != null)
+                        tam++;
+                }
+                if (tam > 0) {
+                    tipos = new Class[tam];
+                    for (int i = 0; i < objParams.length; i++) {
+                        if (objParams[i] != null)
+                            tipos[i] = objParams[i].getClass();
+                    }
+                }
+            }
 
-        	return method;
+            do {
+                method = klass.getMethod(methodName, tipos);
+                klass = klass.getSuperclass();
+            } while (klass.getSuperclass() != null && method == null);
+
+            return method;
 
         } catch (Exception e) {
-        	throw e;
+            throw e;
         }
-	}
+    }
 
-	/**
-	 * Invoca um metodo getXxxxx() para o objeto sem passar parametros.
-	 * @param obj - o objeto cujo metodo get sera chamado
-	 * @param atributo - o nome do atributo que identifica qual getter chamar
-	 * @return {@link Object}
-	 * @throws Exception - erro ao executar método
-	 */
-	public static Object executeGet(Object obj, String atributo) throws Exception {
-	    return executeGet(obj, atributo, null);
-	}
+    /**
+     * Invoca um metodo getXxxxx() para o objeto sem passar parametros.
+     * 
+     * @param obj      - o objeto cujo metodo get sera chamado
+     * @param atributo - o nome do atributo que identifica qual getter chamar
+     * @return {@link Object}
+     * @throws Exception - erro ao executar método
+     */
+    public static Object executeGet(Object obj, String atributo) throws Exception {
+        return executeGet(obj, atributo, null);
+    }
 
-	/**
-	 * Invoca o metodo setXxxx para o objeto e atributo informados.
-	 * @param obj - o objeto a invocar o metodo set
-	 * @param atributo - o atributo cujo metodo set será invocado
-	 * @param objParams - um array de objetos com os parametros do setter
-	 * @return {@link Object}
-	 * @throws Exception - erro ao executar método
-	 */
-	public static Object executeSet(Object obj, String atributo, Object... objParams) throws Exception {
-		String nomeSetter = "set" + StringUtils.capitalize(atributo);
+    /**
+     * Invoca o metodo setXxxx para o objeto e atributo informados.
+     * 
+     * @param obj       - o objeto a invocar o metodo set
+     * @param atributo  - o atributo cujo metodo set será invocado
+     * @param objParams - um array de objetos com os parametros do setter
+     * @return {@link Object}
+     * @throws Exception - erro ao executar método
+     */
+    public static Object executeSet(Object obj, String atributo, Object... objParams) throws Exception {
+        String nomeSetter = "set" + StringUtils.capitalize(atributo);
 
-		boolean paramIsNull = true;
-		
-		if(objParams != null){
-			for(Object oAux : objParams)
-				if(oAux != null)
-					oAux = false;
-		}
-		
-		if (paramIsNull)
-			return executeMethod(obj, nomeSetter, objParams);
+        boolean paramIsNull = true;
 
-		Class<?>[] tipos = new Class[objParams.length];
-		for (int i=0; i< objParams.length; i++) {
-			tipos[i] = objParams[i].getClass();
-		}
-		Method method = obj.getClass().getMethod(nomeSetter, tipos);
-		
-		if(!method.isAccessible()){
-			method.setAccessible(true);
-		}
-		return method.invoke(obj, objParams);
-	}
-	
-	
-	/**
-	 * @param obj - objeto
-	 * @param nomePropriedade - nome da propriedade cujo valor deve ser recuperado
-	 * @return {@link Object}
-	 * @throws Exception - erro ao executar método
-	 */
-	
-	public static Object executeGetCascade(Object obj, String nomePropriedade) throws Exception {
-		Object result = null;
-		Class<?> classe;
-		
-		// se objeto for nulo, valor é nulo
-		if (obj != null)
-			classe = obj.getClass();
-		else
-			return null;
-		
-		String metodo = new String();
-		String propriedade = new String(nomePropriedade);
-		
-		// verificando necessidade de chamadas recursivas
-		boolean rec = false;                        
-		if (propriedade.indexOf('.') > 0) { // se encontrou ponto vai precisar de recursao
-			rec = true;
-			metodo = propriedade.substring(0, propriedade.indexOf('.')); // parte 1: nome da propriedade que guarda o objeto
-			propriedade = propriedade.substring(propriedade.indexOf('.') + 1); // parte 2: o que vem depois do ponto
-		} else 
-			metodo = nomePropriedade;            
-		
-		// procedimento normal
-		metodo = "get" + metodo.substring(0,1).toUpperCase() + metodo.substring(1); // getter
-		Method met = classe.getMethod(metodo, (Class[])null);
-		
-		if(!met.isAccessible()){
-			met.setAccessible(true);
-		}
-		
-		result = met.invoke(obj, (Object[])null);
-		
-		return rec ? executeGetCascade(result, propriedade) : result;
-	}
-	
-	/**
-	 * Recupera a classe utilizando Reflection.
-	 * 
-	 * @param className - String contendo o nome completo da Classe incluindo o pacote
-	 * @return {@link Class}
-	 * @throws ClassNotFoundException - erro ao localizar classe
-	 */
-	public static Class<?> classForName(String className) throws ClassNotFoundException {
+        if (objParams != null) {
+            for (Object oAux : objParams)
+                if (oAux != null)
+                    oAux = false;
+        }
+
+        if (paramIsNull)
+            return executeMethod(obj, nomeSetter, objParams);
+
+        Class<?>[] tipos = new Class[objParams.length];
+        for (int i = 0; i < objParams.length; i++) {
+            tipos[i] = objParams[i].getClass();
+        }
+        Method method = obj.getClass().getMethod(nomeSetter, tipos);
+
+        if (!method.isAccessible()) {
+            method.setAccessible(true);
+        }
+        return method.invoke(obj, objParams);
+    }
+
+    /**
+     * @param obj             - objeto
+     * @param nomePropriedade - nome da propriedade cujo valor deve ser recuperado
+     * @return {@link Object}
+     * @throws Exception - erro ao executar método
+     */
+
+    public static Object executeGetCascade(Object obj, String nomePropriedade) throws Exception {
+        Object result = null;
+        Class<?> classe;
+
+        // se objeto for nulo, valor é nulo
+        if (obj != null)
+            classe = obj.getClass();
+        else
+            return null;
+
+        String metodo = new String();
+        String propriedade = new String(nomePropriedade);
+
+        // verificando necessidade de chamadas recursivas
+        boolean rec = false;
+        if (propriedade.indexOf('.') > 0) { // se encontrou ponto vai precisar de recursao
+            rec = true;
+            metodo = propriedade.substring(0, propriedade.indexOf('.')); // parte 1: nome da propriedade que guarda o objeto
+            propriedade = propriedade.substring(propriedade.indexOf('.') + 1); // parte 2: o que vem depois do ponto
+        } else
+            metodo = nomePropriedade;
+
+        // procedimento normal
+        metodo = "get" + metodo.substring(0, 1).toUpperCase() + metodo.substring(1); // getter
+        Method met = classe.getMethod(metodo, (Class[]) null);
+
+        if (!met.isAccessible()) {
+            met.setAccessible(true);
+        }
+
+        result = met.invoke(obj, (Object[]) null);
+
+        return rec ? executeGetCascade(result, propriedade) : result;
+    }
+
+    /**
+     * Recupera a classe utilizando Reflection.
+     * 
+     * @param className - String contendo o nome completo da Classe incluindo o
+     *                  pacote
+     * @return {@link Class}
+     * @throws ClassNotFoundException - erro ao localizar classe
+     */
+    public static Class<?> classForName(String className) throws ClassNotFoundException {
         try {
             return Class.forName(className);
         } catch (ClassNotFoundException cnfe) {
@@ -614,335 +651,403 @@ public final class ReflectionUtil {
             }
         }
     }
-	
-	/**
-	 * Responsavel por atribuir os novos valores ao campos
-	 * se for do tipo String, Double, Float, Integer ou primitivo retorna a junção ou soma dos valores
-	 * @param field - campo que será 
-	 * @param obj - objeto primário
-	 * @param obj2 - objeto secundário
-	 * @return {@link Object}
-	 */
-	private static Object concatValue(Field field, Object obj, Object obj2) throws Exception{
-		Object val1 = null, val2 = null;
 
-		val1 = executeGet(obj, field.getName());
-		val2 = executeGet(obj2, field.getName());
-		
-		if(val1 == null)
-			return val2;
-		else if (val2 == null)
-			return val1;
-		
-		if(field.getType().equals (String.class)){
-			return ((String) val1) + ((String)val2);
-		}else if(field.getType().equals(Long.class) || field.getType().equals(long.class)){			
-			return ((Long) val1) + ((Long)val2);
-		}else if(field.getType().equals(Float.class) || field.getType().equals(float.class)){
-			return ((Float) val1) + ((Float)val2);
-		}else if(field.getType().equals(Double.class) || field.getType().equals(double.class)){
-			return ((Double) val1) + ((Double)val2);
-		}else if(field.getType().equals(Integer.class) || field.getType().equals(int.class)){
-			return ((Integer) val1) + ((Integer)val2);
-		}else{
-			return val1.toString() + val2.toString();
-		}
-	}
-	
-	/**
-	 * Soma ou junta os valores dos campos do objeto
-	 * @param obj - objeto primário
-	 * @param obj2 - objeto secundário
-	 * @param fieldOff - campos que nao serao concatenados
-	 */
-	
-	public static <T>  T concatObject(T obj, T obj2, String... fieldOff) throws Exception{
-		if(obj == null)
-			obj = obj2;
-		else if (obj2 != null)
-			for(Field field :listAttributes(obj.getClass(), REG_EXP_ALL)){				
-				boolean concatena = true;
-				for(int i = 0; i < fieldOff.length ; i++){
-					if(field.getName().equalsIgnoreCase(fieldOff[i])){
-						concatena = false;
-						break;
-					}
-				}
-				if(concatena){
-					Object novoValor = concatValue(field, obj, obj2);
-					if(novoValor != null)
-						executeSet(obj, field.getName(), novoValor);
-				}
-			}
-		
-		return obj;
-	}
-	
-	/**
-	 * Instancia novo objeto com os valores do Map
-	 * @param obj - objeto
-	 * @param fieldValue - atributo com valor
-	 * @return {@link Object}
-	 * @throws Exception  - erro ao instânciar objeto
-	 */
-	public static Object instanceObject(Object obj, Map<String, Object> fieldValue) throws Exception{
-		for(String atributo : fieldValue.keySet()){
-			if(fieldValue.get(atributo) == null)
-				continue;
-			
-			try {
-				executeSet(obj, atributo, fieldValue.get(atributo));
-			} catch (Exception e) {
-				if(fieldValue.get(atributo).getClass().equals(Long.class) || fieldValue.get(atributo).getClass().equals(long.class)){			
-					executeSet(obj, atributo, Long.parseLong(String.valueOf(fieldValue.get(atributo))));
-				}else if(fieldValue.get(atributo).getClass().equals(Float.class) || fieldValue.get(atributo).getClass().equals(float.class)){
-					executeSet(obj, atributo, Float.parseFloat(String.valueOf(fieldValue.get(atributo))));
-				}else if(fieldValue.get(atributo).getClass().equals(Double.class) || fieldValue.get(atributo).getClass().equals(double.class)){
-					executeSet(obj, atributo, Double.parseDouble(String.valueOf(fieldValue.get(atributo))));
-				}else if(fieldValue.get(atributo).getClass().equals(Integer.class) || fieldValue.get(atributo).getClass().equals(int.class))
-					executeSet(obj, atributo, Integer.parseInt(String.valueOf(fieldValue.get(atributo))));
-			}
-		}
-		return obj;
-	}
-	
-	/**
-	 * Compara as classes, inclusive interface
-	 * @param class1 - classe primária
-	 * @param class2 - classe secundária
-	 * @return {@link Boolean}
-	 */
-	public static boolean compareClass(Class<?> class1, Class<?> class2){
-		if(class1.equals(class2))
-			return true;
-		
-		Class<?> klassAux = class1;
-		while (klassAux.getSuperclass() != null) {
-			klassAux = klassAux.getSuperclass();
-			if(klassAux.equals(class2))
-				return true;
-		}
-		
-		for(Class<?> cAux : class1.getInterfaces()){
-			if(cAux.equals(class2))
-				return true;
-		}
-		
-		return false;
-	}
-	/**
-	 * 
-	 * @param obj - objeto
-	 * @param field - atributo
-	 * @param value - valor
-	 * @throws IllegalAccessException - erro ao acessar valor
-	 * @throws IllegalArgumentException - erro ao setar valor
-	 * 
-	 */
-	public static void setFieldValue(Object obj, Field field, Object value) throws IllegalArgumentException, IllegalAccessException{
-			field.setAccessible(true);
-			field.set(obj, value);
-	}
-	/**
-	 * 
-	 * @param obj - objeto
-	 * @param fieldName - nome atrivuto
-	 * @param value - valor
-	 * @throws IllegalAccessException 
-	 * @throws IllegalArgumentException 
-	 */
-	public static void setFieldValue(Object obj, String fieldName, Object value) throws IllegalArgumentException, IllegalAccessException{
-		List<Field> lFld = listAttributes(obj.getClass(), fieldName);
-		if(lFld.size() == 1){
-			Field fld = lFld.get(0);
-			fld.setAccessible(true);
-			fld.set(obj, value);
-		}
-	}
-	/**
-	 * 
-	 * @param klass - classe de pesquisa
-	 * @param name - nome do atributo
-	 * @return {@link Field}
-	 */
-	public static Field getAttribute(Class<?> klass, String name){
-		List<Field> lFld = listAttributes(klass, name);
-		
-		for(Field fld: lFld){
-			if(fld.getName().equals(name)){
-				return fld;
-			}
-		}
-		
-		return null;
-	}	
-				
-	/**
-	 * Verifica se a classe e um wrapper para o tipo primitivo
-	 * @param klass - classe de pesquisa
-	 * @return {@link Boolean}
-	 */
-	public static boolean isPrimitive(Class<?> klass){
-		return klass.isPrimitive()
-				|| klass.equals(java.lang.String.class)
-				|| klass.equals(Long.class)
-				|| klass.equals(Integer.class)
-				|| klass.equals(Short.class)
-				|| klass.equals(Double.class)
-				|| klass.equals(Number.class)
-				|| klass.equals(Float.class)
-				|| klass.equals(BigInteger.class)
-				|| klass.equals(Boolean.class)
-				|| klass.equals(Character.class);
-	}
-	
-	/**
-	 * Verifica se o atributo da classe é do tipo primitivo
-	 * @param klass - classe de pesquisa
-	 * @param name - nome do atributo
-	 * @return {@link Boolean}
-	 */
-	public static boolean isPrimitiveField(Class<?> klass, String name) {
-		Field field = getAttribute(klass, name);
-		return isPrimitive(field.getType());
-	}
-	
-	/**
-	 * Verifica se é instancia de Collection, List, ou Set
-	 * @param klass - classe de pesquisa
-	 * @return {@link Boolean}
-	 */
-	public static boolean isCollection(Class<?> klass){
-		//return klass.isAssignableFrom(Collection.class) || klass.isAssignableFrom(List.class) || klass.isAssignableFrom(Set.class);
-		return Collection.class.isAssignableFrom(klass);
-	}
-	
-	/**
-	 * 
-	 * @param obj - objeto
-	 * @param field - atributo
-	 * @return T
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getAttributteValue(Object obj, Field field){
-		field.setAccessible(true);
-		try {
-			return (T) field.get(obj);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	/**
-	 * Retorna valor do atributo, verifica o objeto recursivamente.
-	 * Ex: campo.campo1.campo2 - retorna o valor do campo2 da hierarquia de objetos
-	 * Retorna null se null ou não encontrado 
-	 * 
-	 * @param obj - ojeto
-	 * @param field - atributo
-	 * @return T
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getAttributteValue(Object obj, String field){
-		try{
-			if(obj == null || StringUtils.isBlank(field)){
-				return null;
-			}
-			if(field.contains(".")){
-				String[] listFields = field.split("\\.");
-				Object objValue = obj;
-				for(String fld: listFields){
-					objValue = executeGet(objValue, fld);
-					if(objValue == null){
-						return null;
-					}
-				}
-				return (T) objValue;
-			}else{
-				return (T) executeGet(obj, field);
-			}
-		}catch (Exception e) {
-			return null;
-		}
-	}
-	
-	/**
-	 * Ref: https://rationaleemotions.wordpress.com/2016/05/27/changing-annotation-values-at-runtime/
-	 * @param klass - classe de pesquisa
-	 * @param annotationToAlter - annotation a ser alterada
-	 * @param newAnnotation - nova annotation
-	 * @throws Exception - erro ao alterar annotation
-	 */
-	@SuppressWarnings("unchecked")
-	public static void changeAnnotation(Class<?> klass, Class<? extends Annotation> annotationToAlter, Annotation newAnnotation) throws Exception{
-	
-		//JAVA 7
-		/*
-		 Field annotations = Class.class.getDeclaredField("annotations");
-         annotations.setAccessible(true);
-         Map<Class<? extends Annotation>, Annotation> map =
-             (Map<Class<? extends Annotation>, Annotation>) annotations.get(clazzToLookFor);
-         map.put(annotationToAlter, annotationValue);
-		 */
-		//InvocationHandler ih = Proxy.getInvocationHandler(linkResource);
-		//JAVA 8
-		Method method = Class.class.getDeclaredMethod("annotationData");
-		method.setAccessible(true);
-		Object annotationData = method.invoke(klass);
-		Field annotations = annotationData.getClass().getDeclaredField("declaredAnnotations");
-		annotations.setAccessible(true);
+    /**
+     * Responsavel por atribuir os novos valores ao campos se for do tipo String,
+     * Double, Float, Integer ou primitivo retorna a junção ou soma dos valores
+     * 
+     * @param field - campo que será
+     * @param obj   - objeto primário
+     * @param obj2  - objeto secundário
+     * @return {@link Object}
+     */
+    private static Object concatValue(Field field, Object obj, Object obj2) throws Exception {
+        Object val1 = null, val2 = null;
 
-		Map<Class<? extends Annotation>, Annotation> map = (Map<Class<? extends Annotation>, Annotation>) annotations.get(annotationData);
-		map.put(annotationToAlter, newAnnotation);
-	}
-	
-	/**
-	 * Seta o valor para nulo, com cascade (quando encontra ".")
-	 * @param obj - objeto
-	 * @param listAttributeName - lista de atributos
-	 * @throws IllegalAccessException - erro ao acessar valor
-	 * @throws IllegalArgumentException - erro ao setar valor
-	 */
-	public static void setValueToNullCascade(Object obj, String... listAttributeName) throws IllegalArgumentException, IllegalAccessException{
-		if(obj != null){
-			List<Field> listField = listAttributes(obj);
-			for(String attrName : listAttributeName){
-				if(attrName.contains(".")){
-					setValueToNullCascade(getAttributteValue(obj, attrName.substring(0, attrName.indexOf("."))), attrName.substring(attrName.indexOf(".") + 1));
-				}else{
-					for(Field fld : listField){
-						if(fld.getName().equals(attrName)){
-							fld.setAccessible(true);
-							fld.set(obj, null);
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 * Extraido da biblioteca resteasy
-	 * @author Jurandir C. Gonçalves
-	 * @since 26/10/2019
-	 *
-	 * @param <T>
-	 * @param searchList
-	 * @param annotation
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T findAnnotation(Annotation[] searchList, Class<T> annotation)
-	{
-		if (searchList == null) return null;
-		for (Annotation ann : searchList)
-		{
-			if (ann.annotationType().equals(annotation))
-			{
-				return (T) ann;
-			}
-		}
-		return null;
-	}
-	
+        val1 = executeGet(obj, field.getName());
+        val2 = executeGet(obj2, field.getName());
+
+        if (val1 == null)
+            return val2;
+        else if (val2 == null)
+            return val1;
+
+        if (field.getType().equals(String.class)) {
+            return ((String) val1) + ((String) val2);
+        } else if (field.getType().equals(Long.class) || field.getType().equals(long.class)) {
+            return ((Long) val1) + ((Long) val2);
+        } else if (field.getType().equals(Float.class) || field.getType().equals(float.class)) {
+            return ((Float) val1) + ((Float) val2);
+        } else if (field.getType().equals(Double.class) || field.getType().equals(double.class)) {
+            return ((Double) val1) + ((Double) val2);
+        } else if (field.getType().equals(Integer.class) || field.getType().equals(int.class)) {
+            return ((Integer) val1) + ((Integer) val2);
+        } else {
+            return val1.toString() + val2.toString();
+        }
+    }
+
+    /**
+     * Soma ou junta os valores dos campos do objeto
+     * 
+     * @param obj      - objeto primário
+     * @param obj2     - objeto secundário
+     * @param fieldOff - campos que nao serao concatenados
+     */
+
+    public static <T> T concatObject(T obj, T obj2, String... fieldOff) throws Exception {
+        if (obj == null)
+            obj = obj2;
+        else if (obj2 != null)
+            for (Field field : listAttributes(obj.getClass(), REG_EXP_ALL)) {
+                boolean concatena = true;
+                for (int i = 0; i < fieldOff.length; i++) {
+                    if (field.getName().equalsIgnoreCase(fieldOff[i])) {
+                        concatena = false;
+                        break;
+                    }
+                }
+                if (concatena) {
+                    Object novoValor = concatValue(field, obj, obj2);
+                    if (novoValor != null)
+                        executeSet(obj, field.getName(), novoValor);
+                }
+            }
+
+        return obj;
+    }
+
+    /**
+     * Instancia novo objeto com os valores do Map
+     * 
+     * @param obj        - objeto
+     * @param fieldValue - atributo com valor
+     * @return {@link Object}
+     * @throws Exception - erro ao instânciar objeto
+     */
+    public static Object instanceObject(Object obj, Map<String, Object> fieldValue) throws Exception {
+        for (String atributo : fieldValue.keySet()) {
+            if (fieldValue.get(atributo) == null)
+                continue;
+
+            try {
+                executeSet(obj, atributo, fieldValue.get(atributo));
+            } catch (Exception e) {
+                if (fieldValue.get(atributo).getClass().equals(Long.class) || fieldValue.get(atributo).getClass().equals(long.class)) {
+                    executeSet(obj, atributo, Long.parseLong(String.valueOf(fieldValue.get(atributo))));
+                } else if (fieldValue.get(atributo).getClass().equals(Float.class)
+                    || fieldValue.get(atributo).getClass().equals(float.class)) {
+                    executeSet(obj, atributo, Float.parseFloat(String.valueOf(fieldValue.get(atributo))));
+                } else if (fieldValue.get(atributo).getClass().equals(Double.class)
+                    || fieldValue.get(atributo).getClass().equals(double.class)) {
+                    executeSet(obj, atributo, Double.parseDouble(String.valueOf(fieldValue.get(atributo))));
+                } else if (fieldValue.get(atributo).getClass().equals(Integer.class)
+                    || fieldValue.get(atributo).getClass().equals(int.class))
+                    executeSet(obj, atributo, Integer.parseInt(String.valueOf(fieldValue.get(atributo))));
+            }
+        }
+        return obj;
+    }
+
+    /**
+     * Compara as classes, inclusive interface
+     * 
+     * @param class1 - classe primária
+     * @param class2 - classe secundária
+     * @return {@link Boolean}
+     */
+    public static boolean compareClass(Class<?> class1, Class<?> class2) {
+        if (class1.equals(class2))
+            return true;
+
+        Class<?> klassAux = class1;
+        while (klassAux.getSuperclass() != null) {
+            klassAux = klassAux.getSuperclass();
+            if (klassAux.equals(class2))
+                return true;
+        }
+
+        for (Class<?> cAux : class1.getInterfaces()) {
+            if (cAux.equals(class2))
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 
+     * @param obj   - objeto
+     * @param field - atributo
+     * @param value - valor
+     * @throws IllegalAccessException   - erro ao acessar valor
+     * @throws IllegalArgumentException - erro ao setar valor
+     * 
+     */
+    public static void setFieldValue(Object obj, Field field, Object value) throws IllegalArgumentException, IllegalAccessException {
+        field.setAccessible(true);
+        field.set(obj, value);
+    }
+
+    /**
+     * 
+     * @param obj       - objeto
+     * @param fieldName - nome atrivuto
+     * @param value     - valor
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     */
+    public static void setFieldValue(Object obj, String fieldName, Object value) throws IllegalArgumentException, IllegalAccessException {
+        List<Field> lFld = listAttributes(obj.getClass(), fieldName);
+        if (lFld.size() == 1) {
+            Field fld = lFld.get(0);
+            fld.setAccessible(true);
+            fld.set(obj, value);
+        }
+    }
+
+    /**
+     * 
+     * @param klass - classe de pesquisa
+     * @param name  - nome do atributo
+     * @return {@link Field}
+     */
+    public static Field getAttribute(Class<?> klass, String name) {
+        List<Field> lFld = listAttributes(klass, name);
+
+        for (Field fld : lFld) {
+            if (fld.getName().equals(name)) {
+                return fld;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Verifica se a classe e um wrapper para o tipo primitivo
+     * 
+     * @param klass - classe de pesquisa
+     * @return {@link Boolean}
+     */
+    public static boolean isPrimitive(Class<?> klass) {
+        return klass.isPrimitive()
+            || klass.equals(java.lang.String.class)
+            || klass.equals(Long.class)
+            || klass.equals(Integer.class)
+            || klass.equals(Short.class)
+            || klass.equals(Double.class)
+            || klass.equals(Number.class)
+            || klass.equals(Float.class)
+            || klass.equals(BigInteger.class)
+            || klass.equals(Boolean.class)
+            || klass.equals(Character.class);
+    }
+
+    /**
+     * Verifica se o atributo da classe é do tipo primitivo
+     * 
+     * @param klass - classe de pesquisa
+     * @param name  - nome do atributo
+     * @return {@link Boolean}
+     */
+    public static boolean isPrimitiveField(Class<?> klass, String name) {
+        Field field = getAttribute(klass, name);
+        return isPrimitive(field.getType());
+    }
+
+    /**
+     * Verifica se é instancia de Collection, List, ou Set
+     * 
+     * @param klass - classe de pesquisa
+     * @return {@link Boolean}
+     */
+    public static boolean isCollection(Class<?> klass) {
+        // return klass.isAssignableFrom(Collection.class) ||
+        // klass.isAssignableFrom(List.class) || klass.isAssignableFrom(Set.class);
+        return Collection.class.isAssignableFrom(klass);
+    }
+
+    /**
+     * 
+     * @param obj   - objeto
+     * @param field - atributo
+     * @return T
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getAttributteValue(Object obj, Field field) {
+        field.setAccessible(true);
+        try {
+            return (T) field.get(obj);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Retorna valor do atributo, verifica o objeto recursivamente. Ex:
+     * campo.campo1.campo2 - retorna o valor do campo2 da hierarquia de objetos
+     * Retorna null se null ou não encontrado
+     * 
+     * @param obj   - ojeto
+     * @param field - atributo
+     * @return T
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getAttributteValue(Object obj, String field) {
+        try {
+            if (obj == null || StringUtils.isBlank(field)) {
+                return null;
+            }
+            if (field.contains(".")) {
+                String[] listFields = field.split("\\.");
+                Object objValue = obj;
+                for (String fld : listFields) {
+                    objValue = executeGet(objValue, fld);
+                    if (objValue == null) {
+                        return null;
+                    }
+                }
+                return (T) objValue;
+            } else {
+                return (T) executeGet(obj, field);
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Ref:
+     * https://rationaleemotions.wordpress.com/2016/05/27/changing-annotation-values-at-runtime/
+     * 
+     * @param klass             - classe de pesquisa
+     * @param annotationToAlter - annotation a ser alterada
+     * @param newAnnotation     - nova annotation
+     * @throws Exception - erro ao alterar annotation
+     */
+    @SuppressWarnings("unchecked")
+    public static void changeAnnotation(Class<?> klass, Class<? extends Annotation> annotationToAlter, Annotation newAnnotation)
+        throws Exception {
+
+        // JAVA 7
+        /*
+         * Field annotations = Class.class.getDeclaredField("annotations");
+         * annotations.setAccessible(true); Map<Class<? extends Annotation>, Annotation>
+         * map = (Map<Class<? extends Annotation>, Annotation>)
+         * annotations.get(clazzToLookFor); map.put(annotationToAlter, annotationValue);
+         */
+        // InvocationHandler ih = Proxy.getInvocationHandler(linkResource);
+        // JAVA 8
+        Method method = Class.class.getDeclaredMethod("annotationData");
+        method.setAccessible(true);
+        Object annotationData = method.invoke(klass);
+        Field annotations = annotationData.getClass().getDeclaredField("declaredAnnotations");
+        annotations.setAccessible(true);
+
+        Map<Class<? extends Annotation>, Annotation> map = (Map<Class<? extends Annotation>, Annotation>) annotations.get(annotationData);
+        map.put(annotationToAlter, newAnnotation);
+    }
+
+    /**
+     * Seta o valor para nulo, com cascade (quando encontra ".")
+     * 
+     * @param obj               - objeto
+     * @param listAttributeName - lista de atributos
+     * @throws IllegalAccessException   - erro ao acessar valor
+     * @throws IllegalArgumentException - erro ao setar valor
+     */
+    public static void setValueToNullCascade(Object obj, String... listAttributeName)
+        throws IllegalArgumentException, IllegalAccessException {
+        if (obj != null) {
+            List<Field> listField = listAttributes(obj);
+            for (String attrName : listAttributeName) {
+                if (attrName.contains(".")) {
+                    setValueToNullCascade(getAttributteValue(obj, attrName.substring(0, attrName.indexOf("."))),
+                        attrName.substring(attrName.indexOf(".") + 1));
+                } else {
+                    for (Field fld : listField) {
+                        if (fld.getName().equals(attrName)) {
+                            fld.setAccessible(true);
+                            fld.set(obj, null);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     * Extraido da biblioteca resteasy
+     * 
+     * @author Jurandir C. Gonçalves
+     * @since 26/10/2019
+     *
+     * @param <T>
+     * @param searchList
+     * @param annotation
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T findAnnotation(Annotation[] searchList, Class<T> annotation) {
+        if (searchList == null)
+            return null;
+        for (Annotation ann : searchList) {
+            if (ann.annotationType().equals(annotation)) {
+                return (T) ann;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves
+     * @since 17/11/2019
+     *
+     * @param type
+     * @param position
+     * @return
+     */
+    public static Class<?> returnParameterType(Type type, int position) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType aType = (ParameterizedType) type;
+            Type fieldArgTypes = aType.getActualTypeArguments()[position];
+            if (fieldArgTypes != null) {
+                return (Class<?>) fieldArgTypes;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Obtem instancia mesmo que a classe esteja marcada como protected
+     * @author Jurandir C. Gonçalves
+     * @since 17/11/2019
+     *
+     * @param <E>
+     * @param klass
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> E getInstance(Class<E> klass)
+        throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        Constructor<?>[] ctors = klass.getDeclaredConstructors();
+        Constructor<?> ctor = null;
+        for (int i = 0; i < ctors.length; i++) {
+            ctor = ctors[i];
+            if (ctor.getGenericParameterTypes().length == 0) {
+                break;
+            }
+        }
+
+        ctor.setAccessible(true);
+        return (E) ctor.newInstance();
+    }
+
 }

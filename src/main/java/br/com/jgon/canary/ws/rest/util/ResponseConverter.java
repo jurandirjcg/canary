@@ -13,15 +13,11 @@
  */
 package br.com.jgon.canary.ws.rest.util;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.MessageSeverity;
@@ -37,8 +33,6 @@ import br.com.jgon.canary.util.ReflectionUtil;
  */
 public abstract class ResponseConverter<O> {
 
-    private Logger LOGGER = LoggerFactory.getLogger(ResponseConverter.class);
-
     public ResponseConverter() {
 
     }
@@ -46,7 +40,7 @@ public abstract class ResponseConverter<O> {
     @SuppressWarnings("unchecked")
     public <N extends ResponseConverter<O>> N converter(O obj) {
         try {
-            N ret = (N) getInstance(this.getClass());
+            N ret = (N) ReflectionUtil.getInstance(this.getClass());
 
             List<Field> thisFields = ReflectionUtil.listAttributes(this.getClass());
             boolean isResponseConverterType = false;
@@ -77,8 +71,7 @@ public abstract class ResponseConverter<O> {
 
             return ret;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.response-converter");
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.response-converter", e);
         }
     }
 
@@ -90,27 +83,10 @@ public abstract class ResponseConverter<O> {
         }
 
         ResponseConverter<E> ret;
-        ret = (ResponseConverter<E>) getInstance(returnClass);
+        ret = (ResponseConverter<E>) ReflectionUtil.getInstance(returnClass);
         ret.converter(value);
 
         return ret;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <E> E getInstance(Class<E> klass)
-        throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        Constructor<?>[] ctors = klass.getDeclaredConstructors();
-        Constructor<?> ctor = null;
-        for (int i = 0; i < ctors.length; i++) {
-            ctor = ctors[i];
-            if (ctor.getGenericParameterTypes().length == 0) {
-                break;
-            }
-        }
-
-        ctor.setAccessible(true);
-        return (E) ctor.newInstance();
-
     }
 
     /**
@@ -145,5 +121,25 @@ public abstract class ResponseConverter<O> {
         pRetorno.setElements(this.converter(paginacao.getElements()));
 
         return pRetorno;
+    }
+    
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir> - Zion Mountain
+     * @since 17/11/2019
+     *
+     * @param <T>
+     * @param <O>
+     * @param returnType
+     * @param obj
+     * @return
+     */
+    public static <T extends ResponseConverter<O>, O> T converter(Class<T> returnType, O obj) {
+        try {
+            T returnAux = ReflectionUtil.getInstance(returnType);
+            return returnAux.converter(obj);
+        } catch (Exception e) {
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.response-converter", e);
+        }
     }
 }

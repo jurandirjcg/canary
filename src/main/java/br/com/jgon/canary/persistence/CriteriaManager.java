@@ -538,7 +538,7 @@ class CriteriaManager<T> {
 
         for (Field field : listFields) {
             // Verifiando se o metodo não é transiente
-            if (checkField(field) && !ReflectionUtil.existAnnotation(field, Transient.class)) {
+            if (checkField(field) && !ReflectionUtil.existAnnotation(field, Transient.class) && !Modifier.isTransient(field.getModifiers())) {
                 field.setAccessible(true);
 
                 attributeName = StringUtils.isBlank(attributeParent) ? field.getName()
@@ -950,7 +950,7 @@ class CriteriaManager<T> {
 
         for (Field field : listFields) {
             // Verificando se o metodo não é transiente
-            if (checkField(field) && !ReflectionUtil.existAnnotation(field, Transient.class)) {
+            if (checkField(field) && !ReflectionUtil.existAnnotation(field, Transient.class) && !Modifier.isTransient(field.getModifiers())) {
                 field.setAccessible(true);
 
                 attributeName = StringUtils.isBlank(attributeParent) ? field.getName()

@@ -34,6 +34,7 @@ import br.com.jgon.canary.util.ReflectionUtil;
 import br.com.jgon.canary.ws.rest.link.LinkPaginate;
 import br.com.jgon.canary.ws.rest.link.LinkResource;
 import br.com.jgon.canary.ws.rest.link.LinkResources;
+
 /**
  * Intercepta a requisicao para tratamento dos campos
  * 
@@ -42,148 +43,165 @@ import br.com.jgon.canary.ws.rest.link.LinkResources;
  * @version 1.0
  *
  */
-public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFieldParam>{
-	
-	private Class<?> returnType;
-	private String[] forceFields;
-	
-	private static final String REGEX_PATH_PARAMETERS = "(\\#|\\$)\\{[a-z-A-Z\\.]+\\}";
-	private static final String REGEX_REPLACE_PARAM = "\\#|\\$|\\{|\\}";
-	
-	@Context
-	private ResourceInfo resourceInfo;
-	
-	@Override
-	public void setAnnotations(Annotation[] annotations) {
-		WSParamFormat wsParamFormat = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class);
-		
-		returnType = wsParamFormat.value();
-		forceFields = wsParamFormat.forceFields();
-	}
+public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFieldParam> {
 
-	@Override
-	public WSFieldParam fromString(String str) {
-		try{
-			StringBuilder sb = new StringBuilder();
-			sb.append(str);
-			
-			for(String f : forceFields){
-				if(!str.contains(f)){
-					sb.append(",");
-					sb.append(f);
-				}
-			}
-			
-			String fieldsReconfig = configRequiredParam(resourceInfo.getResourceMethod(), sb.toString());
-			return new WSFieldParam(returnType, fieldsReconfig);
-		}catch (ApplicationException e){
-			throw new ApplicationRuntimeException(e);
-		}
-	}
-	/**
-	 * 
-	 * @param serviceMethod
-	 * @param params
-	 * @return
-	 */
-	public String configRequiredParam(Method serviceMethod, String params) {
-		List<LinkResource> listResources = new ArrayList<LinkResource>(1);
-		listResources.addAll(paramFields(serviceMethod));
+    private Class<?> returnType;
+    private String[] forceFields = {};
 
-		if(!listResources.isEmpty()){
-			Pattern pattern = Pattern.compile(REGEX_PATH_PARAMETERS);
-			Matcher matcher;
-			Set<String> listFieldParam = new HashSet<String>();
-			
-			listFieldParam.add(params);
-			
-			for(LinkResource linkResource : listResources){
-				for(String qp : linkResource.queryParameters()){
-					matcher = pattern.matcher(qp);
-					while(matcher.find()){
-						listFieldParam.add(matcher.group().replaceAll(REGEX_REPLACE_PARAM, ""));
-					}
-				}
+    private static final String REGEX_PATH_PARAMETERS = "(\\#|\\$)\\{[a-z-A-Z\\.]+\\}";
+    private static final String REGEX_REPLACE_PARAM = "\\#|\\$|\\{|\\}";
 
-				for(String qp : linkResource.pathParameters()){
-					matcher = pattern.matcher(qp);
-					while(matcher.find()){
-						listFieldParam.add(matcher.group().replaceAll(REGEX_REPLACE_PARAM, ""));
-					}
-				}
-			}
+    @Context
+    private ResourceInfo resourceInfo;
 
-			StringBuilder sb = new StringBuilder();
-			listFieldParam.forEach(item -> {
-				if(sb.length() != 0){
-					sb.append(",");
-				}
-				sb.append(item);
-				
-			});
-			
-			return sb.toString();
-		}
-		return params;
-	}
-	
-	/**
-	 * 
-	 * @param method
-	 * @return
-	 */
-	private List<LinkResource> paramFields(Method method){
-		Annotation[][] parametrosAnotados = method.getParameterAnnotations();
-		Class<?>[] parameterTypes = method.getParameterTypes();
-		
-		WSParamFormat wsAnnotation = null;
-		
-		for(int i=0; i < parametrosAnotados.length; i++){
-			Annotation[] parametroAnotado = parametrosAnotados[i];
-			if(parameterTypes[i].equals(WSFieldParam.class)){
-				for(Annotation a : parametroAnotado){
-					if(a instanceof WSParamFormat){
-						wsAnnotation = (WSParamFormat) a;
-					}
-				}
-				break;
-			}
-		}
-		
-		if(wsAnnotation != null){
-			List<LinkResource> listResources = new ArrayList<LinkResource>(1);
+    @Override
+    public void setAnnotations(Annotation[] annotations) {
+        WSParamFormat wsParamFormat = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class);
 
-			LinkResource lr = method.getAnnotation(LinkResource.class);
-			LinkResources lrs = method.getAnnotation(LinkResources.class);
-			LinkPaginate lp = method.getAnnotation(LinkPaginate.class);
+        if (wsParamFormat != null) {
+            if (wsParamFormat.value() != null) {
+                returnType = wsParamFormat.value();
+            }
+            forceFields = wsParamFormat.forceFields();
+        }
+    }
 
-			if(lr != null){
-				listResources.add(lr);
-			}
+    @Override
+    public WSFieldParam fromString(String str) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append(str);
 
-			if(lrs != null){
-				if(lrs.value().length > 0){
-					listResources.addAll(CollectionUtil.convertArrayToList(lrs.value()));
-				}
-			
-				if(!lrs.serviceClass().equals(void.class)){
-					listResources.addAll(paramFields(ReflectionUtil.getMethod(lrs.serviceClass(), lrs.serviceMethodName())));
-				}
-			}
+            for (String f : forceFields) {
+                if (!str.contains(f)) {
+                    sb.append(",");
+                    sb.append(f);
+                }
+            }
 
-			if(lp != null){
-				if(lp.collectionLinks().value().length > 0){
-					listResources.addAll(CollectionUtil.convertArrayToList(lp.collectionLinks().value()));
-				}
-	
-				if(!lp.collectionLinks().serviceClass().equals(void.class)){
-					listResources.addAll(paramFields(ReflectionUtil.getMethod(lp.collectionLinks().serviceClass(), lp.collectionLinks().serviceMethodName())));
-				}
-			}
-			
-			return listResources;
-		}
-		
-		return null;
-	}
+            String fieldsReconfig = configRequiredParam(resourceInfo.getResourceMethod(), sb.toString());
+
+            if (returnType == null) {
+                returnType = resourceInfo.getResourceMethod().getReturnType();
+
+                Class<?> auxReturnType = ReflectionUtil.returnParameterType(resourceInfo.getResourceMethod().getGenericReturnType(), 0);
+                if (auxReturnType != null) {
+                    returnType = auxReturnType;
+                }
+            }
+
+            return new WSFieldParam(returnType, fieldsReconfig);
+        } catch (ApplicationException e) {
+            throw new ApplicationRuntimeException(e);
+        }
+    }
+
+    /**
+     * 
+     * @param serviceMethod
+     * @param params
+     * @return
+     */
+    public String configRequiredParam(Method serviceMethod, String params) {
+        List<LinkResource> listResources = new ArrayList<LinkResource>(1);
+        listResources.addAll(paramFields(serviceMethod));
+
+        if (!listResources.isEmpty()) {
+            Pattern pattern = Pattern.compile(REGEX_PATH_PARAMETERS);
+            Matcher matcher;
+            Set<String> listFieldParam = new HashSet<String>();
+
+            listFieldParam.add(params);
+
+            for (LinkResource linkResource : listResources) {
+                for (String qp : linkResource.queryParameters()) {
+                    matcher = pattern.matcher(qp);
+                    while (matcher.find()) {
+                        listFieldParam.add(matcher.group().replaceAll(REGEX_REPLACE_PARAM, ""));
+                    }
+                }
+
+                for (String qp : linkResource.pathParameters()) {
+                    matcher = pattern.matcher(qp);
+                    while (matcher.find()) {
+                        listFieldParam.add(matcher.group().replaceAll(REGEX_REPLACE_PARAM, ""));
+                    }
+                }
+            }
+
+            StringBuilder sb = new StringBuilder();
+            listFieldParam.forEach(item -> {
+                if (sb.length() != 0) {
+                    sb.append(",");
+                }
+                sb.append(item);
+
+            });
+
+            return sb.toString();
+        }
+        return params;
+    }
+
+    /**
+     * 
+     * @param method
+     * @return
+     */
+    private List<LinkResource> paramFields(Method method) {
+        //FIXME Remover
+       /* Annotation[][] parametrosAnotados = method.getParameterAnnotations();
+        Class<?>[] parameterTypes = method.getParameterTypes();
+
+        WSParamFormat wsAnnotation = null;
+
+        for (int i = 0; i < parametrosAnotados.length; i++) {
+            Annotation[] parametroAnotado = parametrosAnotados[i];
+            if (parameterTypes[i].equals(WSFieldParam.class)) {
+                for (Annotation a : parametroAnotado) {
+                    if (a instanceof WSParamFormat) {
+                        wsAnnotation = (WSParamFormat) a;
+                    }
+                }
+                break;
+            }
+        }
+
+        if (wsAnnotation != null) {*/
+        List<LinkResource> listResources = new ArrayList<LinkResource>(1);
+
+        LinkResource lr = method.getAnnotation(LinkResource.class);
+        LinkResources lrs = method.getAnnotation(LinkResources.class);
+        LinkPaginate lp = method.getAnnotation(LinkPaginate.class);
+
+        if (lr != null) {
+            listResources.add(lr);
+        }
+
+        if (lrs != null) {
+            if (lrs.value().length > 0) {
+                listResources.addAll(CollectionUtil.convertArrayToList(lrs.value()));
+            }
+
+            if (!lrs.serviceClass().equals(void.class)) {
+                listResources.addAll(paramFields(ReflectionUtil.getMethod(lrs.serviceClass(), lrs.serviceMethodName())));
+            }
+        }
+
+        if (lp != null) {
+            if (lp.collectionLinks().value().length > 0) {
+                listResources.addAll(CollectionUtil.convertArrayToList(lp.collectionLinks().value()));
+            }
+
+            if (!lp.collectionLinks().serviceClass().equals(void.class)) {
+                listResources.addAll(paramFields(
+                    ReflectionUtil.getMethod(lp.collectionLinks().serviceClass(), lp.collectionLinks().serviceMethodName())));
+            }
+        }
+
+        return listResources;
+        /* }
+
+        return null;*/
+    }
 }

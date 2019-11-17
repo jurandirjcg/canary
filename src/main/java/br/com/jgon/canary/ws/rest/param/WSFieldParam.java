@@ -20,52 +20,64 @@ import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.ws.rest.util.WSMapper;
+
 /**
- * Configura os campos vindos da requisicao
- * Ex: pessoa.nome, pessoa{id,nome,dataNascimento}
+ * Configura os campos vindos da requisicao Ex: pessoa.nome,
+ * pessoa{id,nome,dataNascimento}
  *
  * @author Jurandir C. Goncalves
  * 
  * @version 1.0
  *
  */
-public class WSFieldParam{
+public class WSFieldParam {
 
-	private Class<?> returnType;
-	private List<String> listFields;
-	private String fields;
-	
-	/**
-	 * Compatibilidade com QueryParam
-	 * @param fields
-	 */
-	public WSFieldParam(String fields){
-		throw new ApplicationRuntimeException(MessageSeverity.ERROR, null, MessageFactory.getMessage("message","Construtor somente para compatibilidade com QueryParam REST"));
-	}
-	
-	public WSFieldParam(Class<?> returnType, String fields) throws ApplicationException{
-		this.returnType = returnType;
-		this.fields = fields;
-		config();
-	}
-	
-	private void config() throws ApplicationException{
-		listFields = new WSMapper().getFields(returnType, this.fields);
-	}
-		
-	public Class<?> getReturnType() {
-		return returnType;
-	}
+    private Class<?> returnType;
+    private List<String> listField;
+    private String fieldParam;
 
-	public List<String> getListField() {
-		return listFields;
-	}
+    /**
+     * Compatibilidade com QueryParam
+     * 
+     * @param fields
+     */
+    public WSFieldParam(String fields) {
+        throw new ApplicationRuntimeException(MessageSeverity.ERROR, null,
+            MessageFactory.getMessage("message", "Construtor somente para compatibilidade com QueryParam REST"));
+    }
 
-	public void setReturnType(Class<?> returnType) {
-		this.returnType = returnType;
-	}
+    public WSFieldParam(Class<?> returnType, String fields) throws ApplicationException {
+        this.returnType = returnType;
+        this.fieldParam = fields;
+        config();
+    }
 
-	public void setListFields(List<String> listFields) {
-		this.listFields = listFields;
-	}		
+    private void config() throws ApplicationException {
+        listField = new WSMapper().getFields(returnType, this.fieldParam);
+    }
+
+    public Class<?> getReturnType() {
+        return returnType;
+    }
+
+    public List<String> getListField() {
+        return listField;
+    }
+
+    public void setReturnType(Class<?> returnType) {
+        this.returnType = returnType;
+    }
+
+    public void setListField(List<String> listField) {
+        this.listField = listField;
+    }
+
+    public String getFieldParam() {
+        return fieldParam;
+    }
+
+    public void setFieldParam(String fieldParam) {
+        this.fieldParam = fieldParam;
+    }
+
 }

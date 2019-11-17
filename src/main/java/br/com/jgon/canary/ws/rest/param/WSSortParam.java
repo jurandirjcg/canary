@@ -20,61 +20,64 @@ import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.ws.rest.util.WSMapper;
+
 /**
- * Configura os atributos de ordenacao vindos na requisicao
- * Ex: pessoa.nome:desc, -pessoa.nome ou pessoa{+id,-nome}
+ * Configura os atributos de ordenacao vindos na requisicao Ex:
+ * pessoa.nome:desc, -pessoa.nome ou pessoa{+id,-nome}
  *
  * @author Jurandir C. Goncalves
  * 
  * @version 1.0
  *
  */
-public class WSSortParam{
+public class WSSortParam {
 
-	private Class<?> returnType;
-	private List<String> listSort;
-	private String sort;
-	
-	/**
-	 * Compatibilidade com QueryParam
-	 * @param fields
-	 */
-	public WSSortParam(String fields){
-		throw new ApplicationRuntimeException(MessageSeverity.ERROR, null, MessageFactory.getMessage("message", "Construtor somente para compatibilidade com QueryParam REST"));
-	}
-	
-	public WSSortParam(Class<?> returnType, String fields) throws ApplicationException{
-		this.returnType = returnType;
-		this.sort = fields;
-		config();
-	}
-	
-	private void config() throws ApplicationException{
-		listSort = new WSMapper().getSort(returnType, this.sort);
-	}
-		
-	public Class<?> getReturnType() {
-		return returnType;
-	}
+    private Class<?> returnType;
+    private List<String> listSort;
+    private String sortParam;
 
-	public void setReturnType(Class<?> returnType) {
-		this.returnType = returnType;
-	}
+    /**
+     * Compatibilidade com QueryParam
+     * 
+     * @param fields
+     */
+    public WSSortParam(String fields) {
+        throw new ApplicationRuntimeException(MessageSeverity.ERROR, null,
+            MessageFactory.getMessage("message", "Construtor somente para compatibilidade com QueryParam REST"));
+    }
 
-	public List<String> getListSort() {
-		return listSort;
-	}
+    public WSSortParam(Class<?> returnType, String fields) throws ApplicationException {
+        this.returnType = returnType;
+        this.sortParam = fields;
+        config();
+    }
 
-	public void setListSort(List<String> listSort) {
-		this.listSort = listSort;
-	}
+    private void config() throws ApplicationException {
+        listSort = new WSMapper().getSort(returnType, this.sortParam);
+    }
 
-	public String getSort() {
-		return sort;
-	}
+    public Class<?> getReturnType() {
+        return returnType;
+    }
 
-	public void setSort(String sort) {
-		this.sort = sort;
-	}
+    public void setReturnType(Class<?> returnType) {
+        this.returnType = returnType;
+    }
+
+    public List<String> getListSort() {
+        return listSort;
+    }
+
+    public void setListSort(List<String> listSort) {
+        this.listSort = listSort;
+    }
+
+    public String getSortParam() {
+        return sortParam;
+    }
+
+    public void setSortParam(String sortParam) {
+        this.sortParam = sortParam;
+    }
 
 }

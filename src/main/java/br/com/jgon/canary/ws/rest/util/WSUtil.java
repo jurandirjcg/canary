@@ -29,21 +29,21 @@ import br.com.jgon.canary.util.Page;
  *
  */
 public class WSUtil {
-	
-	public static String[] convertStringListToArray(List<String> list){
-		return list.toArray(new String[list.size()]);
-	}
-	
-	/**
-	 * 
-	 * @param paginacao
-	 * @return
-	 */
-	public static <T> ResponseBuilder setPaginationToResponse(Page<T> paginacao){
-		return Response.ok().entity(paginacao.getElements())
-				.header(DominiosRest.X_PAGINATION_TOTAL_ELEMENTS, paginacao.getTotalElements())
-				.header(DominiosRest.X_PAGINATION_ELEMENTS_PER_PAGE, paginacao.getElementsPerPage())
-				.header(DominiosRest.X_PAGINATION_CURRENT_PAGE, paginacao.getCurrentPage())
-				.header(DominiosRest.X_PAGINATION_TOTAL_PAGE, paginacao.getTotalPages());
-	}
+
+    public static String[] convertStringListToArray(List<String> list) {
+        return list.toArray(new String[list.size()]);
+    }
+
+    /**
+     * 
+     * @param paginacao
+     * @return
+     */
+    public static <T> ResponseBuilder setPaginationToResponse(Page<T> paginacao) {
+        return Response.ok().entity(paginacao.getElements())
+            .header(DominiosRest.X_PAGINATION_TOTAL_ELEMENTS, paginacao.getTotalElements())
+            .header(DominiosRest.X_PAGINATION_ELEMENTS_PER_PAGE, paginacao.getElementsPerPage())
+            .header(DominiosRest.X_PAGINATION_CURRENT_PAGE, paginacao.getCurrentPage())
+            .header(DominiosRest.X_PAGINATION_TOTAL_PAGE, paginacao.getTotalPages());
+    }
 }

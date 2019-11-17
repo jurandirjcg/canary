@@ -14,9 +14,6 @@
 package br.com.jgon.canary.persistence;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EmbeddedId;
@@ -61,24 +58,29 @@ public class DAOUtil {
 	 * @param fld - Attributo a ser verificado 
 	 * @return Classe da colecao
 	 */
-	@SuppressWarnings("unchecked")
-	public static Class<? extends Collection<?>> getCollectionClass(Field fld){
+	public static Class<?> getCollectionClass(Field fld){
 		if(!ReflectionUtil.isCollection(fld.getType())){
 			throw new ApplicationRuntimeException(MessageSeverity.ERROR, null, MessageFactory.getMessage("daoutil-collection", fld.getName()));
 		}
 		
-		Type genericFieldType = fld.getGenericType();
-
-		if(genericFieldType instanceof ParameterizedType){
-		    ParameterizedType aType = (ParameterizedType) genericFieldType;
-		    Type fieldArgTypes = aType.getActualTypeArguments()[0];
-		    if(fieldArgTypes != null){
-		    	return (Class<? extends Collection<?>>) fieldArgTypes;
-		    }
-		}
+		//FIXME Remover
+//		Type genericFieldType = fld.getGenericType();
+//
+//		if(genericFieldType instanceof ParameterizedType){
+//		    ParameterizedType aType = (ParameterizedType) genericFieldType;
+//		    Type fieldArgTypes = aType.getActualTypeArguments()[0];
+//		    if(fieldArgTypes != null){
+//		    	return (Class<? extends Collection<?>>) fieldArgTypes;
+//		    }
+//		}
 		
+		Class<?> klass = ReflectionUtil.returnParameterType(fld.getGenericType(), 0);
+        if(klass != null) {
+            return klass;
+        }
+        
 		if(fld.getAnnotation(QueryAttribute.class) != null && !fld.getAnnotation(QueryAttribute.class).collectionTarget().equals(void.class)){
-			return (Class<? extends Collection<?>>) fld.getAnnotation(QueryAttribute.class).collectionTarget();
+			return fld.getAnnotation(QueryAttribute.class).collectionTarget();
 		}else if (fld.getAnnotation(OneToMany.class) != null && !fld.getAnnotation(OneToMany.class).targetEntity().equals(void.class)){
 			return fld.getAnnotation(OneToMany.class).targetEntity();
 		}else if(fld.getAnnotation(ManyToMany.class) != null && !fld.getAnnotation(ManyToMany.class).targetEntity().equals(void.class)){
@@ -86,6 +88,6 @@ public class DAOUtil {
 		}else if(fld.getAnnotation(ManyToOne.class) != null && !fld.getAnnotation(ManyToOne.class).targetEntity().equals(void.class)){
 			return fld.getAnnotation(ManyToOne.class).targetEntity();
 		}
-		return (Class<? extends Collection<?>>) fld.getType();
+		return fld.getType();
 	}
 }
