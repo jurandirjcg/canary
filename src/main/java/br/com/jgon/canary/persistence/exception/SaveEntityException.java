@@ -14,7 +14,6 @@
 package br.com.jgon.canary.persistence.exception;
 
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
-import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
 
 /**
@@ -33,6 +32,6 @@ public class SaveEntityException extends ApplicationRuntimeException {
     private static final long serialVersionUID = 8785226925929014724L;
 
     public SaveEntityException(Exception e, Class<?> entityClass) {
-        super(MessageSeverity.ERROR, e, MessageFactory.getMessage("error.save", entityClass.getSimpleName()));
+        super(MessageSeverity.ERROR, "error.save", e, entityClass.getSimpleName());
     }
 }

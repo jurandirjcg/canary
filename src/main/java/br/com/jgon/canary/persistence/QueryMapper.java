@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.filter.QueryAttribute;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
@@ -58,9 +58,9 @@ abstract class QueryMapper {
 	 * @param campos
 	 * @param expression
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	protected List<SimpleEntry<String, String>> getCamposAjustados(String campos, String expression) throws ApplicationException{
+	protected List<SimpleEntry<String, String>> getCamposAjustados(String campos, String expression) throws ApplicationRuntimeException{
 		if(StringUtils.isNotBlank(campos)){
 			String fieldsAjustados = ajustaCampos(campos.replace(" ", ""), expression);
 			if(fieldsAjustados != null){
@@ -92,7 +92,7 @@ abstract class QueryMapper {
 						if(campoVerificado != null){
 							retorno.add(campoVerificado);
 						}else{
-							ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+						    ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
 							logger.error("[getCamposAjustados]", ae.getMessage());
 							throw ae;
 						}
@@ -108,9 +108,9 @@ abstract class QueryMapper {
 	 * @param fldCheck
 	 * @param fNome
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	private List<SimpleEntry<String, String>> verificaCampoObject(Field fldCheck, String fNome) throws ApplicationException{
+	private List<SimpleEntry<String, String>> verificaCampoObject(Field fldCheck, String fNome) throws ApplicationRuntimeException{
 		QueryAttribute queryMapperAttribute = null;
 		if(fldCheck.isAnnotationPresent(QueryAttribute.class)){
 			queryMapperAttribute = fldCheck.getAnnotation(QueryAttribute.class);
@@ -127,7 +127,7 @@ abstract class QueryMapper {
 						retorno.add(new SimpleEntry<String, String>(fNome.concat(".").concat(campoVerificado.getKey()), fNome.concat(".").concat(campoVerificado.getValue())));
 					}
 				}else{
-					ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+				    ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
 					logger.error("[verificaCampoObject]", ae.getMessage());
 					throw ae; 
 				}
@@ -167,9 +167,9 @@ abstract class QueryMapper {
 	 * @param klass
 	 * @param fieldName
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
-	private SimpleEntry<String, String> verificaCampo(Class<?> klass, String fieldName) throws ApplicationException{
+	private SimpleEntry<String, String> verificaCampo(Class<?> klass, String fieldName) throws ApplicationRuntimeException{
 		String partField;
 		
 		boolean multiLevel = false;
@@ -221,7 +221,7 @@ abstract class QueryMapper {
 					*/
 					
 					if(ReflectionUtil.isCollection(attrType)){
-						ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-collection-not-definied", klass.getName() + "." + fl.getName());
+					    ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "query-mapper.field-collection-not-definied", klass.getName() + "." + fl.getName());
 						logger.error("[verificaCampo]", ae.getMessage());
 						throw ae;
 					}

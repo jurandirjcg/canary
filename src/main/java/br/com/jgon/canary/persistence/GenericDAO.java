@@ -49,7 +49,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.CriteriaFilterImpl.SelectAggregate;
 import br.com.jgon.canary.persistence.exception.RemoveEntityException;
 import br.com.jgon.canary.persistence.exception.SaveEntityException;
@@ -168,10 +168,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * 
 	 * @param criteriaFilterUpdate - filtro
 	 * @return {@link Integer}
-	 * @throws ApplicationException - erro ao alterar
+	 * @throws ApplicationRuntimeException - erro ao alterar
 	 */
 	@Transactional(Transactional.TxType.MANDATORY)
-	protected int update(CriteriaFilterUpdate<T> criteriaFilterUpdate) throws ApplicationException{
+	protected int update(CriteriaFilterUpdate<T> criteriaFilterUpdate) throws ApplicationRuntimeException{
 		CriteriaManager<T> criteriaManager = new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), (CriteriaFilterImpl<T>) criteriaFilterUpdate);
 		CriteriaUpdate<T> update = criteriaManager.getCriteriaUpdate();
 		return getEntityManager().createQuery(update).executeUpdate();
@@ -211,10 +211,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * 
 	 * @param criteriaFilterDelete - filtro
 	 * @return {@link Integer}
-	 * @throws ApplicationException - erro ao remover
+	 * @throws ApplicationRuntimeException - erro ao remover
 	 */
 	@Transactional(Transactional.TxType.MANDATORY)
-	protected int remove(CriteriaFilterDelete<T> criteriaFilterDelete) throws ApplicationException{
+	protected int remove(CriteriaFilterDelete<T> criteriaFilterDelete) {
 		CriteriaManager<T> criteriaManager = new CriteriaManager<T>(getEntityManager(), getPrimaryClass(), (CriteriaFilterImpl<T>) criteriaFilterDelete);
 		CriteriaDelete<T> delete = criteriaManager.getCriteriaDelete();
 		return getEntityManager().createQuery(delete).executeUpdate();
@@ -225,28 +225,28 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * atenção pois normalmente este comando carrega todos os objetos relacionados com a entidade
 	 * @param id - identificador
 	 * @return T - objeto encontrado
-	 * @throws ApplicationException - erro ao buscar
+	 * @throws ApplicationRuntimeException - erro ao buscar
 	 */
-	public T find(K id) throws ApplicationException {
+	public T find(K id) throws ApplicationRuntimeException {
 		try {
 			return getSearchEntityManager().find(getPrimaryClass(), id);
 		} catch (IllegalArgumentException e) {
 			logger.error("[find]", e);
-			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, new String[] { getPrimaryClass().getSimpleName() });
+			throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY, new String[] { getPrimaryClass().getSimpleName() });
 		}
 	}
 	/**
 	 * Retorna entidade sem retornar os objetos relacionados
 	 * @param id - identificador
 	 * @return T - objeto econtrado
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public T findReference(K id) throws ApplicationException {
+	public T findReference(K id) throws ApplicationRuntimeException{
 		try {
 			return getSearchEntityManager().getReference(getPrimaryClass(), id);
 		} catch (IllegalArgumentException e) {
 			logger.error("[findReference]", e);
-			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, new String[] { getPrimaryClass().getSimpleName() });
+			throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY, new String[] { getPrimaryClass().getSimpleName() });
 		}
 	}
 	/**
@@ -254,9 +254,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param id - identificador
 	 * @param fields - atributos retornados
 	 * @return T - objeto pesquisado
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public T find(K id, List<String> fields) throws ApplicationException {
+	public T find(K id, List<String> fields) throws ApplicationRuntimeException {
 		 return find(id, getPrimaryClass(), fields); 
 	}
 	/**
@@ -264,9 +264,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param id - identificador
 	 * @param fields - campos retornados
 	 * @return T - objeto pesquisado
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public T find(K id, String[] fields) throws ApplicationException {
+	public T find(K id, String[] fields) throws ApplicationRuntimeException {
 		 return find(id, CollectionUtil.convertArrayToList(fields)); 
 	}
 	/**
@@ -276,9 +276,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param fields - campos retornados
 	 * @param <E> - classe de retorno
 	 * @return E - objeto pesquisado
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public <E> E find(K id, Class<E> resultClass, String[] fields) throws ApplicationException {
+	public <E> E find(K id, Class<E> resultClass, String[] fields) throws ApplicationRuntimeException {
 		return find(id, resultClass, CollectionUtil.convertArrayToList(fields));
 	}
 	/**
@@ -287,9 +287,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe que indica o tipo de objeto de retorno
 	 * @param fields - campos retornados
 	 * @return T - objeto pesquisado
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public <E> E find(K id, Class<E> resultClass, List<String> fields) throws ApplicationException {
+	public <E> E find(K id, Class<E> resultClass, List<String> fields) throws ApplicationRuntimeException {
 		try {
 			List<Field> flds = ReflectionUtil.listAttributesByAnnotation(getPrimaryClass(), Id.class);
 			if(flds.isEmpty()){
@@ -304,11 +304,11 @@ public abstract class GenericDAO<T, K extends Serializable>{
 			}else{
 				return null;
 			}
-		} catch (ApplicationException e) {
+		} catch (ApplicationRuntimeException e) {
 			throw e;
 		} catch (Exception e) {
 			logger.error("[find]", e);
-			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, getPrimaryClass().getSimpleName());
+			throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY, getPrimaryClass().getSimpleName());
 		}
 	}
 	/**
@@ -317,9 +317,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe que indica o tipo de objeto de retorno
 	 * @param fieldAlias - padrao chave valor entre atributos da entidade e atributos retornados
 	 * @return E - objeto pesquisado
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public <E> E find(K id, Class<E> resultClass, Map<String, String> fieldAlias) throws ApplicationException {
+	public <E> E find(K id, Class<E> resultClass, Map<String, String> fieldAlias) throws ApplicationRuntimeException {
 		try {
 			List<Field> flds = ReflectionUtil.listAttributesByAnnotation(getPrimaryClass(), Id.class);
 			if(flds.isEmpty()){
@@ -334,11 +334,11 @@ public abstract class GenericDAO<T, K extends Serializable>{
 			}else{
 				return null;
 			}
-		} catch (ApplicationException e) {
+		} catch (ApplicationRuntimeException e) {
 			throw e;
 		} catch (Exception e) {
 			logger.error("[find]", e);
-			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, new String[] { getPrimaryClass().getSimpleName() });
+			throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY, new String[] { getPrimaryClass().getSimpleName() });
 		}
 	}
 
@@ -385,9 +385,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	protected <E> List<E> getResultList(Class<E> resultClass, T objRef, List<String> fields, List<String> sort, Integer pagina, Integer qtde) throws ApplicationException {
+	protected <E> List<E> getResultList(Class<E> resultClass, T objRef, List<String> fields, List<String> sort, Integer pagina, Integer qtde) throws ApplicationRuntimeException {
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
 				.addSelect(resultClass, fields)
 				.addOrder(sort);
@@ -404,9 +404,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	protected <E> List<E> getResultList(Class<E> resultClass, T objRef, Map<String, String> fieldAlias, List<String> sort, Integer pagina, Integer qtde) throws ApplicationException {
+	protected <E> List<E> getResultList(Class<E> resultClass, T objRef, Map<String, String> fieldAlias, List<String> sort, Integer pagina, Integer qtde) throws ApplicationRuntimeException {
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
 				.addSelect(fieldAlias)
 				.addOrder(sort);
@@ -421,10 +421,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
 	@SuppressWarnings("unchecked")
-	protected <E> List<E> getResultList(Class<E> resultClass, CriteriaFilter<T> criteriaFilter, Integer pagina, Integer qtde) throws ApplicationException {
+	protected <E> List<E> getResultList(Class<E> resultClass, CriteriaFilter<T> criteriaFilter, Integer pagina, Integer qtde) throws ApplicationRuntimeException {
 		try {		
 			if(resultClass == null){
 				resultClass = (Class<E>) getPrimaryClass();
@@ -434,11 +434,11 @@ public abstract class GenericDAO<T, K extends Serializable>{
 			List<SimpleEntry<?, E>> returnList = getPreparedResultList(resultClass, query, pagina, qtde);
 						
 			return checkTupleResultList(criteriaManager.getListCollectionRelation(), returnList);
-		} catch (ApplicationException e) {
+		} catch (ApplicationRuntimeException e) {
 			throw e;
 		} catch (Exception e) {
 			logger.error("[getResultList]", e);
-			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, new String[] { getPrimaryClass().getSimpleName() });
+			throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, new String[] { getPrimaryClass().getSimpleName() });
 		}
 	}
 	
@@ -447,10 +447,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe de retorno
 	 * @param criteriaFilter - filtro
 	 * @return {@link CriteriaQuery}
-	 * @throws ApplicationException - erro ao criar query
+	 * @throws ApplicationRuntimeException - erro ao criar query
 	 */
 	@SuppressWarnings("unchecked")
-	protected <E> CriteriaQuery<T> getCriteriaQuery(Class<E> resultClass, CriteriaFilter<T> criteriaFilter) throws ApplicationException {
+	protected <E> CriteriaQuery<T> getCriteriaQuery(Class<E> resultClass, CriteriaFilter<T> criteriaFilter) throws ApplicationRuntimeException {
 		if(resultClass == null){
 			resultClass = (Class<E>) getPrimaryClass();
 		}
@@ -496,10 +496,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return {@link List}
 	 * @throws InstantiationException - erro ao instanciar
 	 * @throws IllegalAccessException - erro ao acessar atributo
-	 * @throws ApplicationException - erro generico ao pesquisar
+	 * @throws ApplicationRuntimeException - erro generico ao pesquisar
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private <E> List<E> checkTupleResultList(Map<String, CriteriaFilterImpl<?>> listCollectionRelation, List<SimpleEntry<?, E>> returnList) throws InstantiationException, IllegalAccessException, ApplicationException{
+	private <E> List<E> checkTupleResultList(Map<String, CriteriaFilterImpl<?>> listCollectionRelation, List<SimpleEntry<?, E>> returnList) throws InstantiationException, IllegalAccessException, ApplicationRuntimeException{
 		//------------ ADICIONADO PARA TRATAR COLLECTION
 		if(listCollectionRelation != null && !listCollectionRelation.isEmpty()){
 			Field fldAux = null;
@@ -560,10 +560,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return E - objeto com colecao associada
 	 * @throws InstantiationException - erro ao instanciar
 	 * @throws IllegalAccessException - erro ao acessar atributo
-	 * @throws ApplicationException - erro generico ao pesquisar
+	 * @throws ApplicationRuntimeException - erro generico ao pesquisar
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private <E> E checkTupleSingleResult(CriteriaManager<T> criteriaManager, SimpleEntry<?, E> result) throws InstantiationException, IllegalAccessException, ApplicationException{
+	private <E> E checkTupleSingleResult(CriteriaManager<T> criteriaManager, SimpleEntry<?, E> result) throws InstantiationException, IllegalAccessException, ApplicationRuntimeException{
 		if(result == null){
 			return null;
 		}
@@ -624,9 +624,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pequisar
+	 * @throws ApplicationRuntimeException - erro ao pequisar
 	 */
-	protected List<T> getResultList(CriteriaFilter<T> criteriaFilter, Integer pagina, Integer qtde) throws ApplicationException {
+	protected List<T> getResultList(CriteriaFilter<T> criteriaFilter, Integer pagina, Integer qtde) throws ApplicationRuntimeException {
 		return getResultList(getPrimaryClass(), criteriaFilter, pagina, qtde);
 	}
 	
@@ -634,9 +634,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * 
 	 * @param criteriaFilter - {@link CriteriaFilter}
 	 * @return T
-	 * @throws ApplicationException - erro ao obter o resultado
+	 * @throws ApplicationRuntimeException - erro ao obter o resultado
 	 */
-	protected T getFirstResult(CriteriaFilter<T> criteriaFilter) throws ApplicationException {
+	protected T getFirstResult(CriteriaFilter<T> criteriaFilter) throws ApplicationRuntimeException {
 		return getFirstResult(getPrimaryClass(), criteriaFilter);
 	}
 	
@@ -646,9 +646,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe de retorno 
 	 * @param criteriaQuery - {@link CriteriaQuery}
 	 * @return E
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	protected <E> E getFirstResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationException{
+	protected <E> E getFirstResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationRuntimeException{
 		List<E> list = new LinkedList<E>();
 		for(SimpleEntry<?, E> se : getPreparedResultList(resultClass, criteriaQuery, 1, 1)){
 			list.add(se.getValue());
@@ -665,9 +665,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * 
 	 * @param criteriaQuery - {@link CriteriaQuery}
 	 * @return T
-	 * @throws ApplicationException - erro ao obter o resultado
+	 * @throws ApplicationRuntimeException - erro ao obter o resultado
 	 */
-	protected T getFirstResult(CriteriaQuery<T> criteriaQuery) throws ApplicationException{
+	protected T getFirstResult(CriteriaQuery<T> criteriaQuery) throws ApplicationRuntimeException{
 		return getFirstResult(getPrimaryClass(), criteriaQuery);
 	}
 	
@@ -677,10 +677,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe de retorno
 	 * @param criteriaFilter - {@link CriteriaFilter}
 	 * @return E
-	 * @throws ApplicationException - erro ao obter o resultado
+	 * @throws ApplicationRuntimeException - erro ao obter o resultado
 	 */
 	@SuppressWarnings("unchecked")
-	protected <E> E getFirstResult(Class<E> resultClass, CriteriaFilter<T> criteriaFilter) throws ApplicationException{
+	protected <E> E getFirstResult(Class<E> resultClass, CriteriaFilter<T> criteriaFilter) throws ApplicationRuntimeException{
 		List<E> list = (List<E>) getResultList(criteriaFilter, 1, 1);
 		if(list == null || list.isEmpty()) {
 			return null;
@@ -696,9 +696,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param objRef - objeto de referencia
 	 * @param fields - campos
 	 * @return E
-	 * @throws ApplicationException - erro ao obter o resultado
+	 * @throws ApplicationRuntimeException - erro ao obter o resultado
 	 */
-	protected <E> E getFirstResult(Class<E> resultClass, T objRef, List<String> fields) throws ApplicationException {
+	protected <E> E getFirstResult(Class<E> resultClass, T objRef, List<String> fields) throws ApplicationRuntimeException {
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
 				.addSelect(resultClass, fields);
 		
@@ -712,9 +712,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param objRef - objeto de referencia
 	 * @param fieldAlias - atributos e alias de retorno
 	 * @return E
-	 * @throws ApplicationException - erro ao obter o resultado
+	 * @throws ApplicationRuntimeException - erro ao obter o resultado
 	 */
-	protected <E> E getFirstResult(Class<E> resultClass, T objRef, Map<String, String> fieldAlias) throws ApplicationException {
+	protected <E> E getFirstResult(Class<E> resultClass, T objRef, Map<String, String> fieldAlias) throws ApplicationRuntimeException {
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
 				.addSelect(fieldAlias);
 		
@@ -726,10 +726,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe que indica o tipo de objeto de retorno
 	 * @param criteriaFilter - filtro de pesquisa {@link CriteriaFilter}
 	 * @return {@link CriteriaManager}
-	 * @throws ApplicationException - erro ao configurar gerenciador
+	 * @throws ApplicationRuntimeException - erro ao configurar gerenciador
 	 */
 	@SuppressWarnings("unchecked")
-	private <E> CriteriaManager<T> getCriteriaManager(Class<E> resultClass, CriteriaFilterImpl<T> criteriaFilter) throws ApplicationException {
+	private <E> CriteriaManager<T> getCriteriaManager(Class<E> resultClass, CriteriaFilterImpl<T> criteriaFilter) throws ApplicationRuntimeException {
 		if(resultClass == null){
 			resultClass = (Class<E>) getPrimaryClass();
 		}
@@ -749,9 +749,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	protected <E> List<E> getResultList(Class<E> resultClass, CriteriaQuery<?> criteriaQuery, Integer pagina, Integer qtde) throws ApplicationException {
+	protected <E> List<E> getResultList(Class<E> resultClass, CriteriaQuery<?> criteriaQuery, Integer pagina, Integer qtde) throws ApplicationRuntimeException {
 		List<E> listReturn = new LinkedList<E>();
 		for(SimpleEntry<?, E> se : getPreparedResultList(resultClass, criteriaQuery, pagina, qtde)){
 			listReturn.add(se.getValue());
@@ -765,10 +765,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
 	@SuppressWarnings("unchecked")
-	private <E> List<SimpleEntry<?, E>> getPreparedResultList(Class<E> resultClass, CriteriaQuery<?> criteriaQuery, Integer pagina, Integer qtde) throws ApplicationException {
+	private <E> List<SimpleEntry<?, E>> getPreparedResultList(Class<E> resultClass, CriteriaQuery<?> criteriaQuery, Integer pagina, Integer qtde) throws ApplicationRuntimeException {
 		try {
 			boolean isTuple = criteriaQuery.getResultType().equals(Tuple.class);
 			List<SimpleEntry<?, E>> listReturn = new LinkedList<SimpleEntry<?, E>>();
@@ -793,14 +793,14 @@ public abstract class GenericDAO<T, K extends Serializable>{
 				}
 				return listReturn;
 			}
-		} catch (ApplicationException e) {
+		} catch (ApplicationRuntimeException e) {
 			throw e;
 		} catch (InstantiationException e) {
 				logger.error("[getPreparedResultList]", e);
-				throw new ApplicationException(MessageSeverity.ERROR, "error.instantiation", new String[] { getPrimaryClass().getSimpleName() });
+				throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.instantiation", new String[] { getPrimaryClass().getSimpleName() });
 		} catch (IllegalAccessException e) {
 				logger.error("[getPreparedResultList]", e);
-				throw new ApplicationException(MessageSeverity.ERROR, "error.field.access", new String[] { getPrimaryClass().getSimpleName() });
+				throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.field.access", new String[] { getPrimaryClass().getSimpleName() });
 		} 
 	}
 	
@@ -810,9 +810,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	protected List<T> getResultList(CriteriaQuery<T> criteriaQuery, Integer pagina, Integer qtde) throws ApplicationException {
+	protected List<T> getResultList(CriteriaQuery<T> criteriaQuery, Integer pagina, Integer qtde) throws ApplicationRuntimeException {
 		return getResultList(getPrimaryClass(), criteriaQuery, pagina, qtde);
 	}
 	
@@ -822,9 +822,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param objRef - objeto de referencia para pesquisa
 	 * @param fieldAlias - associacao entre atributo da entidade e atributo de retorno
 	 * @return E
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	protected <E> E getSingleResult(Class<E> resultClass, T objRef, Map<String, String> fieldAlias) throws ApplicationException {
+	protected <E> E getSingleResult(Class<E> resultClass, T objRef, Map<String, String> fieldAlias) throws ApplicationRuntimeException {
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
 				.addSelect(fieldAlias);
 		
@@ -836,9 +836,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param objRef - objeto de referencia para pesquisa
 	 * @param fields - campos retornados
 	 * @return E
-	 * @throws ApplicationException - erro ao pesquisa
+	 * @throws ApplicationRuntimeException - erro ao pesquisa
 	 */
-	protected <E> E getSingleResult(Class<E> resultClass, T objRef, List<String> fields) throws ApplicationException {
+	protected <E> E getSingleResult(Class<E> resultClass, T objRef, List<String> fields) throws ApplicationRuntimeException {
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
 				.addSelect(resultClass, fields);
 		
@@ -849,10 +849,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe que indica o tipo de objeto de retorno
 	 * @param criteriaFilter - filtros da pesquisa {@link CriteriaFilter}
 	 * @return E
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
 	@SuppressWarnings("unchecked")
-	protected <E> E getSingleResult(Class<E> resultClass, CriteriaFilter<T> criteriaFilter) throws ApplicationException {
+	protected <E> E getSingleResult(Class<E> resultClass, CriteriaFilter<T> criteriaFilter) throws ApplicationRuntimeException {
 		try {
 			if(resultClass == null){
 				resultClass = (Class<E>) getPrimaryClass();
@@ -862,13 +862,13 @@ public abstract class GenericDAO<T, K extends Serializable>{
 			
 			SimpleEntry<?, E> result = getPreparedSingleResult(resultClass, query);
 			return checkTupleSingleResult(criteriaManager, result);
-		} catch (ApplicationException e) {
+		} catch (ApplicationRuntimeException e) {
 			throw e;
 		} catch (NoResultException nre){
 			return null;
 		} catch (Exception e) {
 			logger.error("[getSingleResult]", e);
-			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, new String[] { getPrimaryClass().getSimpleName() });
+			throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY, new String[] { getPrimaryClass().getSimpleName() });
 		}
 	}
 
@@ -877,9 +877,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe que indica o tipo de objeto de retorno
 	 * @param criteriaQuery - {@link CriteriaQuery}
 	 * @return E
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	protected <E> E getSingleResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationException {
+	protected <E> E getSingleResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationRuntimeException {
 		return getPreparedSingleResult(resultClass, criteriaQuery).getValue();
 	}
 	/**
@@ -887,10 +887,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe que indica o tipo de objeto de retorno
 	 * @param criteriaQuery - {@link CriteriaQuery}
 	 * @return E
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
 	@SuppressWarnings("unchecked")
-	private <E> SimpleEntry<?, E> getPreparedSingleResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationException {
+	private <E> SimpleEntry<?, E> getPreparedSingleResult(Class<E> resultClass, CriteriaQuery<?> criteriaQuery) throws ApplicationRuntimeException {
 		try {
 			boolean isTuple = criteriaQuery.getResultType().equals(Tuple.class);
 			
@@ -904,16 +904,16 @@ public abstract class GenericDAO<T, K extends Serializable>{
 				TypedQuery<E> tQuery = getSearchEntityManager().createQuery(query);
 				return new SimpleEntry<Object, E>(null, tQuery.getSingleResult());
 			}
-		} catch (ApplicationException e) {
+		} catch (ApplicationRuntimeException e) {
 			throw e;
 		} catch (NoResultException nre){
 			return null;
 		} catch (IllegalArgumentException e) {
 			logger.error("[getPreparedSingleResult]", e);
-			throw new ApplicationException(MessageSeverity.ERROR, "message", new String[] { e.getMessage() });
+			throw new ApplicationRuntimeException(MessageSeverity.ERROR, "message", new String[] { e.getMessage() });
 		} catch (Exception e) {
 			logger.error("[getPreparedSingleResult]", e);
-			throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_KEY, new String[] { getPrimaryClass().getSimpleName() });
+			throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY, new String[] { getPrimaryClass().getSimpleName() });
 		}
 	}
 	
@@ -921,18 +921,18 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * 
 	 * @param criteriaQuery - {@link CriteriaQuery}
 	 * @return T
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	protected T getSingleResult(CriteriaQuery<T> criteriaQuery) throws ApplicationException {
+	protected T getSingleResult(CriteriaQuery<T> criteriaQuery) throws ApplicationRuntimeException {
 		return getSingleResult(getPrimaryClass(), criteriaQuery);
 	}
 	/**
 	 * 
 	 * @param criteriaFilter - filtros da pesquisa {@link CriteriaFilter}
 	 * @return T
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	protected T getSingleResult(CriteriaFilter<T> criteriaFilter) throws ApplicationException {
+	protected T getSingleResult(CriteriaFilter<T> criteriaFilter) throws ApplicationRuntimeException {
 		return getSingleResult(getPrimaryClass(), criteriaFilter);
 	}
 	/**
@@ -942,10 +942,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @return E
 	 * @throws InstantiationException - erro ao instanciar objeto
 	 * @throws IllegalAccessException - erro ao acessar atributo
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
 	@SuppressWarnings("unchecked")
-	private <E> SimpleEntry<?, E> tupleToResultClass(Tuple tuple, Class<E> resultClass) throws ApplicationException, InstantiationException, IllegalAccessException {
+	private <E> SimpleEntry<?, E> tupleToResultClass(Tuple tuple, Class<E> resultClass) throws ApplicationRuntimeException, InstantiationException, IllegalAccessException {
 		if(resultClass == null){
 			resultClass = (Class<E>) getPrimaryClass();
 		}
@@ -962,7 +962,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 		
 		for(TupleElement<?> te : tuple.getElements()){
 			if(StringUtils.isBlank(te.getAlias())) {
-				ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "genericdao-tuple-alias-not-found", resultClass.getName());
+			    ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "genericdao-tuple-alias-not-found", resultClass.getName());
 				logger.error("[tupleToResultClass]", ae.getMessage());
 				throw ae;
 			}
@@ -977,7 +977,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 					Field fldAux = ReflectionUtil.getAttribute(objAux.getClass(), subObj[i]);
 				
 					if(fldAux == null){
-						ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, ERROR_FIELD_DOES_NOT_EXIST, new String[] { subObj[i], objAux.getClass().getSimpleName() });
+					    ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIELD_DOES_NOT_EXIST, new String[] { subObj[i], objAux.getClass().getSimpleName() });
 						logger.error("[tupleToResultClass]", ae.getMessage());
 						throw ae;
 					}
@@ -1024,7 +1024,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 						ReflectionUtil.setFieldValue(objReturn, te.getAlias(), tuple.get(te));
 					} catch (Exception e) {
 						logger.error("[tupleToResultClass]", e);
-						throw new ApplicationException(MessageSeverity.ERROR, "genericdao-field-not-found", resultClass.getName(), te.getAlias());
+						throw new ApplicationRuntimeException(MessageSeverity.ERROR, "genericdao-field-not-found", resultClass.getName(), te.getAlias());
 					}
 				}
 			}
@@ -1039,14 +1039,12 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * 
 	 * @param fld - campo para analise
 	 * @return {@link Object}
-	 * @throws ApplicationException - objeto nao e colecao
-	 * @throws InstantiationException - erro ao instanciar
-	 * @throws IllegalAccessException - erro ao acessar atributo
+	 * @throws ApplicationRuntimeException - objeto nao e colecao
 	 */
-	private Object getObjectCollectionInstance(Field fld) throws ApplicationException{
+	private Object getObjectCollectionInstance(Field fld) throws ApplicationRuntimeException{
 		Class<?> classAux = DAOUtil.getCollectionClass(fld);
 		if(classAux == null){
-			ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-collection-not-definied", fld.getDeclaringClass().getName() + "." + fld.getName()); 
+		    ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "query-mapper.field-collection-not-definied", fld.getDeclaringClass().getName() + "." + fld.getName()); 
 			logger.error("[getObjectCollectionInstance]", ae.getMessage());
 			throw ae; 
 		}else{
@@ -1054,7 +1052,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 				return classAux.newInstance();
 			} catch (Exception e) {
 				logger.error("[getObjectCollectionInstance]", e);
-				throw new ApplicationException(MessageSeverity.ERROR, "error.instantiation", classAux.getName());
+				throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.instantiation", classAux.getName());
 			}
 		}		
 	}
@@ -1063,9 +1061,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * 
 	 * @param klass - tipo de colecao
 	 * @return {@link Collection}
-	 * @throws ApplicationException - erro ao instanciar colecao
+	 * @throws ApplicationRuntimeException - erro ao instanciar colecao
 	 */
-	private Collection<Object> createCollectionInstance(Class<?> klass) throws ApplicationException{
+	private Collection<Object> createCollectionInstance(Class<?> klass) throws ApplicationRuntimeException{
 		if(klass.isAssignableFrom(List.class)){
 			return new ArrayList<Object>();
 		}else if(klass.isAssignableFrom(Set.class)){
@@ -1073,7 +1071,7 @@ public abstract class GenericDAO<T, K extends Serializable>{
 		} else if(klass.isAssignableFrom(Collection.class)){
 			return new HashSet<Object>();
 		} 
-		ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "error.collection-instance", new String[] {klass.getName()});
+		ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "error.collection-instance", new String[] {klass.getName()});
 		logger.error("[createCollectionInstance]", ae.getMessage());
 		throw ae;
 	}
@@ -1082,9 +1080,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * 
 	 * @param obj - objeto de pesquisa
 	 * @return T
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public T find(T obj) throws ApplicationException {
+	public T find(T obj) throws ApplicationRuntimeException {
 		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj);
 		return getSingleResult(getPrimaryClass(), cf);
 	}
@@ -1094,9 +1092,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe que indica o tipo de objeto de retorno
 	 * @param fields - campos retornados
 	 * @return E
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public <E> E find(T obj, Class<E> resultClass, String[] fields) throws ApplicationException{
+	public <E> E find(T obj, Class<E> resultClass, String[] fields) throws ApplicationRuntimeException{
 		return find(obj, resultClass, CollectionUtil.convertArrayToList(fields));
 	}
 	
@@ -1106,10 +1104,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe que indica o tipo de objeto de retorno
 	 * @param fields - campos
 	 * @return E
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
 	@SuppressWarnings("unchecked")
-	public <E> E find(T obj, Class<E> resultClass, List<String> fields) throws ApplicationException {
+	public <E> E find(T obj, Class<E> resultClass, List<String> fields) throws ApplicationRuntimeException {
 		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj);
 		if(resultClass == null){
 			cf.addSelect(getPrimaryClass(), fields);
@@ -1125,9 +1123,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param resultClass - classe que indica o tipo de objeto de retorno
 	 * @param fieldAlias - referencia entre atributo da entidade e atributo de retorno
 	 * @return E
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public <E> E find(T obj, Class<E> resultClass, Map<String, String> fieldAlias) throws ApplicationException {
+	public <E> E find(T obj, Class<E> resultClass, Map<String, String> fieldAlias) throws ApplicationRuntimeException {
 		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj)
 			.addSelect(fieldAlias);
 		
@@ -1138,9 +1136,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param obj - objeto de pesquisa
 	 * @param fields - campos retornados
 	 * @return T
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public T find(T obj, List<String> fields) throws ApplicationException {
+	public T find(T obj, List<String> fields) throws ApplicationRuntimeException {
 		return find(obj, getPrimaryClass(), fields);
 	}
 	/**
@@ -1148,9 +1146,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param obj - objeto de pesquisa
 	 * @param fields - campos retornados
 	 * @return T
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public T find(T obj, String[] fields) throws ApplicationException {
+	public T find(T obj, String[] fields) throws ApplicationRuntimeException {
 		return find(obj, CollectionUtil.convertArrayToList(fields));
 	}
 	/**
@@ -1158,9 +1156,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public List<T> list(Integer pagina, Integer qtde) throws ApplicationException {
+	public List<T> list(Integer pagina, Integer qtde) throws ApplicationRuntimeException {
 		return this.list(null, pagina, qtde);
 	}
 	
@@ -1170,9 +1168,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public List<T> list(T obj, Integer pagina, Integer qtde) throws ApplicationException {
+	public List<T> list(T obj, Integer pagina, Integer qtde) throws ApplicationRuntimeException {
 		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj);
 		return getResultList(getPrimaryClass(), cf, pagina, qtde);
 	}
@@ -1241,9 +1239,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param page - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	protected Page<T> getResultPaginate(CriteriaFilter<T> criteriaFilter, int page, int qtde) throws ApplicationException{
+	protected Page<T> getResultPaginate(CriteriaFilter<T> criteriaFilter, int page, int qtde) throws ApplicationRuntimeException{
 		return getResultPaginate(getPrimaryClass(), criteriaFilter, page, qtde);
 	}
 	/**
@@ -1252,9 +1250,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param page - numero da pagina
 	 * @param qtde - numero de registros por pagina
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	public Page<T> paginate(T obj, int page, int qtde) throws ApplicationException{
+	public Page<T> paginate(T obj, int page, int qtde) throws ApplicationRuntimeException{
 		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj);
 		return getResultPaginate(getPrimaryClass(), cf, page, qtde);
 	}
@@ -1265,9 +1263,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param fields - campos retornados
 	 * @param sort - ordenacao
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	public Page<T> paginate(List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationException{
+	public Page<T> paginate(List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationRuntimeException{
 		return paginate(null, fields, sort, pagina, qtde);
 	}
 	/**
@@ -1278,9 +1276,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param fields - campos retornados
 	 * @param sort - ordenacao
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	public Page<T> paginate(T obj, List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationException{
+	public Page<T> paginate(T obj, List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationRuntimeException{
 		return paginate(obj, null, fields, sort, pagina, qtde);
 	}
 	
@@ -1292,9 +1290,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	public Page<T> paginate(T obj, String[] fields, String[] sort, int pagina, int qtde) throws ApplicationException{
+	public Page<T> paginate(T obj, String[] fields, String[] sort, int pagina, int qtde) throws ApplicationRuntimeException{
 		return paginate(obj, null, fields, sort, pagina, qtde);
 	}
 	
@@ -1307,9 +1305,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param fields - campos retornados
 	 * @param sort - ordenacao
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	public <E> Page<E> paginate(T obj, Class<E> resultClass, List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationException{
+	public <E> Page<E> paginate(T obj, Class<E> resultClass, List<String> fields, List<String> sort, int pagina, int qtde) throws ApplicationRuntimeException{
 		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj);
 		
 		if(resultClass == null){
@@ -1331,9 +1329,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de regitros por pagina
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	public <E> Page<E> paginate(T obj, Class<E> resultClass, Map<String, String> fieldAlias, List<String> sort, int pagina, int qtde) throws ApplicationException{
+	public <E> Page<E> paginate(T obj, Class<E> resultClass, Map<String, String> fieldAlias, List<String> sort, int pagina, int qtde) throws ApplicationRuntimeException{
 		return getResultPaginate(resultClass, obj, fieldAlias, sort, pagina, qtde);
 	}
 	
@@ -1346,9 +1344,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param fields - campos retornados
 	 * @param sort - ordenacao
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	public <E> Page<E> paginate(T obj, Class<E> resultClass, String[] fields, String[] sort, int pagina, int qtde) throws ApplicationException{
+	public <E> Page<E> paginate(T obj, Class<E> resultClass, String[] fields, String[] sort, int pagina, int qtde) throws ApplicationRuntimeException{
 		return paginate(obj, resultClass, CollectionUtil.convertArrayToList(fields), CollectionUtil.convertArrayToList(sort), pagina, qtde);
 	}
 	/**
@@ -1360,9 +1358,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - qunatidade de registros por pagina
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	public <E> Page<E> paginate(T obj, Class<E> resultClass, Map<String, String> fieldAlias, String[] sort, int pagina, int qtde) throws ApplicationException{
+	public <E> Page<E> paginate(T obj, Class<E> resultClass, Map<String, String> fieldAlias, String[] sort, int pagina, int qtde) throws ApplicationRuntimeException{
 		return paginate(obj, resultClass, fieldAlias, CollectionUtil.convertArrayToList(sort), pagina, qtde);
 	}
 	
@@ -1375,9 +1373,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param fields - campos retornados
 	 * @param sort - ordenacao
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	public <E> List<E> list(T obj, Class<E> resultClass, List<String> fields, List<String> sort, Integer pagina, Integer qtde) throws ApplicationException{
+	public <E> List<E> list(T obj, Class<E> resultClass, List<String> fields, List<String> sort, Integer pagina, Integer qtde) throws ApplicationRuntimeException{
 		CriteriaFilterImpl<T> cf = (CriteriaFilterImpl<T>) getCriteriaFilter(obj);
 		
 		if(resultClass == null){
@@ -1399,9 +1397,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public <E> List<E> list(T obj, Class<E> resultClass, Map<String, String> fieldAlias, List<String> sort, Integer pagina, Integer qtde) throws ApplicationException{
+	public <E> List<E> list(T obj, Class<E> resultClass, Map<String, String> fieldAlias, List<String> sort, Integer pagina, Integer qtde) throws ApplicationRuntimeException{
 		return getResultList(resultClass, obj, fieldAlias, sort, pagina, qtde);
 	}
 	
@@ -1414,9 +1412,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da paigna
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public <E> List<E> list(T obj, Class<E> resultClass, String[] fields, String[] sort, Integer pagina, Integer qtde) throws ApplicationException{
+	public <E> List<E> list(T obj, Class<E> resultClass, String[] fields, String[] sort, Integer pagina, Integer qtde) throws ApplicationRuntimeException{
 		return list(obj, resultClass, CollectionUtil.convertArrayToList(fields), CollectionUtil.convertArrayToList(sort), pagina, qtde);
 	}
 	/**
@@ -1428,9 +1426,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - qunatidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public <E> List<E> list(T obj, Class<E> resultClass, Map<String, String> fieldAlias, String[] sort, Integer pagina, Integer qtde) throws ApplicationException{
+	public <E> List<E> list(T obj, Class<E> resultClass, Map<String, String> fieldAlias, String[] sort, Integer pagina, Integer qtde) throws ApplicationRuntimeException{
 		return list(obj, resultClass, fieldAlias, CollectionUtil.convertArrayToList(sort), pagina, qtde);
 	}
 	/**
@@ -1441,9 +1439,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param fields - campos retornados
 	 * @param sort - ordenacao
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public List<T> list(T obj, List<String> fields, List<String> sort, Integer pagina, Integer qtde) throws ApplicationException{
+	public List<T> list(T obj, List<String> fields, List<String> sort, Integer pagina, Integer qtde) throws ApplicationRuntimeException{
 		return list(obj, null, fields, sort, pagina, qtde);
 	}
 	
@@ -1455,9 +1453,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public List<T> list(T obj, String[] fields, String[] sort, Integer pagina, Integer qtde) throws ApplicationException{
+	public List<T> list(T obj, String[] fields, String[] sort, Integer pagina, Integer qtde) throws ApplicationRuntimeException{
 		return list(obj, null, fields, sort, pagina, qtde);
 	}
 	/**
@@ -1467,9 +1465,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param fields - campos retornados
 	 * @param sort - ordenacao
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public List<T> list(List<String> fields, List<String> sort, Integer pagina, Integer qtde) throws ApplicationException{
+	public List<T> list(List<String> fields, List<String> sort, Integer pagina, Integer qtde) throws ApplicationRuntimeException{
 		return list(null, null, fields, sort, pagina, qtde);
 	}
 	
@@ -1480,27 +1478,27 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param pagina - numero da pagina
 	 * @param qtde - quantidade de registros por pagina
 	 * @return {@link List}
-	 * @throws ApplicationException - erro ao pesquisar
+	 * @throws ApplicationRuntimeException - erro ao pesquisar
 	 */
-	public List<T> list(String[] fields, String[] sort, Integer pagina, Integer qtde) throws ApplicationException{
+	public List<T> list(String[] fields, String[] sort, Integer pagina, Integer qtde) throws ApplicationRuntimeException{
 		return list(null, null, fields, sort, pagina, qtde);
 	}
 	/**
 	 * 
 	 * @param criteriaFilter - {@link CriteriaFilter}
 	 * @return {@link Boolean}
-	 * @throws ApplicationException - erro ao verificar se existe registro
+	 * @throws ApplicationRuntimeException - erro ao verificar se existe registro
 	 */
-	protected boolean getResultExists(CriteriaFilter<T> criteriaFilter) throws ApplicationException{
+	protected boolean getResultExists(CriteriaFilter<T> criteriaFilter) throws ApplicationRuntimeException{
 		return this.getResultCount(criteriaFilter) > 0;
 	}
 	/**
 	 * 
 	 * @param objRef - objeto de referência
 	 * @return {@link Boolean}
-	 * @throws ApplicationException - erro ao verificar se existe registro
+	 * @throws ApplicationRuntimeException - erro ao verificar se existe registro
 	 */
-	public boolean exists(T objRef) throws ApplicationException{
+	public boolean exists(T objRef) throws ApplicationRuntimeException{
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef);
 		return this.getResultExists(cf);
 	}
@@ -1510,9 +1508,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param objRef - Ojeto de referência
 	 * @param distinct - {@link Boolean}
 	 * @return {@link Long}
-	 * @throws ApplicationException - erro ao contar
+	 * @throws ApplicationRuntimeException - erro ao contar
 	 */
-	public Long count(T objRef, boolean distinct) throws ApplicationException{
+	public Long count(T objRef, boolean distinct) throws ApplicationRuntimeException{
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef);
 		return this.getResultCount(cf, distinct);
 	}
@@ -1520,9 +1518,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * COUNT com distinct false
 	 * @param objRef - objeto de referência
 	 * @return {@link Long}
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	public Long count(T objRef) throws ApplicationException{
+	public Long count(T objRef) throws ApplicationRuntimeException{
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef);
 		return this.getResultCount(cf, false);
 	}
@@ -1532,10 +1530,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param root - {@link Root}
 	 * @param distinct - true para utilizar countDistinct
 	 * @return {@link Long}
-	 * @throws ApplicationException - erro ao contar
+	 * @throws ApplicationRuntimeException - erro ao contar
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected Long getResultCount(CriteriaQuery<?> criteriaQuery, Root<T> root, boolean distinct) throws ApplicationException{
+	protected Long getResultCount(CriteriaQuery<?> criteriaQuery, Root<T> root, boolean distinct) throws ApplicationRuntimeException{
 		//SELECT
 		Selection<?> sel = criteriaQuery.getSelection();
 		//ORDER
@@ -1559,9 +1557,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param criteriaFilter - {@link CriteriaFilter}
 	 * @param distinct - {@link Boolean}
 	 * @return {@link Long}
-	 * @throws ApplicationException - erro ao contar
+	 * @throws ApplicationRuntimeException - erro ao contar
 	 */
-	protected Long getResultCount(CriteriaFilter<T> criteriaFilter, boolean distinct) throws ApplicationException{
+	protected Long getResultCount(CriteriaFilter<T> criteriaFilter, boolean distinct) throws ApplicationRuntimeException{
 		CriteriaManager<T> criteriaManager = getCriteriaManager(getPrimaryClass(), (CriteriaFilterImpl<T>) criteriaFilter);	
 		CriteriaQuery<?> query = criteriaManager.getCriteriaQuery();
 		return getResultCount(query, criteriaManager.getRootEntry(), distinct);
@@ -1570,9 +1568,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * COUNT com distinct false
 	 * @param criteriaFilter - {@link CriteriaFilter}
 	 * @return {@link Long}
-	 * @throws ApplicationException - erro ao contar
+	 * @throws ApplicationRuntimeException - erro ao contar
 	 */
-	protected Long getResultCount(CriteriaFilter<T> criteriaFilter) throws ApplicationException{
+	protected Long getResultCount(CriteriaFilter<T> criteriaFilter) throws ApplicationRuntimeException{
 		return getResultCount(criteriaFilter, false);
 	}
 	/**
@@ -1620,9 +1618,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param page - numero da pagina
 	 * @param limit - quantidade de registros por pagina
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	protected <E> Page<E> getResultPaginate(Class<E> returnClass, T objRef, List<String> fields, List<String> sort, int page, int limit) throws ApplicationException{
+	protected <E> Page<E> getResultPaginate(Class<E> returnClass, T objRef, List<String> fields, List<String> sort, int page, int limit) throws ApplicationRuntimeException{
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
 				.addSelect(returnClass, fields)
 				.addOrder(sort);
@@ -1639,9 +1637,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param page - numero da pagina
 	 * @param limit - quantidade de registros por pagina
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	protected <E> Page<E> getResultPaginate(Class<E> returnClass, T objRef, Map<String, String> fieldAlias, List<String> sort, int page, int limit) throws ApplicationException{
+	protected <E> Page<E> getResultPaginate(Class<E> returnClass, T objRef, Map<String, String> fieldAlias, List<String> sort, int page, int limit) throws ApplicationRuntimeException{
 		CriteriaFilter<T> cf = getCriteriaFilter(objRef)
 				.addSelect(fieldAlias)
 				.addOrder(sort);
@@ -1655,9 +1653,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param page - numero da pagina
 	 * @param limit - quantidade de registros por pagina
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	protected <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaFilter<T> criteriaFilter, int page, int limit) throws ApplicationException{
+	protected <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaFilter<T> criteriaFilter, int page, int limit) throws ApplicationRuntimeException{
 
 		CriteriaManager<T> criteriaManager = getCriteriaManager(returnClass, (CriteriaFilterImpl<T>) criteriaFilter);	
 		CriteriaQuery<?> query = criteriaManager.getCriteriaQuery();
@@ -1672,10 +1670,10 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param page - número da página
 	 * @param limit - quantidade de registros por página
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
 	@SuppressWarnings("unchecked")
-	protected <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, int page, int limit) throws ApplicationException{
+	protected <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, int page, int limit) throws ApplicationRuntimeException{
 		Root<T> root = null;
 		for(Root<?> rootAux : criteriaQuery.getRoots()) {
 			if(rootAux.getJavaType().equals(getPrimaryClass())) {
@@ -1695,9 +1693,9 @@ public abstract class GenericDAO<T, K extends Serializable>{
 	 * @param page - número da página
 	 * @param limit - quantidade de registros por página
 	 * @return {@link Page}
-	 * @throws ApplicationException - erro ao paginar
+	 * @throws ApplicationRuntimeException - erro ao paginar
 	 */
-	private <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, Root<T> root, Map<String, CriteriaFilterImpl<?>> listCollectionRelation,  int page, int limit) throws ApplicationException{
+	private <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, Root<T> root, Map<String, CriteriaFilterImpl<?>> listCollectionRelation,  int page, int limit) throws ApplicationRuntimeException{
 		Long qtdeReg = this.getResultCount(criteriaQuery, root, false);
 		
 		Page<E> paginacao = new Page<E>(qtdeReg, limit, page);
@@ -1707,11 +1705,11 @@ public abstract class GenericDAO<T, K extends Serializable>{
 			
 			try {
 				paginacao.setElements(checkTupleResultList(listCollectionRelation, returnList));
-			} catch (ApplicationException e) {
+			} catch (ApplicationRuntimeException e) {
 				throw e;
 			} catch (Exception e) {
 				logger.error("[getResultPaginate]", e);
-				throw new ApplicationException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, new String[] { getPrimaryClass().getSimpleName() });
+				throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY, new String[] { getPrimaryClass().getSimpleName() });
 			}			
 		}		
 		return paginacao;

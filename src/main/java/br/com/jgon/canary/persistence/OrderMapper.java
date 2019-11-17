@@ -14,10 +14,9 @@
 package br.com.jgon.canary.persistence;
 
 import java.util.AbstractMap.SimpleEntry;
-
-import br.com.jgon.canary.exception.ApplicationException;
-
 import java.util.List;
+
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 
 /**
  * Ajusta a ordenacao dos campos
@@ -46,9 +45,9 @@ class OrderMapper extends QueryMapper {
 	/**
 	 * Retorna os campos ajustados para ordenacao
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	public List<SimpleEntry<String, String>> getOrder() throws ApplicationException{
+	public List<SimpleEntry<String, String>> getOrder() throws ApplicationRuntimeException{
 		return getCamposAjustados(orderFields, expOrder);
 	}
 	

@@ -21,7 +21,7 @@ import java.util.Map;
 
 import javax.persistence.criteria.JoinType;
 
-import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 
 /**
  * Define os filtros da consulta
@@ -38,26 +38,26 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T>{
 	 * 
 	 * @param returnType
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
-	public CriteriaFilter<T> addSelect(Class<?> returnType) throws ApplicationException;
+	public CriteriaFilter<T> addSelect(Class<?> returnType) throws ApplicationRuntimeException;
 	/**
 	 * 
 	 * @param returnType
 	 * @param fields
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
-	public CriteriaFilter<T> addSelect(Class<?> returnType, List<String> fields) throws ApplicationException;
+	public CriteriaFilter<T> addSelect(Class<?> returnType, List<String> fields) throws ApplicationRuntimeException;
 	
 	/**
 	 * 
 	 * @param returnType
 	 * @param fields
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
-	public CriteriaFilter<T> addSelect(Class<?> returnType, String... fields) throws ApplicationException;
+	public CriteriaFilter<T> addSelect(Class<?> returnType, String... fields) throws ApplicationRuntimeException;
 		
 	/**
 	 * 
@@ -176,18 +176,18 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T>{
 	 * @param returnType
 	 * @param order
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
-	public CriteriaFilter<T> addOrder(Class<?> returnType, String... order) throws ApplicationException;
+	public CriteriaFilter<T> addOrder(Class<?> returnType, String... order) throws ApplicationRuntimeException;
 	
 	/**
 	 * 
 	 * @param returnType
 	 * @param order
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
-	public CriteriaFilter<T> addOrder(Class<?> returnType, List<String> order) throws ApplicationException;
+	public CriteriaFilter<T> addOrder(Class<?> returnType, List<String> order) throws ApplicationRuntimeException;
 	
 	/**
 	 * 
@@ -602,9 +602,9 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T>{
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	public CriteriaFilter<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilter<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
 	/**
 	 * 
 	 * @param field

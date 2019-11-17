@@ -22,7 +22,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
 
-import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.filter.QueryAttribute;
 import br.com.jgon.canary.util.ReflectionUtil;
 
@@ -50,9 +50,9 @@ class SelectMapper extends QueryMapper {
 
 	/** 
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	public List<SimpleEntry<String, String>> getFields() throws ApplicationException{
+	public List<SimpleEntry<String, String>> getFields() throws ApplicationRuntimeException{
 		List<SimpleEntry<String, String>> ret = getCamposAjustados(fields, expField);
 
 		if(ret == null){
@@ -65,7 +65,6 @@ class SelectMapper extends QueryMapper {
 	/**
 	 * Retorna todos os campos do da classe, independente dos parâmetros informados
 	 * @return
-	 * @throws ApplicationException
 	 */
 	private List<SimpleEntry<String, String>> getAllFields(){
 		List<SimpleEntry<String, String>> campos = new ArrayList<SimpleEntry<String, String>>(0);

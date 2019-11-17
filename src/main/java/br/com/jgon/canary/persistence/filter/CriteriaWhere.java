@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 
 /**
  * Define os filtros da consulta
@@ -546,7 +546,7 @@ public interface CriteriaWhere<T> {
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	public CriteriaWhere<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaWhere<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
 }

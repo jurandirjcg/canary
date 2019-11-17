@@ -23,6 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.DAOUtil;
@@ -39,6 +42,8 @@ import br.com.jgon.canary.util.ReflectionUtil;
  */
 public abstract class RequestConverter<T> {
 
+    private Logger LOGGER = LoggerFactory.getLogger(RequestConverter.class);
+    
     public RequestConverter() {
 
     }
@@ -78,7 +83,8 @@ public abstract class RequestConverter<T> {
 
             return ret;
         } catch (Exception e) {
-            throw new ApplicationRuntimeException(MessageSeverity.ERROR, e, e.getMessage());
+            LOGGER.error(e.getMessage(), e);
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.request-converter");
         }
     }
 

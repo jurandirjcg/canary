@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.Page;
@@ -33,6 +36,8 @@ import br.com.jgon.canary.util.ReflectionUtil;
  * @param <O> - Origem
  */
 public abstract class ResponseConverter<O> {
+
+    private Logger LOGGER = LoggerFactory.getLogger(ResponseConverter.class);
 
     public ResponseConverter() {
 
@@ -72,7 +77,8 @@ public abstract class ResponseConverter<O> {
 
             return ret;
         } catch (Exception e) {
-            throw new ApplicationRuntimeException(MessageSeverity.ERROR, e, e.getMessage());
+            LOGGER.error(e.getMessage(), e);
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.response-converter");
         }
     }
 

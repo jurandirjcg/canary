@@ -22,7 +22,7 @@ import java.util.Map;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.Attribute;
 
-import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 
 /**
  * Define os filtros da consulta
@@ -39,29 +39,29 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * 
 	 * @param returnType
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
 	@Override
-	public CriteriaFilterMetamodel<T> addSelect(Class<?> returnType) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addSelect(Class<?> returnType) throws ApplicationRuntimeException;
 	/**
 	 * 
 	 * @param returnType
 	 * @param fields
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
 	@Override
-	public CriteriaFilterMetamodel<T> addSelect(Class<?> returnType, List<String> fields) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addSelect(Class<?> returnType, List<String> fields) throws ApplicationRuntimeException;
 	
 	/**
 	 * 
 	 * @param returnType
 	 * @param fields
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
 	@Override
-	public CriteriaFilterMetamodel<T> addSelect(Class<?> returnType, String... fields) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addSelect(Class<?> returnType, String... fields) throws ApplicationRuntimeException;
 		
 	/**
 	 * 
@@ -194,19 +194,19 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @param returnType
 	 * @param order
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
 	@Override
-	public CriteriaFilterMetamodel<T> addOrder(Class<?> returnType, String... order) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addOrder(Class<?> returnType, String... order) throws ApplicationRuntimeException;
 	/**
 	 * 
 	 * @param returnType
 	 * @param order
 	 * @return
-	 * @throws ApplicationException 
+	 * @throws ApplicationRuntimeException 
 	 */
 	@Override
-	public CriteriaFilterMetamodel<T> addOrder(Class<?> returnType, List<String> order) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addOrder(Class<?> returnType, List<String> order) throws ApplicationRuntimeException;
 	/**
 	 *
 	 * @param order
@@ -671,10 +671,10 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
 	@Override
-	public CriteriaFilterMetamodel<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
 	/**
 	 * 
 	 * @param field
@@ -1756,9 +1756,9 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	public CriteriaFilterMetamodel<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
 	/**
 	 * Verifica a condicao recebida junto com o valor
 	 * 
@@ -1792,9 +1792,9 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>{
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilterMetamodel<T> addWhereRegex(ComplexAttribute attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
 
 	/**
 	 * 

@@ -20,7 +20,7 @@ import java.util.List;
 
 import javax.persistence.metamodel.Attribute;
 
-import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 
 /**
  * Define os filtros da consulta
@@ -453,10 +453,10 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhereMetamodel<T>{
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
 	@Override
-	public CriteriaFilterDelete<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilterDelete<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
 
 	/**
 	 * @param attribute
@@ -1201,9 +1201,9 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhereMetamodel<T>{
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	public CriteriaFilterDelete<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilterDelete<T> addWhereRegex(Attribute<?, ?> attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
 	/**
 	 * Verifica a condicao recebida junto com o valor
 	 * 
@@ -1237,9 +1237,9 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhereMetamodel<T>{
 	 * @param regexToAnalyse condicoes (Where) para analisar  para analisar, se null verifica todas.
 	 * @param defaultIfNotMatch padrao caso nao encontre referencia
 	 * @return
-	 * @throws ApplicationException
+	 * @throws ApplicationRuntimeException
 	 */
-	public CriteriaFilterDelete<T> addWhereRegex(ComplexAttribute attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationException;
+	public CriteriaFilterDelete<T> addWhereRegex(ComplexAttribute attribute, String value, RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
 
 	/**
 	 * 
