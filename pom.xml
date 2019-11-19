@@ -69,11 +69,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<!-- RESTEASY -->
-		<dependency>
-		 	<groupId>org.jboss.resteasy</groupId>
-		 	<artifactId>resteasy-core</artifactId>
-		 	<version>${resteasy-core.version}</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 		 	<groupId>org.jboss.resteasy</groupId> -->
+<!-- 		 	<artifactId>resteasy-core</artifactId> -->
+<!-- 		 	<version>${resteasy-core.version}</version> -->
+<!-- 		</dependency> -->
 		<!-- JSONB -->	
 		<dependency>
 			<groupId>javax.json.bind</groupId>

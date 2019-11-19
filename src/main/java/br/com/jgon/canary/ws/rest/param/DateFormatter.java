@@ -14,11 +14,14 @@
 package br.com.jgon.canary.ws.rest.param;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.jboss.resteasy.spi.StringParameterUnmarshaller;
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.DateUtil;
@@ -33,20 +36,26 @@ import br.com.jgon.canary.util.ReflectionUtil;
  * @version 1.0
  *
  */
-public class DateFormatter implements StringParameterUnmarshaller<Date> {
+public class DateFormatter implements /* StringParameterUnmarshaller<Date> */ParamConverter<Date>, ParamConverterProvider {
 
     private SimpleDateFormat formatter;
+    private Annotation[] annotations;
 
-    @Override
-    public void setAnnotations(Annotation[] annotations) {
+    // @Override
+    private void setAnnotations(Annotation[] annotations) {
         DateFormat format = ReflectionUtil.findAnnotation(annotations, DateFormat.class);
+        JsonbDateFormat formatAux = ReflectionUtil.findAnnotation(annotations, JsonbDateFormat.class);
         if (format != null) {
             formatter = new SimpleDateFormat(format.value());
+        } else if (formatAux != null) {
+            formatter = new SimpleDateFormat(formatAux.value());
         }
     }
 
     @Override
     public Date fromString(String str) {
+        setAnnotations(annotations);
+        
         try {
             if (formatter != null) {
                 return formatter.parse(str);
@@ -57,4 +66,22 @@ public class DateFormatter implements StringParameterUnmarshaller<Date> {
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.parse-date", e, str);
         }
     }
+
+    @Override
+    public String toString(Date value) {
+        if (formatter != null) {
+            return formatter.format(value);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
+        if (rawType.equals(Date.class)) {
+            return (ParamConverter<T>) this;
+        }
+        return null;
+    }
+
 }

@@ -15,6 +15,7 @@ package br.com.jgon.canary.ws.rest.param;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,8 +25,8 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
-
-import org.jboss.resteasy.spi.StringParameterUnmarshaller;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
@@ -43,10 +44,11 @@ import br.com.jgon.canary.ws.rest.link.LinkResources;
  * @version 1.0
  *
  */
-public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFieldParam> {
+public class WsFieldsParamFormatter implements /*StringParameterUnmarshaller<WSFieldParam>,*/ ParamConverter<WSFieldParam>, ParamConverterProvider {
 
     private Class<?> returnType;
     private String[] forceFields = {};
+    private Annotation[] annotations;
 
     private static final String REGEX_PATH_PARAMETERS = "(\\#|\\$)\\{[a-z-A-Z\\.]+\\}";
     private static final String REGEX_REPLACE_PARAM = "\\#|\\$|\\{|\\}";
@@ -54,8 +56,8 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
     @Context
     private ResourceInfo resourceInfo;
 
-    @Override
-    public void setAnnotations(Annotation[] annotations) {
+  //  @Override
+    private void setAnnotations(Annotation[] annotations) {
         WSParamFormat wsParamFormat = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class);
 
         if (wsParamFormat != null) {
@@ -64,11 +66,14 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
             }
             forceFields = wsParamFormat.forceFields();
         }
+
     }
 
     @Override
     public WSFieldParam fromString(String str) {
         try {
+            setAnnotations(annotations);
+            
             StringBuilder sb = new StringBuilder();
             sb.append(str);
 
@@ -149,25 +154,21 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
      * @return
      */
     private List<LinkResource> paramFields(Method method) {
-        //FIXME Remover
-       /* Annotation[][] parametrosAnotados = method.getParameterAnnotations();
-        Class<?>[] parameterTypes = method.getParameterTypes();
-
-        WSParamFormat wsAnnotation = null;
-
-        for (int i = 0; i < parametrosAnotados.length; i++) {
-            Annotation[] parametroAnotado = parametrosAnotados[i];
-            if (parameterTypes[i].equals(WSFieldParam.class)) {
-                for (Annotation a : parametroAnotado) {
-                    if (a instanceof WSParamFormat) {
-                        wsAnnotation = (WSParamFormat) a;
-                    }
-                }
-                break;
-            }
-        }
-
-        if (wsAnnotation != null) {*/
+        // FIXME Remover
+        /*
+         * Annotation[][] parametrosAnotados = method.getParameterAnnotations();
+         * Class<?>[] parameterTypes = method.getParameterTypes();
+         * 
+         * WSParamFormat wsAnnotation = null;
+         * 
+         * for (int i = 0; i < parametrosAnotados.length; i++) { Annotation[]
+         * parametroAnotado = parametrosAnotados[i]; if
+         * (parameterTypes[i].equals(WSFieldParam.class)) { for (Annotation a :
+         * parametroAnotado) { if (a instanceof WSParamFormat) { wsAnnotation =
+         * (WSParamFormat) a; } } break; } }
+         * 
+         * if (wsAnnotation != null) {
+         */
         List<LinkResource> listResources = new ArrayList<LinkResource>(1);
 
         LinkResource lr = method.getAnnotation(LinkResource.class);
@@ -200,8 +201,25 @@ public class WsFieldsParamFormatter implements StringParameterUnmarshaller<WSFie
         }
 
         return listResources;
-        /* }
+        /*
+         * }
+         * 
+         * return null;
+         */
+    }
 
-        return null;*/
+    @Override
+    public String toString(WSFieldParam value) {
+        return value.getFieldParam();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
+        if(rawType.equals(WSFieldParam.class)) {
+            this.annotations = annotations;
+            return (ParamConverter<T>) this;
+        }
+        return null;
     }
 }

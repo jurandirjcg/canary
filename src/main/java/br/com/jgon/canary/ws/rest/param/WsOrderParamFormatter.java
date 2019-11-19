@@ -14,11 +14,12 @@
 package br.com.jgon.canary.ws.rest.param;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
-
-import org.jboss.resteasy.spi.StringParameterUnmarshaller;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
@@ -32,15 +33,16 @@ import br.com.jgon.canary.util.ReflectionUtil;
  * @version 1.0
  *
  */
-public class WsOrderParamFormatter implements StringParameterUnmarshaller<WSSortParam> {
+public class WsOrderParamFormatter
+    implements /* StringParameterUnmarshaller<WSSortParam> */ParamConverter<WSSortParam>, ParamConverterProvider {
 
     Class<?> returnType;
-
     @Context
     private ResourceInfo resourceInfo;
+    private Annotation[] annotations;
 
-    @Override
-    public void setAnnotations(Annotation[] annotations) {
+    // @Override
+    private void setAnnotations(Annotation[] annotations) {
         WSParamFormat wsParamFormat = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class);
 
         if (wsParamFormat != null) {
@@ -53,16 +55,35 @@ public class WsOrderParamFormatter implements StringParameterUnmarshaller<WSSort
     @Override
     public WSSortParam fromString(String str) {
         try {
-            returnType = resourceInfo.getResourceMethod().getReturnType();
+            setAnnotations(annotations);
 
-            Class<?> auxReturnType = ReflectionUtil.returnParameterType(resourceInfo.getResourceMethod().getGenericReturnType(), 0);
-            if (auxReturnType != null) {
-                returnType = auxReturnType;
+            if (returnType == null) {
+                returnType = resourceInfo.getResourceMethod().getReturnType();
+
+                Class<?> auxReturnType = ReflectionUtil.returnParameterType(resourceInfo.getResourceMethod().getGenericReturnType(), 0);
+                if (auxReturnType != null) {
+                    returnType = auxReturnType;
+                }
             }
-            
+
             return new WSSortParam(returnType, str);
         } catch (ApplicationException e) {
             throw new ApplicationRuntimeException(e);
         }
+    }
+
+    @Override
+    public String toString(WSSortParam value) {
+        return value.getSortParam();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
+        if (rawType.equals(WSSortParam.class)) {
+            this.annotations = annotations;
+            return (ParamConverter<T>) this;
+        }
+        return null;
     }
 }

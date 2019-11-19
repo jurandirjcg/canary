@@ -6,7 +6,13 @@ import java.util.Date;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
-public abstract class DateUtil {
+/**
+ * 
+ * @author Jurandir C. Gonçalves
+ * @since 18/11/2019
+ *
+ */
+public abstract class DateUtil extends DateUtils{
 
     /**
      * 
@@ -28,7 +34,7 @@ public abstract class DateUtil {
     public static final String ISO_8601_EXTENDED_MILLIS_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
     public static Date parseDate(String dateValue) throws ParseException {
-        return DateUtils.parseDate(dateValue, new String[] { DateFormatUtils.ISO_8601_EXTENDED_DATE_FORMAT.getPattern(),
+        return parseDate(dateValue, new String[] { DateFormatUtils.ISO_8601_EXTENDED_DATE_FORMAT.getPattern(),
             DateFormatUtils.ISO_8601_EXTENDED_DATETIME_FORMAT.getPattern(),
             DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.getPattern(),
             DateFormatUtils.ISO_8601_EXTENDED_TIME_FORMAT.getPattern(),
