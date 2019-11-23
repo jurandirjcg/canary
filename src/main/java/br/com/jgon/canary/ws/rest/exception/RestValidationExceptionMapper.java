@@ -13,6 +13,7 @@
  */
 package br.com.jgon.canary.ws.rest.exception;
 
+import javax.validation.ValidationException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -28,11 +29,11 @@ import javax.ws.rs.ext.ExceptionMapper;
  *
  */
 //@Provider
-public class RestExceptionMapper implements ExceptionMapper<Exception> {
+public class RestValidationExceptionMapper implements ExceptionMapper<ValidationException> {
 
     @Override
     @Produces(MediaType.APPLICATION_JSON)
-    public Response toResponse(Exception exception) {
+    public Response toResponse(ValidationException exception) {
         return ExceptionUtils.toResponse(exception);
     }
 }

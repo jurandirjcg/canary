@@ -2068,4 +2068,148 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
         this.addJoin(attribute.getName(), joinType, fetch, force);
         return this;
     }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereGreaterThan(ComplexAttribute attribute, LocalDate value) {
+        this.addWhereGreaterThan(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereGreaterThan(ComplexAttribute attribute, LocalDateTime value) {
+        this.addWhereGreaterThan(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, LocalDate value) {
+        this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, LocalDateTime value) {
+        this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThan(ComplexAttribute attribute, LocalDate value) {
+        this.addWhereLessThan(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThan(ComplexAttribute attribute, LocalDateTime value) {
+        this.addWhereLessThan(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, LocalDate value) {
+        this.addWhereLessThanOrEqualTo(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, LocalDateTime value) {
+        this.addWhereLessThanOrEqualTo(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public <E> CriteriaFilterImpl<T> addWhereGreaterThan(String field, LocalDate value) {
+        this.whereRestriction.add(field, Where.GREATER_THAN, value);
+        return this;
+    }
+
+    @Override
+    public <E> CriteriaFilterImpl<T> addWhereGreaterThan(String field, LocalDateTime value) {
+        this.whereRestriction.add(field, Where.GREATER_THAN, value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(String field, LocalDate value) {
+        this.whereRestriction.add(field, Where.GREATER_THAN_OR_EQUAL_TO, value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(String field, LocalDateTime value) {
+        this.whereRestriction.add(field, Where.GREATER_THAN_OR_EQUAL_TO, value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThan(String field, LocalDate value) {
+        this.whereRestriction.add(field, Where.LESS_THAN, value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThan(String field, LocalDateTime value) {
+        this.whereRestriction.add(field, Where.LESS_THAN, value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(String field, LocalDate value) {
+        this.whereRestriction.add(field, Where.LESS_THAN_OR_EQUAL_TO, value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(String field, LocalDateTime value) {
+        this.whereRestriction.add(field, Where.LESS_THAN_OR_EQUAL_TO, value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, LocalDate> attribute, LocalDate value) {
+        this.addWhereGreaterThan(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, LocalDateTime> attribute, LocalDateTime value) {
+        this.addWhereGreaterThan(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, LocalDate> attribute, LocalDate value) {
+        this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, LocalDateTime> attribute, LocalDateTime value) {
+        this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, LocalDate> attribute, LocalDate value) {
+        this.addWhereLessThan(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, LocalDateTime> attribute, LocalDateTime value) {
+        this.addWhereLessThan(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, LocalDate> attribute, LocalDate value) {
+        this.addWhereLessThanOrEqualTo(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, LocalDateTime> attribute, LocalDateTime value) {
+        this.addWhereLessThanOrEqualTo(attribute.getName(), value);
+        return this;
+    }
 }

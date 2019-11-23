@@ -22,6 +22,7 @@ import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.validation.exception.ValidationException;
 import br.com.jgon.canary.ws.rest.exception.RestExceptionMapper;
+import br.com.jgon.canary.ws.rest.exception.RestValidationExceptionMapper;
 import br.com.jgon.canary.ws.rest.link.LinkResponseFeature;
 import br.com.jgon.canary.ws.rest.param.DateFormatter;
 import br.com.jgon.canary.ws.rest.param.WsFieldsParamFormatter;
@@ -55,6 +56,7 @@ public abstract class CanaryRestResources {
 	public static Set<Class<?>> getClasses(boolean checkException){
 		if(checkException){
 			resources.add(RestExceptionMapper.class);
+			resources.add(RestValidationExceptionMapper.class);
 		}
 		return resources;
 	}
