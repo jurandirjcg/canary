@@ -53,8 +53,7 @@ public abstract class RequestConverter<T> {
         return (Class<T>) type.getActualTypeArguments()[0];
     }
 
-    @SuppressWarnings("rawtypes")
-    public <N extends RequestConverter> T converter() {
+    public T converter() {
         try {
             T ret = getInstance(parameterizedClass());
 

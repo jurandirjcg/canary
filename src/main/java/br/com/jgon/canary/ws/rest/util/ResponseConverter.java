@@ -39,6 +39,9 @@ public abstract class ResponseConverter<O> {
 
     @SuppressWarnings("unchecked")
     public <N extends ResponseConverter<O>> N converter(O obj) {
+        if (obj == null) {
+            return null;
+        }
         try {
             N ret = (N) ReflectionUtil.getInstance(this.getClass());
 
@@ -122,7 +125,7 @@ public abstract class ResponseConverter<O> {
 
         return pRetorno;
     }
-    
+
     /**
      * 
      * @author Jurandir C. Gonçalves <jurandir> - Zion Mountain
@@ -135,6 +138,46 @@ public abstract class ResponseConverter<O> {
      * @return
      */
     public static <T extends ResponseConverter<O>, O> T converter(Class<T> returnType, O obj) {
+        try {
+            T returnAux = ReflectionUtil.getInstance(returnType);
+            return returnAux.converter(obj);
+        } catch (Exception e) {
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.response-converter", e);
+        }
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves
+     * @since 23/11/2019
+     *
+     * @param <T>
+     * @param <O>
+     * @param returnType
+     * @param obj
+     * @return
+     */
+    public static <T extends ResponseConverter<O>, O> Page<T> converter(Class<T> returnType, Page<O> obj) {
+        try {
+            T returnAux = ReflectionUtil.getInstance(returnType);
+            return returnAux.converter(obj);
+        } catch (Exception e) {
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.response-converter", e);
+        }
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves
+     * @since 23/11/2019
+     *
+     * @param <T>
+     * @param <O>
+     * @param returnType
+     * @param obj
+     * @return
+     */
+    public static <T extends ResponseConverter<O>, O> Collection<T> converter(Class<T> returnType, Collection<O> obj) {
         try {
             T returnAux = ReflectionUtil.getInstance(returnType);
             return returnAux.converter(obj);

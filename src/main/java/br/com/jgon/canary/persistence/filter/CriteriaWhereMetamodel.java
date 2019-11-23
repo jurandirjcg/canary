@@ -517,7 +517,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param matchMode {@link MatchMode}
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereILike(Attribute<?, ?> attribute, String value, MatchMode matchMode);
+    public CriteriaWhereMetamodel<T> addWhereILike(Attribute<T, String> attribute, String value, MatchMode matchMode);
 
     /**
      * @param attribute
@@ -533,7 +533,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param matchMode {@link MatchMode}
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereILike(Attribute<?, ?> attribute, MatchMode matchMode);
+    public CriteriaWhereMetamodel<T> addWhereILike(Attribute<T, String> attribute, MatchMode matchMode);
 
     /**
      * 
@@ -549,7 +549,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param matchMode {@link MatchMode}
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereNotILike(Attribute<?, ?> attribute, String value, MatchMode matchMode);
+    public CriteriaWhereMetamodel<T> addWhereNotILike(Attribute<T, String> attribute, String value, MatchMode matchMode);
 
     /**
      * @param attribute
@@ -565,7 +565,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param matchMode {@link MatchMode}
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereNotLike(Attribute<?, ?> attribute, String value, MatchMode matchMode);
+    public CriteriaWhereMetamodel<T> addWhereNotLike(Attribute<T, String> attribute, String value, MatchMode matchMode);
 
     /**
      * @param attribute
@@ -581,7 +581,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param matchMode {@link MatchMode}
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLike(Attribute<?, ?> attribute, String value, MatchMode matchMode);
+    public CriteriaWhereMetamodel<T> addWhereLike(Attribute<T, String> attribute, String value, MatchMode matchMode);
 
     /**
      * @param attribute
@@ -596,7 +596,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param matchMode {@link MatchMode}
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereNotILike(Attribute<?, ?> attribute, MatchMode matchMode);
+    public CriteriaWhereMetamodel<T> addWhereNotILike(Attribute<T, String> attribute, MatchMode matchMode);
 
     /**
      * @param attribute
@@ -610,7 +610,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param matchMode {@link MatchMode}
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereNotLike(Attribute<?, ?> attribute, MatchMode matchMode);
+    public CriteriaWhereMetamodel<T> addWhereNotLike(Attribute<T, String> attribute, MatchMode matchMode);
 
     /**
      * @param attribute
@@ -625,7 +625,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param matchMode {@link MatchMode}
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLike(Attribute<?, ?> attribute, MatchMode matchMode);
+    public CriteriaWhereMetamodel<T> addWhereLike(Attribute<T, String> attribute, MatchMode matchMode);
 
     /**
      * 
@@ -640,7 +640,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param attribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereEqual(Attribute<?, ?> attribute);
+    public CriteriaWhereMetamodel<T> addWhereEqual(Attribute<T, ?> attribute);
 
     /**
      * 
@@ -655,7 +655,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param values
      * @return
      */
-    public <E> CriteriaWhereMetamodel<T> addWhereIn(Attribute<?, ?> attribute, List<E> values);
+    public <E> CriteriaWhereMetamodel<T> addWhereIn(Attribute<T, E> attribute, List<E> values);
 
     /**
      * 
@@ -672,7 +672,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public <E> CriteriaWhereMetamodel<T> addWhereIn(Attribute<?, ?> attribute, E... values);
+    public <E> CriteriaWhereMetamodel<T> addWhereIn(Attribute<T, E> attribute, E... values);
 
     /**
      * 
@@ -690,7 +690,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public <E> CriteriaWhereMetamodel<T> addWhereNotIn(Attribute<?, ?> attribute, E... values);
+    public <E> CriteriaWhereMetamodel<T> addWhereNotIn(Attribute<T, E> attribute, E... values);
 
     /**
      * 
@@ -707,7 +707,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param values
      * @return
      */
-    public <E> CriteriaWhereMetamodel<T> addWhereNotIn(Attribute<?, ?> attribute, List<E> values);
+    public <E> CriteriaWhereMetamodel<T> addWhereNotIn(Attribute<T, E> attribute, List<E> values);
 
     /**
      * 
@@ -724,7 +724,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public <E> CriteriaWhereMetamodel<T> addWhereEqual(Attribute<?, ?> attribute, E... values);
+    public <E> CriteriaWhereMetamodel<T> addWhereEqual(Attribute<T, E> attribute, E... values);
 
     /**
      * 
@@ -741,7 +741,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param values
      * @return
      */
-    public <E> CriteriaWhereMetamodel<T> addWhereEqual(Attribute<?, ?> attribute, List<E> values);
+    public <E> CriteriaWhereMetamodel<T> addWhereEqual(Attribute<T, E> attribute, List<E> values);
 
     /**
      * 
@@ -758,7 +758,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<?, ?> attribute, E... values);
+    public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<T, E> attribute, E... values);
 
     /**
      * 
@@ -775,7 +775,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param values
      * @return
      */
-    public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<?, ?> attribute, List<E> values);
+    public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<T, E> attribute, List<E> values);
 
     /**
      * 
@@ -792,7 +792,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param endValue
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<?, ?> attribute, Integer startValue, Integer endValue);
+    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, Integer> attribute, Integer startValue, Integer endValue);
 
     /**
      * 
@@ -810,7 +810,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param endValue
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<?, ?> attribute, Short startValue, Short endValue);
+    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, Short> attribute, Short startValue, Short endValue);
 
     /**
      * 
@@ -828,7 +828,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param endValue
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<?, ?> attribute, Long startValue, Long endValue);
+    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, Long> attribute, Long startValue, Long endValue);
 
     /**
      * 
@@ -845,7 +845,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThanField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+    public <E> CriteriaWhereMetamodel<T> addWhereLessThanField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
 
     /**
      * 
@@ -853,7 +853,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThanField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute);
+    public CriteriaWhereMetamodel<T> addWhereLessThanField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
 
     /**
      * 
@@ -869,7 +869,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThanField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+    public <E> CriteriaWhereMetamodel<T> addWhereGreaterThanField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
 
     /**
      * 
@@ -877,7 +877,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThanField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute);
+    public CriteriaWhereMetamodel<T> addWhereGreaterThanField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
 
     /**
      * 
@@ -893,7 +893,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualToField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+    public <E> CriteriaWhereMetamodel<T> addWhereLessThanOrEqualToField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
 
     /**
      * 
@@ -901,7 +901,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute);
+    public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
 
     /**
      * 
@@ -917,7 +917,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualToField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+    public <E> CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualToField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
 
     /**
      * 
@@ -925,7 +925,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute);
+    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
 
     /**
      * 
@@ -941,7 +941,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereEqualField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+    public <E> CriteriaWhereMetamodel<T> addWhereEqualField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
 
     /**
      * 
@@ -949,7 +949,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereEqualField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute);
+    public CriteriaWhereMetamodel<T> addWhereEqualField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
 
     /**
      * 
@@ -965,7 +965,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereNotEqualField(Attribute<?, ?> attribute, Attribute<?, ?> anotherAttribute);
+    public <E> CriteriaWhereMetamodel<T> addWhereNotEqualField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
 
     /**
      * 
@@ -973,7 +973,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereNotEqualField(ComplexAttribute attribute, Attribute<?, ?> anotherAttribute);
+    public CriteriaWhereMetamodel<T> addWhereNotEqualField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
 
     /**
      * 
@@ -990,7 +990,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param endValue
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<?, ?> attribute, Date startValue, Date endValue);
+    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, Date> attribute, Date startValue, Date endValue);
 
     /**
      * 
@@ -1008,7 +1008,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param endValue
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<?, ?> attribute, LocalDate startValue, LocalDate endValue);
+    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, LocalDate> attribute, LocalDate startValue, LocalDate endValue);
 
     /**
      * 
@@ -1026,7 +1026,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param endValue
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<?, ?> attribute, LocalDateTime startValue, LocalDateTime endValue);
+    public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, LocalDateTime> attribute, LocalDateTime startValue, LocalDateTime endValue);
 
     /**
      * 
@@ -1042,7 +1042,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param attribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThan(Attribute<?, ?> attribute);
+    public CriteriaWhereMetamodel<T> addWhereGreaterThan(Attribute<T, ?> attribute);
 
     /**
      * 
@@ -1056,7 +1056,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param attribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<?, ?> attribute);
+    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, ?> attribute);
 
     /**
      * 
@@ -1070,7 +1070,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param attribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereIsNotNull(Attribute<?, ?> attribute);
+    public CriteriaWhereMetamodel<T> addWhereIsNotNull(Attribute<T, ?> attribute);
 
     /**
      * 
@@ -1084,7 +1084,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param attribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereIsNull(Attribute<?, ?> attribute);
+    public CriteriaWhereMetamodel<T> addWhereIsNull(Attribute<T, ?> attribute);
 
     /**
      * 
@@ -1098,7 +1098,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param attribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereIn(Attribute<?, ?> attribute);
+    public CriteriaWhereMetamodel<T> addWhereIn(Attribute<T, ?> attribute);
 
     /**
      * 
@@ -1112,7 +1112,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param attribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThan(Attribute<?, ?> attribute);
+    public CriteriaWhereMetamodel<T> addWhereLessThan(Attribute<T, ?> attribute);
 
     /**
      * 
@@ -1126,7 +1126,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param attribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(Attribute<?, ?> attribute);
+    public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(Attribute<T, ?> attribute);
 
     /**
      * 
@@ -1140,7 +1140,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param attribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<?, ?> attribute);
+    public CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<T, ?> attribute);
 
     /**
      * 
@@ -1154,7 +1154,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param attribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereNotIn(Attribute<?, ?> attribute);
+    public CriteriaWhereMetamodel<T> addWhereNotIn(Attribute<T, ?> attribute);
 
     /**
      * 
@@ -1169,7 +1169,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param value
      * @return
      */
-    public <E> CriteriaWhereMetamodel<T> addWhereEqual(Attribute<?, ?> attribute, E value);
+    public <E> CriteriaWhereMetamodel<T> addWhereEqual(Attribute<T, E> attribute, E value);
 
     /**
      * 
@@ -1185,7 +1185,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param value
      * @return
      */
-    public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<?, ?> attribute, E value);
+    public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<T, E> attribute, E value);
 
     /**
      * 
@@ -1201,7 +1201,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThan(Attribute<?, ?> attribute, Date value);
+    public CriteriaWhereMetamodel<T> addWhereGreaterThan(Attribute<T, Date> attribute, Date value);
 
     /**
      * 
@@ -1217,7 +1217,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThan(Attribute<?, ?> attribute, Number value);
+    public CriteriaWhereMetamodel<T> addWhereGreaterThan(Attribute<T, Number> attribute, Number value);
 
     /**
      * 
@@ -1233,7 +1233,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<?, ?> attribute, Date value);
+    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, Date> attribute, Date value);
 
     /**
      * 
@@ -1249,7 +1249,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<?, ?> attribute, Number value);
+    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, Number> attribute, Number value);
 
     /**
      * 
@@ -1265,7 +1265,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThan(Attribute<?, ?> attribute, Date value);
+    public CriteriaWhereMetamodel<T> addWhereLessThan(Attribute<T, Date> attribute, Date value);
 
     /**
      * 
@@ -1281,7 +1281,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThan(Attribute<?, ?> attribute, Number value);
+    public CriteriaWhereMetamodel<T> addWhereLessThan(Attribute<T, Number> attribute, Number value);
 
     /**
      * 
@@ -1297,7 +1297,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(Attribute<?, ?> attribute, Date value);
+    public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(Attribute<T, Date> attribute, Date value);
 
     /**
      * 
@@ -1313,7 +1313,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(Attribute<?, ?> attribute, Number value);
+    public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(Attribute<T, Number> attribute, Number value);
 
     /**
      * 
@@ -1359,7 +1359,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @throws ApplicationRuntimeException
      */
     public CriteriaWhereMetamodel<T> addWhereRegex(
-        Attribute<?, ?> attribute,
+        Attribute<T, ?> attribute,
         String value,
         RegexWhere[] regexToAnalyse,
         RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
@@ -1411,7 +1411,7 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereNotEqualField(Attribute<?, ?> attribute, ComplexAttribute anotherAttribute);
+    public CriteriaWhereMetamodel<T> addWhereNotEqualField(Attribute<T, ?> attribute, ComplexAttribute anotherAttribute);
 
     /**
      * 
@@ -1419,6 +1419,6 @@ public interface CriteriaWhereMetamodel<T> extends CriteriaWhere<T> {
      * @param anotherAttribute
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereEqualField(Attribute<?, ?> attribute, ComplexAttribute anotherAttribute);
+    public CriteriaWhereMetamodel<T> addWhereEqualField(Attribute<T, ?> attribute, ComplexAttribute anotherAttribute);
 
 }
