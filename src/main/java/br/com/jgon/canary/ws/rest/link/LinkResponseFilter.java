@@ -312,6 +312,8 @@ public class LinkResponseFilter implements ContainerResponseFilter {
                     childName = getChildClassName((Collection<Object>) responseContext.getEntity());
                     if (StringUtils.isBlank(childName)) {
                         childName = "items";
+                    } else {
+                        childName += "List";
                     }
                 }
 
@@ -559,23 +561,23 @@ public class LinkResponseFilter implements ContainerResponseFilter {
         }
 
         for (String rpAux : reqPathParamOrder) {
-            //boolean test = true;
+            // boolean test = true;
             if (linkPathParameters != null && linkPathParameters.length > 0) {
                 for (int i = 0; i < linkPathParameters.length; i++) {
                     // if(linkPathParameters[i].equals("{" + rpAux + "}")){
                     if (StringUtils.isBlank(linkPathParameters[i])) {
-                        //test = false;
+                        // test = false;
                         values.add("");
                     } else if (linkPathParameters[i].matches(REGEX_PATH_PARAMETERS_REQ)
                         && uriInfo.getPathParameters(false).get(rpAux) != null) {
-                        //test = false; Nao tinha adicionado para verificacao
+                        // test = false; Nao tinha adicionado para verificacao
                         if (uriInfo.getPathParameters(false).get(rpAux).size() > 1) {
                             values.add(uriInfo.getPathParameters(false).get(rpAux));
                         } else {
                             values.add(uriInfo.getPathParameters(false).getFirst(rpAux));
                         }
                     } else {
-                        //test = false;
+                        // test = false;
                         if (linkPathParameters[i].matches(REGEX_LINK_TEMPLATE)) {
                             linkTemplate = true;
                         }
@@ -583,11 +585,11 @@ public class LinkResponseFilter implements ContainerResponseFilter {
                     }
                     // }
                 }
-            }else {
+            } else {
                 values.add("");
             }
 
-            //FIXME Remover se nao apresentar erro nos links
+            // FIXME Remover se nao apresentar erro nos links
 //            if (test) {
 //                if (uriInfo.getPathParameters(false).get(rpAux) != null) {
 //                    if (uriInfo.getPathParameters(false).get(rpAux).size() > 1) {
@@ -833,16 +835,21 @@ public class LinkResponseFilter implements ContainerResponseFilter {
      * @return
      */
     private <T> String getChildClassName(Collection<T> list) {
-        if (list != null) {
-            for (T obj : list) {
-                Class<?> klass = obj.getClass();
-                if (klass.isAnnotationPresent(HalJsonRootName.class)) {
-                    return klass.getAnnotation(HalJsonRootName.class).value();
-                } else if (klass.isAnnotationPresent(JsonbProperty.class)) {
-                    return klass.getAnnotation(JsonbProperty.class).value();
-                }
-                return obj.getClass().getSimpleName();
+        Class<?> contentClass = ReflectionUtil.colletionContentType(list.getClass());
+        if (contentClass == null && list != null) {
+            Object obj = list.stream().filter(f -> f != null).findFirst().orElse(null);
+            if(obj != null) {
+                contentClass = obj.getClass();
             }
+        }
+        
+        if(contentClass != null) {
+            if (contentClass.isAnnotationPresent(HalJsonRootName.class)) {
+                return contentClass.getAnnotation(HalJsonRootName.class).value();
+            } else if (contentClass.isAnnotationPresent(JsonbProperty.class)) {
+                return contentClass.getAnnotation(JsonbProperty.class).value();
+            }
+            return contentClass.getSimpleName();
         }
         return null;
     }

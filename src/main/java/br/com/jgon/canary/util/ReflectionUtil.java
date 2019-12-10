@@ -30,6 +30,8 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
+
 /**
  * Biblioteca de Reflection, baseada na bilioteca de reflection do Framework
  * Pinhão Paraná (http://www.frameworkpinhao.pr.gov.br)
@@ -1014,15 +1016,29 @@ public final class ReflectionUtil {
         if (type instanceof ParameterizedType) {
             ParameterizedType aType = (ParameterizedType) type;
             Type fieldArgTypes = aType.getActualTypeArguments()[position];
-            if (fieldArgTypes != null) {
+            if (fieldArgTypes != null && !(fieldArgTypes instanceof TypeVariableImpl)) {
                 return (Class<?>) fieldArgTypes;
             }
         }
         return null;
     }
-    
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves
+     * @since 24/11/2019
+     *
+     * @param <E>
+     * @param collectionClass
+     * @return
+     */
+    public static <E extends Collection<?>> Class<?> colletionContentType(Class<E> collectionClass) {
+        return returnParameterType(collectionClass.getGenericSuperclass(), 0);
+    }
+
     /**
      * Obtem instancia mesmo que a classe esteja marcada como protected
+     * 
      * @author Jurandir C. Gonçalves
      * @since 17/11/2019
      *

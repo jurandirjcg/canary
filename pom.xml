@@ -1,65 +1,66 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>br.com.jgon</groupId>
-  <artifactId>canary</artifactId>
-  <version>2.0-RC1-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>Canary</name>
-  <description>Utils for Java JPA 2.1 and REST WebServices</description>
-  <url>https://github.com/jurandirjcg/canary</url>
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-  <developers>
-    <developer>
-      <name>Jurandir C. Gonçalves</name>
-      <email>juragoncalves@gmail.com</email>
-    </developer>
-  </developers>
-  <scm>
-  <connection>scm:git:git://github.com/jurandirjcg/canary.git</connection>
-  <developerConnection>scm:git:ssh://github.com:jurandirjcg/canary.git</developerConnection>
-  <url>http://github.com/jurandirjcg/canary/tree/master</url>
- </scm>
- <distributionManagement>
-  <snapshotRepository>
-   <id>ossrh</id>
-   <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-  </snapshotRepository>
-  <repository>
-   <id>ossrh</id>
-   <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-  </repository>
- </distributionManagement>
-  <properties>
-	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<!-- Dependencias -->
-	<commons-lang3.version>3.9</commons-lang3.version>
-	<javaee-api.version>7.0</javaee-api.version>
-	<javax.json.bind-api.version>1.0</javax.json.bind-api.version>
-	<resteasy-core.version>4.3.1.Final</resteasy-core.version>
-	<slf4j-api.version>1.7.13</slf4j-api.version>
-	<yasson.version>1.0.5</yasson.version>
-	<!-- Plugins -->
-	<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
-	<maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
-	<maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
-	<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
-	<maven-source-plugin.version>2.2.1</maven-source-plugin.version>
-	<nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
-  </properties>
-	
-  <dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>br.com.jgon</groupId>
+	<artifactId>canary</artifactId>
+	<version>2.0-RC1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>Canary</name>
+	<description>Utils for Java JPA 2.1 and REST WebServices</description>
+	<url>https://github.com/jurandirjcg/canary</url>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Jurandir C. Gonçalves</name>
+			<email>juragoncalves@gmail.com</email>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:git:git://github.com/jurandirjcg/canary.git</connection>
+		<developerConnection>scm:git:ssh://github.com:jurandirjcg/canary.git</developerConnection>
+		<url>http://github.com/jurandirjcg/canary/tree/master</url>
+	</scm>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Dependencias -->
+		<commons-lang3.version>3.9</commons-lang3.version>
+		<javaee-api.version>7.0</javaee-api.version>
+		<javax.json.bind-api.version>1.0</javax.json.bind-api.version>
+		<resteasy-core.version>4.3.1.Final</resteasy-core.version>
+		<slf4j-api.version>1.7.13</slf4j-api.version>
+		<yasson.version>1.0.5</yasson.version>
+		<!-- Plugins -->
+		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+		<maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
+		<maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
+		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
+		<maven-source-plugin.version>2.2.1</maven-source-plugin.version>
+		<nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
+	</properties>
+
+	<dependencies>
 		<!-- Dependência da especificação do JBOSS -->
 		<dependency>
-		    <groupId>javax</groupId>
-		    <artifactId>javaee-api</artifactId>
-		    <version>${javaee-api.version}</version>
-		    <scope>provided</scope>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>${javaee-api.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<!-- LOG -->
 		<dependency>
@@ -68,23 +69,17 @@
 			<version>${slf4j-api.version}</version>
 			<scope>provided</scope>
 		</dependency>
-	<!-- RESTEASY -->
-	<!-- <dependency> -->
-	<!-- <groupId>org.jboss.resteasy</groupId> -->
-	<!-- <artifactId>resteasy-core</artifactId> -->
-	<!-- <version>${resteasy-core.version}</version> -->
-	<!-- </dependency> -->
-		<!-- JSONB -->	
+		<!-- JSONB -->
 		<dependency>
 			<groupId>javax.json.bind</groupId>
-		    <artifactId>javax.json.bind-api</artifactId>
-		    <version>${javax.json.bind-api.version}</version>
-		    <scope>provided</scope>
+			<artifactId>javax.json.bind-api</artifactId>
+			<version>${javax.json.bind-api.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse</groupId>
-		    <artifactId>yasson</artifactId>
-		    <version>${yasson.version}</version>
+			<artifactId>yasson</artifactId>
+			<version>${yasson.version}</version>
 		</dependency>
 		<!-- COMMONS -->
 		<dependency>
@@ -92,7 +87,7 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>${commons-lang3.version}</version>
 		</dependency>
- 	</dependencies>
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -122,56 +117,56 @@
 			<build>
 				<plugins>
 					<plugin>
-				      <groupId>org.apache.maven.plugins</groupId>
-				      <artifactId>maven-source-plugin</artifactId>
-				      <version>${maven-source-plugin.version}</version>
-				      <executions>
-				        <execution>
-				          <id>attach-sources</id>
-				          <goals>
-				            <goal>jar-no-fork</goal>
-				          </goals>
-				        </execution>
-				      </executions>
-				    </plugin>
-				    <plugin>
-				      <groupId>org.apache.maven.plugins</groupId>
-				      <artifactId>maven-javadoc-plugin</artifactId>
-				      <version>${maven-javadoc-plugin.version}</version>
-				      <executions>
-				        <execution>
-				          <id>attach-javadocs</id>
-				          <goals>
-				            <goal>jar</goal>
-				          </goals>
-				        </execution>
-				      </executions>
-				    </plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>${maven-source-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 					<plugin>
-				      <groupId>org.sonatype.plugins</groupId>
-				      <artifactId>nexus-staging-maven-plugin</artifactId>
-				      <version>${nexus-staging-maven-plugin.version}</version>
-				      <extensions>true</extensions>
-				      <configuration>
-				        <serverId>ossrh</serverId>
-				        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-				        <autoReleaseAfterClose>true</autoReleaseAfterClose>
-				      </configuration>
-				    </plugin>
-				    <plugin>
-				      <groupId>org.apache.maven.plugins</groupId>
-				      <artifactId>maven-gpg-plugin</artifactId>
-				      <version>${maven-gpg-plugin.version}</version>
-				      <executions>
-				        <execution>
-				          <id>sign-artifacts</id>
-				          <phase>verify</phase>
-				          <goals>
-				            <goal>sign</goal>
-				          </goals>
-				        </execution>
-				      </executions>
-				    </plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>${maven-javadoc-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>${nexus-staging-maven-plugin.version}</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${maven-gpg-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>

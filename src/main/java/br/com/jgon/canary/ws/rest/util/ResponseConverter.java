@@ -177,10 +177,10 @@ public abstract class ResponseConverter<O> {
      * @param obj
      * @return
      */
-    public static <T extends ResponseConverter<O>, O> Collection<T> converter(Class<T> returnType, Collection<O> obj) {
+    public static <T extends ResponseConverter<O>, O> Collection<T> converter(Class<T> returnType, Collection<O> list) {
         try {
             T returnAux = ReflectionUtil.getInstance(returnType);
-            return returnAux.converter(obj);
+            return returnAux.converter(list);
         } catch (Exception e) {
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.response-converter", e);
         }
