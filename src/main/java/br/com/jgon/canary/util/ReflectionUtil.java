@@ -14,7 +14,9 @@
 package br.com.jgon.canary.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -919,4 +921,55 @@ public class ReflectionUtil {
 			}
 		}
 	}
+	
+
+    /**
+     * Obtem instancia
+     * 
+     * @author Jurandir C. Gonçalves
+     * @since 17/11/2019
+     *
+     * @param <E>
+     * @param klass
+     * @param allDeclared - inclui construtores private e protected
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> E getInstance(Class<E> klass, boolean allDeclared)
+        throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        Constructor<?>[] ctors = allDeclared ? klass.getDeclaredConstructors() : klass.getConstructors();
+        Constructor<?> ctor = null;
+        for (int i = 0; i < ctors.length; i++) {
+            ctor = ctors[i];
+            if (ctor.getGenericParameterTypes().length == 0) {
+                break;
+            }
+        }
+
+        ctor.setAccessible(true);
+        return (E) ctor.newInstance();
+    }
+
+    /**
+     * Obtem instancia mesmo que a classe esteja marcada como protected
+     * 
+     * @author Jurandir C. Gonçalves
+     * @since 03/01/2020
+     *
+     * @param <E>
+     * @param klass
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
+    public static <E> E getInstance(Class<E> klass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        return getInstance(klass, true);
+    }
+
 }
