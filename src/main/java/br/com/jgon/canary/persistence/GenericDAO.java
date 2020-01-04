@@ -15,6 +15,7 @@ package br.com.jgon.canary.persistence;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -313,7 +314,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
             }
             if (!flds.isEmpty()) {
                 Field fld = flds.get(0);
-                T objRef = getPrimaryClass().newInstance();
+                T objRef = ReflectionUtil.getInstance(getPrimaryClass());
                 ReflectionUtil.setFieldValue(objRef, fld, id);
 
                 return find(objRef, resultClass, fields);
@@ -345,7 +346,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
             }
             if (!flds.isEmpty()) {
                 Field fld = flds.get(0);
-                T objRef = getPrimaryClass().newInstance();
+                T objRef = ReflectionUtil.getInstance(getPrimaryClass());
                 ReflectionUtil.setFieldValue(objRef, fld, id);
 
                 return find(objRef, resultClass, fieldAlias);
@@ -599,10 +600,12 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @throws InstantiationException      - erro ao instanciar
      * @throws IllegalAccessException      - erro ao acessar atributo
      * @throws ApplicationRuntimeException - erro generico ao pesquisar
+     * @throws InvocationTargetException 
+     * @throws IllegalArgumentException 
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private <E> E checkTupleSingleResult(CriteriaManager<T> criteriaManager, SimpleEntry<?, E> result)
-        throws InstantiationException, IllegalAccessException, ApplicationRuntimeException {
+        throws InstantiationException, IllegalAccessException, ApplicationRuntimeException, IllegalArgumentException, InvocationTargetException {
         if (result == null) {
             return null;
         }
@@ -615,7 +618,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
                 fldAux = ReflectionUtil.getAttribute(getPrimaryClass(), k);
                 fldAux.setAccessible(true);
 
-                objAux = getPrimaryClass().newInstance();
+                objAux = ReflectionUtil.getInstance(getPrimaryClass());
                 if (result.getKey() == null) {
                     fieldId.set(objAux, fieldId.get(ret));
                 } else {
@@ -854,6 +857,14 @@ public abstract class GenericDAO<T, K extends Serializable> {
             logger.error("[getPreparedResultList]", e);
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.field.access",
                 new String[] { getPrimaryClass().getSimpleName() });
+        } catch (IllegalArgumentException e) {
+            logger.error("[getPreparedResultList]", e);
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.instantiation",
+                new String[] { getPrimaryClass().getSimpleName() });
+        } catch (InvocationTargetException e) {
+            logger.error("[getPreparedResultList]", e);
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.instantiation",
+                new String[] { getPrimaryClass().getSimpleName() });
         }
     }
 
@@ -1005,10 +1016,12 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @throws InstantiationException      - erro ao instanciar objeto
      * @throws IllegalAccessException      - erro ao acessar atributo
      * @throws ApplicationRuntimeException - erro ao pesquisar
+     * @throws InvocationTargetException 
+     * @throws IllegalArgumentException 
      */
     @SuppressWarnings("unchecked")
     private <E> SimpleEntry<?, E> tupleToResultClass(Tuple tuple, Class<E> resultClass)
-        throws ApplicationRuntimeException, InstantiationException, IllegalAccessException {
+        throws ApplicationRuntimeException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         if (resultClass == null) {
             resultClass = (Class<E>) getPrimaryClass();
         }
@@ -1019,7 +1032,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
 
         E objReturn;
 
-        objReturn = resultClass.newInstance();
+        objReturn = ReflectionUtil.getInstance(resultClass);
 
         SimpleEntry<?, E> seReturn = null;
 
@@ -1055,7 +1068,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
                             if (ReflectionUtil.isCollection(fldAux.getType())) {
                                 objTemp = createCollectionInstance(fldAux.getType());
                             } else {
-                                objTemp = fldAux.getType().newInstance();
+                                objTemp = ReflectionUtil.getInstance(fldAux.getType());
                             }
                             fldAux.set(objAux, objTemp);
                         }
@@ -1117,7 +1130,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
             throw ae;
         } else {
             try {
-                return classAux.newInstance();
+                return ReflectionUtil.getInstance(classAux);
             } catch (Exception e) {
                 logger.error("[getObjectCollectionInstance]", e);
                 throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.instantiation", classAux.getName());

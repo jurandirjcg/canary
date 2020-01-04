@@ -1037,13 +1037,14 @@ public final class ReflectionUtil {
     }
 
     /**
-     * Obtem instancia mesmo que a classe esteja marcada como protected
+     * Obtem instancia
      * 
      * @author Jurandir C. Gonçalves
      * @since 17/11/2019
      *
      * @param <E>
      * @param klass
+     * @param allDeclared - inclui construtores private e protected
      * @return
      * @throws InstantiationException
      * @throws IllegalAccessException
@@ -1051,9 +1052,9 @@ public final class ReflectionUtil {
      * @throws InvocationTargetException
      */
     @SuppressWarnings("unchecked")
-    public static <E> E getInstance(Class<E> klass)
+    public static <E> E getInstance(Class<E> klass, boolean allDeclared)
         throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        Constructor<?>[] ctors = klass.getDeclaredConstructors();
+        Constructor<?>[] ctors = allDeclared ? klass.getDeclaredConstructors() : klass.getConstructors();
         Constructor<?> ctor = null;
         for (int i = 0; i < ctors.length; i++) {
             ctor = ctors[i];
@@ -1066,4 +1067,21 @@ public final class ReflectionUtil {
         return (E) ctor.newInstance();
     }
 
+    /**
+     * Obtem instancia mesmo que a classe esteja marcada como protected
+     * 
+     * @author Jurandir C. Gonçalves
+     * @since 03/01/2020
+     *
+     * @param <E>
+     * @param klass
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
+    public static <E> E getInstance(Class<E> klass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        return getInstance(klass, true);
+    }
 }
