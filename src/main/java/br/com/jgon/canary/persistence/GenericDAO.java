@@ -241,8 +241,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
             return getSearchEntityManager().find(getPrimaryClass(), id);
         } catch (IllegalArgumentException e) {
             logger.error("[find]", e);
-            throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY,
-                new String[] { getPrimaryClass().getSimpleName() });
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY, getPrimaryClass().getSimpleName());
         }
     }
 
@@ -258,8 +257,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
             return getSearchEntityManager().getReference(getPrimaryClass(), id);
         } catch (IllegalArgumentException e) {
             logger.error("[findReference]", e);
-            throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY,
-                new String[] { getPrimaryClass().getSimpleName() });
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY, getPrimaryClass().getSimpleName());
         }
     }
 
@@ -281,7 +279,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @return T - objeto pesquisado
      * @throws ApplicationRuntimeException - erro ao pesquisar
      */
-    public T find(K id, String[] fields) throws ApplicationRuntimeException {
+    public T find(K id, String... fields) throws ApplicationRuntimeException {
         return find(id, CollectionUtil.convertArrayToList(fields));
     }
 
@@ -294,7 +292,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @return E - objeto pesquisado
      * @throws ApplicationRuntimeException - erro ao pesquisar
      */
-    public <E> E find(K id, Class<E> resultClass, String[] fields) throws ApplicationRuntimeException {
+    public <E> E find(K id, Class<E> resultClass, String... fields) throws ApplicationRuntimeException {
         return find(id, resultClass, CollectionUtil.convertArrayToList(fields));
     }
 
@@ -358,7 +356,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
         } catch (Exception e) {
             logger.error("[find]", e);
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY,
-                new String[] { getPrimaryClass().getSimpleName() });
+                getPrimaryClass().getSimpleName());
         }
     }
 
@@ -472,7 +470,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
         } catch (Exception e) {
             logger.error("[getResultList]", e);
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY,
-                new String[] { getPrimaryClass().getSimpleName() });
+                getPrimaryClass().getSimpleName());
         }
     }
 
@@ -600,12 +598,13 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @throws InstantiationException      - erro ao instanciar
      * @throws IllegalAccessException      - erro ao acessar atributo
      * @throws ApplicationRuntimeException - erro generico ao pesquisar
-     * @throws InvocationTargetException 
-     * @throws IllegalArgumentException 
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private <E> E checkTupleSingleResult(CriteriaManager<T> criteriaManager, SimpleEntry<?, E> result)
-        throws InstantiationException, IllegalAccessException, ApplicationRuntimeException, IllegalArgumentException, InvocationTargetException {
+        throws InstantiationException, IllegalAccessException, ApplicationRuntimeException, IllegalArgumentException,
+        InvocationTargetException {
         if (result == null) {
             return null;
         }
@@ -852,19 +851,19 @@ public abstract class GenericDAO<T, K extends Serializable> {
         } catch (InstantiationException e) {
             logger.error("[getPreparedResultList]", e);
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.instantiation",
-                new String[] { getPrimaryClass().getSimpleName() });
+                getPrimaryClass().getSimpleName());
         } catch (IllegalAccessException e) {
             logger.error("[getPreparedResultList]", e);
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.field.access",
-                new String[] { getPrimaryClass().getSimpleName() });
+                getPrimaryClass().getSimpleName());
         } catch (IllegalArgumentException e) {
             logger.error("[getPreparedResultList]", e);
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.instantiation",
-                new String[] { getPrimaryClass().getSimpleName() });
+                getPrimaryClass().getSimpleName());
         } catch (InvocationTargetException e) {
             logger.error("[getPreparedResultList]", e);
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.instantiation",
-                new String[] { getPrimaryClass().getSimpleName() });
+                getPrimaryClass().getSimpleName());
         }
     }
 
@@ -936,7 +935,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
         } catch (Exception e) {
             logger.error("[getSingleResult]", e);
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY,
-                new String[] { getPrimaryClass().getSimpleName() });
+                getPrimaryClass().getSimpleName());
         }
     }
 
@@ -980,11 +979,11 @@ public abstract class GenericDAO<T, K extends Serializable> {
             return null;
         } catch (IllegalArgumentException e) {
             logger.error("[getPreparedSingleResult]", e);
-            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "message", new String[] { e.getMessage() });
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "message", e.getMessage());
         } catch (Exception e) {
             logger.error("[getPreparedSingleResult]", e);
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_KEY,
-                new String[] { getPrimaryClass().getSimpleName() });
+                getPrimaryClass().getSimpleName());
         }
     }
 
@@ -1016,12 +1015,13 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @throws InstantiationException      - erro ao instanciar objeto
      * @throws IllegalAccessException      - erro ao acessar atributo
      * @throws ApplicationRuntimeException - erro ao pesquisar
-     * @throws InvocationTargetException 
-     * @throws IllegalArgumentException 
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      */
     @SuppressWarnings("unchecked")
     private <E> SimpleEntry<?, E> tupleToResultClass(Tuple tuple, Class<E> resultClass)
-        throws ApplicationRuntimeException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        throws ApplicationRuntimeException, InstantiationException, IllegalAccessException, IllegalArgumentException,
+        InvocationTargetException {
         if (resultClass == null) {
             resultClass = (Class<E>) getPrimaryClass();
         }
@@ -1055,7 +1055,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
 
                     if (fldAux == null) {
                         ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIELD_DOES_NOT_EXIST,
-                            new String[] { subObj[i], objAux.getClass().getSimpleName() });
+                            subObj[i], objAux.getClass().getSimpleName());
                         logger.error("[tupleToResultClass]", ae.getMessage());
                         throw ae;
                     }
@@ -1153,7 +1153,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
             return new HashSet<Object>();
         }
         ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "error.collection-instance",
-            new String[] { klass.getName() });
+            klass.getName());
         logger.error("[createCollectionInstance]", ae.getMessage());
         throw ae;
     }
@@ -1177,7 +1177,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @return E
      * @throws ApplicationRuntimeException - erro ao pesquisar
      */
-    public <E> E find(T obj, Class<E> resultClass, String[] fields) throws ApplicationRuntimeException {
+    public <E> E find(T obj, Class<E> resultClass, String... fields) throws ApplicationRuntimeException {
         return find(obj, resultClass, CollectionUtil.convertArrayToList(fields));
     }
 
@@ -1235,7 +1235,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @return T
      * @throws ApplicationRuntimeException - erro ao pesquisar
      */
-    public T find(T obj, String[] fields) throws ApplicationRuntimeException {
+    public T find(T obj, String... fields) throws ApplicationRuntimeException {
         return find(obj, CollectionUtil.convertArrayToList(fields));
     }
 
@@ -1622,7 +1622,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
     public boolean exists(K id) throws ApplicationRuntimeException {
         return findReference(id) != null;
     }
-    
+
     /**
      * 
      * @param objRef   - Ojeto de referência
@@ -1859,7 +1859,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
             } catch (Exception e) {
                 logger.error("[getResultPaginate]", e);
                 throw new ApplicationRuntimeException(MessageSeverity.ERROR, ERROR_FIND_LIST_KEY,
-                    new String[] { getPrimaryClass().getSimpleName() });
+                    getPrimaryClass().getSimpleName());
             }
         }
         return paginacao;
