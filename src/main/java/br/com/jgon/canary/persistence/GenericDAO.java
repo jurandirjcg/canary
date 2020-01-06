@@ -1615,6 +1615,16 @@ public abstract class GenericDAO<T, K extends Serializable> {
 
     /**
      * 
+     * @param id - identificador
+     * @return {@link Boolean}
+     * @throws ApplicationRuntimeException - erro ao verificar se existe registro
+     */
+    public boolean exists(K id) throws ApplicationRuntimeException {
+        return findReference(id) != null;
+    }
+    
+    /**
+     * 
      * @param objRef   - Ojeto de referência
      * @param distinct - {@link Boolean}
      * @return {@link Long}
