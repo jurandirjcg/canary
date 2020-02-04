@@ -58,7 +58,7 @@ import br.com.jgon.canary.ws.rest.util.json.JsonLinkEntity;
 public class LinkResponseFilter implements ContainerResponseFilter {
 
     private static final String REGEX_REQUEST_PATH_PARAMETERS = "\\{[a-z-A-Z]+\\}";
-    private static final String REGEX_PATH_PARAMETERS_REQ = "[^\\#\\$]\\{[a-z-A-Z]+\\}";
+    private static final String REGEX_PATH_PARAMETERS_REQ = "(?<![\\#\\$])\\{[a-z-A-Z]+\\}";//"[^\\#\\$]\\{[a-z-A-Z]+\\}";
     private static final String REGEX_PATH_PARAMETERS_ENTITY = "(\\#|\\$)\\{[a-z-A-Z\\.]+\\}";
     private static final String REGEX_REPLACE_PARAM = "\\#|\\$|\\{|\\}";
     private static final String REGEX_LINK_TEMPLATE = "(^\\{[a-zA-Z_-]+\\})|([^\\#\\$]\\{[a-zA-Z_-]+\\})";

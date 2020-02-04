@@ -13,6 +13,9 @@
  */
 package br.com.jgon.canary.ws.rest.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.core.Response.Status;
 
 import br.com.jgon.canary.util.MessageSeverity;
@@ -32,6 +35,7 @@ public class ResponseError {
     private Integer errorCode;
     private MessageSeverity type;
     private String moreInformation;
+    private List<ResponseError> errors;
 
     public ResponseError(Status status, String message) {
         this(status, message, null, null, null);
@@ -109,4 +113,18 @@ public class ResponseError {
         this.moreInformation = moreInformation;
     }
 
+    public List<ResponseError> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<ResponseError> errors) {
+        this.errors = errors;
+    }
+
+    public boolean addError(ResponseError error) {
+        if(this.errors == null) {
+            this.errors = new ArrayList<ResponseError>(1);
+        }
+        return this.errors.add(error);
+    }
 }

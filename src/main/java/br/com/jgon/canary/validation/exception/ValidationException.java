@@ -29,87 +29,91 @@ import br.com.jgon.canary.validation.ValidateMessage;
  * @version 1.0
  *
  */
-@ApplicationException(rollback=true)
-public class ValidationException extends RuntimeException{
+@ApplicationException(rollback = true)
+public class ValidationException extends RuntimeException {
 
-	private static final long serialVersionUID = -3033543720897816964L;
-	
-	private List<ValidateMessage> listMessage = new ArrayList<ValidateMessage>(0);
-	private List<ConstraintViolation<?>> listConstraintViolation = new ArrayList<ConstraintViolation<?>>(0);
-		
-	public ValidationException() {
-		
-	}	
-	
-	public ValidationException(Collection<ConstraintViolation<?>> listConstraintViolation){
-		this.add(listConstraintViolation);
-	}
-	/**
-	 * 
-	 * @param validateMessage
-	 */
-	public void add(ValidateMessage validateMessage){
-		listMessage.add(validateMessage);
-	}
-	/**
-	 * 
-	 * @since 18/06/2019
-	 * @param constraintViolation
-	 */
-	public void add(ConstraintViolation<?> constraintViolation){
-		listConstraintViolation.add(constraintViolation);
-	}
-	/**
-	 * 
-	 * @since 18/06/2019
-	 * @param listConstraintViolation
-	 */
-	public void add(Collection<ConstraintViolation<?>> listConstraintViolation){
-		if(listConstraintViolation != null) {
-			this.listConstraintViolation.addAll(listConstraintViolation);
-		}
-	}
-	/**
-	 * 
-	 * @return
-	 */
-	public List<ValidateMessage> getListMessage() {
-		return listMessage;
-	}
-	
-	/**
-	 * 
-	 * @return {@link List}
-	 */
-	public List<ConstraintViolation<?>> getListConstraintViolation() {
-		return listConstraintViolation;
-	}
-	
-	/**
-	 * Retorna as mensagens da lista separadas por "-"
-	 */
-	@Override
-	public String getMessage() {
-		StringBuffer b = new StringBuffer();
-		
-		boolean separador = false;
-		for(ValidateMessage m : listMessage){
-			if(separador){
-				b.append(" - ");
-			}else{
-				separador = true;
-			}
-			b.append(m.getMensagem());
-		}
-		
-		for(ConstraintViolation<?> cv : listConstraintViolation) {
-			if(separador){
-				b.append(" - ");
-			}else{
-				separador = true;
-			}
-			b.append(cv.getMessage());
-		}
-		return b.toString();
-	}	 
+    private static final long serialVersionUID = -3033543720897816964L;
+
+    private List<ValidateMessage> listMessage = new ArrayList<ValidateMessage>(0);
+    private List<ConstraintViolation<?>> listConstraintViolation = new ArrayList<ConstraintViolation<?>>(0);
+
+    public ValidationException() {
+
+    }
+
+    public ValidationException(Collection<ConstraintViolation<?>> listConstraintViolation) {
+        this.add(listConstraintViolation);
+    }
+
+    /**
+     * 
+     * @param validateMessage
+     */
+    public void add(ValidateMessage validateMessage) {
+        listMessage.add(validateMessage);
+    }
+
+    /**
+     * 
+     * @since 18/06/2019
+     * @param constraintViolation
+     */
+    public void add(ConstraintViolation<?> constraintViolation) {
+        listConstraintViolation.add(constraintViolation);
+    }
+
+    /**
+     * 
+     * @since 18/06/2019
+     * @param listConstraintViolation
+     */
+    public void add(Collection<ConstraintViolation<?>> listConstraintViolation) {
+        if (listConstraintViolation != null) {
+            this.listConstraintViolation.addAll(listConstraintViolation);
+        }
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public List<ValidateMessage> getListMessage() {
+        return listMessage;
+    }
+
+    /**
+     * 
+     * @return {@link List}
+     */
+    public List<ConstraintViolation<?>> getListConstraintViolation() {
+        return listConstraintViolation;
+    }
+
+    /**
+     * Retorna as mensagens da lista separadas por "-"
+     */
+    @Override
+    public String getMessage() {
+        StringBuffer b = new StringBuffer();
+
+        boolean separador = false;
+        for (ValidateMessage m : listMessage) {
+            if (separador) {
+                b.append(" - ");
+            } else {
+                separador = true;
+            }
+            b.append(m.getMensagem());
+        }
+
+        for (ConstraintViolation<?> cv : listConstraintViolation) {
+            if (separador) {
+                b.append(" - ");
+            } else {
+                separador = true;
+            }
+            b.append(cv.getMessage());
+        }
+        return b.toString();
+    }
 }

@@ -66,7 +66,7 @@ public abstract class ResponseConverter<O> {
 
                 if (!isResponseConverterType) {
                     ReflectionUtil.setFieldValue(ret, fld, objAux);
-                } else if (isResponseConverterType) {
+                } else {
                     ResponseConverter<?> respConv = checkResponse(objAux, fld.getType());
                     ReflectionUtil.setFieldValue(ret, fld, respConv);
                 }
@@ -87,9 +87,7 @@ public abstract class ResponseConverter<O> {
 
         ResponseConverter<E> ret;
         ret = (ResponseConverter<E>) ReflectionUtil.getInstance(returnClass);
-        ret.converter(value);
-
-        return ret;
+        return ret.converter(value);
     }
 
     /**

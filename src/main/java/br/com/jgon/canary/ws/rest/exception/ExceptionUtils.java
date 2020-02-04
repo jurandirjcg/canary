@@ -13,6 +13,8 @@
  */
 package br.com.jgon.canary.ws.rest.exception;
 
+import java.util.stream.StreamSupport;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.WebApplicationException;
@@ -77,9 +79,17 @@ abstract class ExceptionUtils {
     }
 
     public static ResponseError configConstraintViolationException(ConstraintViolationException constraintViolationException) {
-        ValidationException validationException = new ValidationException(constraintViolationException.getConstraintViolations());
+        if (constraintViolationException.getConstraintViolations().size() == 1) {
+            return configConstraintViolationException(constraintViolationException.getConstraintViolations().stream().findFirst().get());
+        }
+        ResponseError retorno = new ResponseError(Status.BAD_REQUEST, "", MessageSeverity.WARN);
+        constraintViolationException.getConstraintViolations().forEach(cv -> {
+            String nome = StreamSupport.stream(cv.getPropertyPath().spliterator(), false).reduce((first, second) -> second).orElse(null)
+                .getName();
+            retorno.addError(new ResponseError(null, nome + " " + cv.getMessage()));
+        });
 
-        return new ResponseError(Status.BAD_REQUEST, validationException.getMessage(), MessageSeverity.WARN);
+        return retorno;
     }
 
     public static ResponseError configApplicationException(ApplicationException exception) {

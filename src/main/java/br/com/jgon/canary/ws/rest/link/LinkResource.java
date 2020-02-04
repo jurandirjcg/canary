@@ -53,6 +53,7 @@ public @interface LinkResource {
 	/**
 	 * define parametros PATH - faz replace na ordem que esta definida na anotation Path.
 	 * Ex. path = /system/{id} e pathParameters = /user/${atributo_variavel} apos replace = /system/user/ATRIBUTO_VARIAVEL
+	 * Para obter o mesmo valor passado no parâmetro da chamada usar o identificador sem os caracteres '$' '#'. Ex: {valor_variavel_path}
 	 * @return
 	 */
 	String[] pathParameters() default {};
