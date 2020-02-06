@@ -65,7 +65,11 @@ abstract class ExceptionUtils {
                 MessageSeverity.ERROR);
             LOG.error("[toResponse]", exception);
         }
-        return Response.status(retorno.getStatus()).entity(retorno).header("Content-type", "application/json").build();
+        Integer status = retorno.getStatus();
+        if(retorno.getErrors() != null && !retorno.getErrors().isEmpty()) {
+            retorno.setStatus(null);
+        }
+        return Response.status(status).entity(retorno).header("Content-type", "application/json").build();
     }
 
     public static ResponseError configValidationException(javax.validation.ValidationException exception) {
@@ -82,11 +86,14 @@ abstract class ExceptionUtils {
         if (constraintViolationException.getConstraintViolations().size() == 1) {
             return configConstraintViolationException(constraintViolationException.getConstraintViolations().stream().findFirst().get());
         }
-        ResponseError retorno = new ResponseError(Status.BAD_REQUEST, "", MessageSeverity.WARN);
+        ResponseError retorno = new ResponseError(Status.BAD_REQUEST, null, null);
         constraintViolationException.getConstraintViolations().forEach(cv -> {
-            String nome = StreamSupport.stream(cv.getPropertyPath().spliterator(), false).reduce((first, second) -> second).orElse(null)
+            String propertyId = StreamSupport.stream(cv.getPropertyPath().spliterator(), false).reduce((first, second) -> second).orElse(null)
                 .getName();
-            retorno.addError(new ResponseError(null, nome + " " + cv.getMessage()));
+            
+            ResponseError re = new ResponseError(Status.BAD_REQUEST, cv.getMessage(), MessageSeverity.WARN);
+            re.setPropertyId(propertyId);
+            retorno.addError(re);
         });
 
         return retorno;

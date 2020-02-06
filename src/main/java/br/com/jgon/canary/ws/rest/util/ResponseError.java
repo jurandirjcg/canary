@@ -32,6 +32,7 @@ public class ResponseError {
 
     private Integer status;
     private String message;
+    private String propertyId;
     private Integer errorCode;
     private MessageSeverity type;
     private String moreInformation;
@@ -55,7 +56,7 @@ public class ResponseError {
      */
     public ResponseError(Status status, String message, Integer errorCode, String moreInformation, MessageSeverity type) {
         super();
-        this.status = status.getStatusCode();
+        this.status = status != null ? status.getStatusCode() : null;
         this.message = message;
         this.errorCode = errorCode;
         this.moreInformation = moreInformation;
@@ -119,6 +120,14 @@ public class ResponseError {
 
     public void setErrors(List<ResponseError> errors) {
         this.errors = errors;
+    }
+
+    public String getPropertyId() {
+        return propertyId;
+    }
+
+    public void setPropertyId(String propertyId) {
+        this.propertyId = propertyId;
     }
 
     public boolean addError(ResponseError error) {

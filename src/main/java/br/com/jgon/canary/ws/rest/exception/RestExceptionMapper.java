@@ -18,6 +18,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
+import br.com.jgon.canary.ws.rest.util.DominiosRest;
+
 /**
  * Realiza o tratamento de execoes lancadas durante a execucao dos servicos
  *
@@ -31,7 +33,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 public class RestExceptionMapper implements ExceptionMapper<Exception> {
 
     @Override
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, DominiosRest.APPLICATION_HAL_JSON, MediaType.APPLICATION_XML})
     public Response toResponse(Exception exception) {
         return ExceptionUtils.toResponse(exception);
     }
