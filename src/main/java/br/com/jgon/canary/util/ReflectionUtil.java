@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -842,6 +843,7 @@ public final class ReflectionUtil {
             || klass.equals(Number.class)
             || klass.equals(Float.class)
             || klass.equals(BigInteger.class)
+            || klass.equals(BigDecimal.class)
             || klass.equals(Boolean.class)
             || klass.equals(Character.class);
     }

@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.Page;
@@ -56,7 +58,7 @@ public abstract class ResponseConverter<O> {
                     continue;
                 }
                 WSAttribute wsa = ReflectionUtil.getAnnotation(fld, WSAttribute.class);
-                if (wsa != null) {
+                if (wsa != null && StringUtils.isNotBlank(wsa.value())) {
                     objAux = ReflectionUtil.getAttributteValue(obj, wsa.value());
                 } else {
                     objAux = ReflectionUtil.getAttributteValue(obj, fld.getName());

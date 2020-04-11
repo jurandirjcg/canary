@@ -151,7 +151,11 @@ public interface CriteriaWhere<T> {
         /**
          * Ex: &lt;=100;&gt;10;!=50
          */
-        MULTI
+        MULTI;
+        
+        public static RegexWhere[] build(RegexWhere... regexWhere) {
+            return regexWhere;
+        }
     }
 
     /**

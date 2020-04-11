@@ -28,8 +28,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
 
-import br.com.jgon.canary.exception.ApplicationException;
-import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.CollectionUtil;
 import br.com.jgon.canary.util.ReflectionUtil;
 import br.com.jgon.canary.ws.rest.link.LinkPaginate;
@@ -44,11 +42,7 @@ import br.com.jgon.canary.ws.rest.link.LinkResources;
  * @version 1.0
  *
  */
-public class WsFieldsParamFormatter implements /*StringParameterUnmarshaller<WSFieldParam>,*/ ParamConverter<WSFieldParam>, ParamConverterProvider {
-
-    private Class<?> returnType;
-    private String[] forceFields = {};
-    private Annotation[] annotations;
+public class WsFieldsParamFormatter implements ParamConverter<WSFieldParam>, ParamConverterProvider {
 
     private static final String REGEX_PATH_PARAMETERS = "(\\#|\\$)\\{[a-z-A-Z\\.]+\\}";
     private static final String REGEX_REPLACE_PARAM = "\\#|\\$|\\{|\\}";
@@ -56,8 +50,12 @@ public class WsFieldsParamFormatter implements /*StringParameterUnmarshaller<WSF
     @Context
     private ResourceInfo resourceInfo;
 
-  //  @Override
-    private void setAnnotations(Annotation[] annotations) {
+    @Override
+    public WSFieldParam fromString(String str) {
+        Class<?> returnType = null;
+        String[] forceFields = {};
+        Annotation[] annotations = resourceInfo.getResourceMethod().getAnnotations();
+
         WSParamFormat wsParamFormat = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class);
 
         if (wsParamFormat != null) {
@@ -67,38 +65,28 @@ public class WsFieldsParamFormatter implements /*StringParameterUnmarshaller<WSF
             forceFields = wsParamFormat.forceFields();
         }
 
-    }
+        StringBuilder sb = new StringBuilder();
+        sb.append(str);
 
-    @Override
-    public WSFieldParam fromString(String str) {
-        try {
-            setAnnotations(annotations);
-            
-            StringBuilder sb = new StringBuilder();
-            sb.append(str);
-
-            for (String f : forceFields) {
-                if (!str.contains(f)) {
-                    sb.append(",");
-                    sb.append(f);
-                }
+        for (String f : forceFields) {
+            if (!str.contains(f)) {
+                sb.append(",");
+                sb.append(f);
             }
-
-            String fieldsReconfig = configRequiredParam(resourceInfo.getResourceMethod(), sb.toString());
-
-            if (returnType == null) {
-                returnType = resourceInfo.getResourceMethod().getReturnType();
-
-                Class<?> auxReturnType = ReflectionUtil.returnParameterType(resourceInfo.getResourceMethod().getGenericReturnType(), 0);
-                if (auxReturnType != null) {
-                    returnType = auxReturnType;
-                }
-            }
-
-            return new WSFieldParam(returnType, fieldsReconfig);
-        } catch (ApplicationException e) {
-            throw new ApplicationRuntimeException(e);
         }
+
+        String fieldsReconfig = configRequiredParam(resourceInfo.getResourceMethod(), sb.toString());
+
+        if (returnType == null) {
+            returnType = resourceInfo.getResourceMethod().getReturnType();
+
+            Class<?> auxReturnType = ReflectionUtil.returnParameterType(resourceInfo.getResourceMethod().getGenericReturnType(), 0);
+            if (auxReturnType != null) {
+                returnType = auxReturnType;
+            }
+        }
+
+        return new WSFieldParam(returnType, fieldsReconfig);
     }
 
     /**
@@ -154,21 +142,6 @@ public class WsFieldsParamFormatter implements /*StringParameterUnmarshaller<WSF
      * @return
      */
     private List<LinkResource> paramFields(Method method) {
-        // FIXME Remover
-        /*
-         * Annotation[][] parametrosAnotados = method.getParameterAnnotations();
-         * Class<?>[] parameterTypes = method.getParameterTypes();
-         * 
-         * WSParamFormat wsAnnotation = null;
-         * 
-         * for (int i = 0; i < parametrosAnotados.length; i++) { Annotation[]
-         * parametroAnotado = parametrosAnotados[i]; if
-         * (parameterTypes[i].equals(WSFieldParam.class)) { for (Annotation a :
-         * parametroAnotado) { if (a instanceof WSParamFormat) { wsAnnotation =
-         * (WSParamFormat) a; } } break; } }
-         * 
-         * if (wsAnnotation != null) {
-         */
         List<LinkResource> listResources = new ArrayList<LinkResource>(1);
 
         LinkResource lr = method.getAnnotation(LinkResource.class);
@@ -216,8 +189,7 @@ public class WsFieldsParamFormatter implements /*StringParameterUnmarshaller<WSF
     @SuppressWarnings("unchecked")
     @Override
     public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
-        if(rawType.equals(WSFieldParam.class)) {
-            this.annotations = annotations;
+        if (rawType.equals(WSFieldParam.class)) {
             return (ParamConverter<T>) this;
         }
         return null;

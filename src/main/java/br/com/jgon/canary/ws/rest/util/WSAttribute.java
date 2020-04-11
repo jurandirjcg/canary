@@ -46,7 +46,17 @@ public @interface WSAttribute {
 	 */
 	boolean autoInclude() default true;
 	/**
-	 * Utilizado em campos do tipo Collection, pois não é possível realizar reflection (Java generics)
+	 * Utilizado em campos do tipo Collection para indicar o tipo contido
 	 */
 	Class<?> collectionType() default void.class;
+	
+	/**
+	 * Atributo que receberá a instância do objeto pai.
+	 * Ex: 
+	 * value = "endereco"
+	 * recursiveAttribute = "pessoa"
+	 * 
+	 * implementacao: endereco.pessoa = instância da Pessoa
+	 */
+	String recursiveAttribute() default "";
 }

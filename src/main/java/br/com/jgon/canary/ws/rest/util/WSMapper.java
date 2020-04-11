@@ -15,6 +15,8 @@ package br.com.jgon.canary.ws.rest.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.DAOUtil;
 import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
@@ -58,11 +61,11 @@ public class WSMapper {
 
     }
 
-    public List<String> getSort(Class<?> responseClass, String sort) throws ApplicationException {
+    public List<String> getSort(Class<?> responseClass, String sort) {
         return getCamposAjustados(responseClass, expSort, sort.replace("/", ".").replace("(", "{").replace(")", "}"));
     }
 
-    public List<String> getFields(Class<?> responseClass, String fields) throws ApplicationException {
+    public List<String> getFields(Class<?> responseClass, String fields) {
         return getCamposAjustados(responseClass, expFields, fields.replace("/*", "").replace("/", ".").replace("(", "{").replace(")", "}"));
     }
 
@@ -74,7 +77,7 @@ public class WSMapper {
      * @return
      * @throws ApplicationException
      */
-    protected List<String> getCamposAjustados(Class<?> responseClass, String expression, String campos) throws ApplicationException {
+    protected List<String> getCamposAjustados(Class<?> responseClass, String expression, String campos) {
         boolean sortAux = expression.equals(expSort);
 
         if (StringUtils.isNotBlank(campos)) {
@@ -129,7 +132,7 @@ public class WSMapper {
                                 retorno.add(campoVerificado);
                             }
                         } else {
-                            ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found",
+                            ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "query-mapper.field-not-found",
                                 fNome);
                             logger.error("[getCamposAjustados]", ae);
                             throw ae;
@@ -150,7 +153,7 @@ public class WSMapper {
      * @return
      * @throws ApplicationException
      */
-    private List<String> verificaCampoObject(Field fldCheck, String fNome) throws ApplicationException {
+    private List<String> verificaCampoObject(Field fldCheck, String fNome) {
 
         WSAttribute wsMapperAttribute = null;
         if (fldCheck.isAnnotationPresent(WSAttribute.class)) {
@@ -189,7 +192,7 @@ public class WSMapper {
                             retorno.add(fNome.concat(".").concat(campoVerificado));
                         }
                     } else {
-                        ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+                        ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
                         logger.error("[verificaCampoObject]", ae);
                         throw ae;
                     }
@@ -207,6 +210,8 @@ public class WSMapper {
     private boolean isPrimitiveBasic(Class<?> klass) {
         return ReflectionUtil.isPrimitive(klass)
             || klass.equals(Date.class)
+            || klass.equals(LocalDate.class)
+            || klass.equals(LocalDateTime.class)
             || klass.equals(Calendar.class)
             || klass.equals(Temporal.class)
             || klass.isEnum();

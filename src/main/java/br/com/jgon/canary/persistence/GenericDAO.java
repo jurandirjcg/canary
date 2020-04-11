@@ -512,12 +512,29 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @param restriction   {@link Predicate}
      * @return {@link CriteriaQuery}
      */
-    protected CriteriaQuery<?> addRestrictionInCriteriaQuery(CriteriaQuery<?> criteriaQuery, Predicate restriction) {
+    protected CriteriaQuery<?> addPredicateInCriteriaQuery(CriteriaQuery<?> criteriaQuery, Predicate predicate) {
         Predicate predicateAux = criteriaQuery.getRestriction();
         if (predicateAux != null) {
-            criteriaQuery.where(predicateAux, restriction);
+            criteriaQuery.where(predicateAux, predicate);
         } else {
-            criteriaQuery.where(restriction);
+            criteriaQuery.where(predicate);
+        }
+
+        return criteriaQuery;
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 11/04/2020
+     *
+     * @param criteriaQuery {@link CriteriaQuery}
+     * @param predicates    {@link Predicate}
+     * @return {@link CriteriaQuery}
+     */
+    protected CriteriaQuery<?> addPredicateInCriteriaQuery(CriteriaQuery<?> criteriaQuery, Predicate... predicates) {
+        for (Predicate p : predicates) {
+            criteriaQuery = addPredicateInCriteriaQuery(criteriaQuery, p);
         }
 
         return criteriaQuery;
@@ -1658,7 +1675,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @throws ApplicationRuntimeException - erro ao contar
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected Long getResultCount(CriteriaQuery<?> criteriaQuery, Root<T> root, boolean distinct) throws ApplicationRuntimeException {
+    private Long getResultCount(CriteriaQuery<?> criteriaQuery, Root<T> root, boolean distinct) throws ApplicationRuntimeException {
         // SELECT
         Selection<?> sel = criteriaQuery.getSelection();
         // ORDER

@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.DAOUtil;
@@ -38,7 +40,7 @@ import br.com.jgon.canary.util.ReflectionUtil;
  * @param <T>
  */
 public abstract class RequestConverter<T> {
-    
+
     public RequestConverter() {
 
     }
@@ -59,7 +61,7 @@ public abstract class RequestConverter<T> {
 
             List<Field> thisFields = ReflectionUtil.listAttributes(this.getClass());
 
-            Object objAux;
+            Object objAuxValue;
             for (Field fld : thisFields) {
                 WSTransient wst = ReflectionUtil.getAnnotation(fld, WSTransient.class);
                 if (wst != null) {
@@ -67,12 +69,18 @@ public abstract class RequestConverter<T> {
                 }
                 WSAttribute wsa = ReflectionUtil.getAnnotation(fld, WSAttribute.class);
                 String fldName = fld.getName();
+                String recursiveAttribute = null;
                 if (wsa != null) {
-                    fldName = wsa.value();
+                    if (StringUtils.isNotBlank(wsa.value())) {
+                        fldName = wsa.value();
+                    }
+                    if (StringUtils.isNotBlank(wsa.recursiveAttribute())) {
+                        recursiveAttribute = wsa.recursiveAttribute();
+                    }
                 }
-                objAux = ReflectionUtil.getAttributteValue(this, fld.getName());
+                objAuxValue = ReflectionUtil.getAttributteValue(this, fld.getName());
 
-                setAttributeValue(ret, fldName, objAux);
+                setAttributeValue(ret, fldName, objAuxValue, recursiveAttribute);
             }
 
             return ret;
@@ -83,15 +91,15 @@ public abstract class RequestConverter<T> {
 
     // FIXME mover para ReflectionUtil
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void setAttributeValue(Object obj, String fieldName, Object value) throws IllegalArgumentException,
-            IllegalAccessException, InstantiationException, ApplicationException, InvocationTargetException {
+    private void setAttributeValue(Object obj, String fieldName, Object value, String recursiveAttribute) throws IllegalArgumentException,
+        IllegalAccessException, InstantiationException, ApplicationException, InvocationTargetException {
         if (value == null) {
             return;
         }
         if (fieldName.contains(".")) {
             Object objAuxValue;
-            if (obj instanceof Collection) {
-                Collection colFld = (Collection) obj;
+            if (value instanceof Collection) {
+                Collection colFld = (Collection) value;
                 objAuxValue = colFld.toArray()[colFld.size() - 1];
             } else {
                 Field fld = ReflectionUtil.getAttribute(obj.getClass(), fieldName.substring(0, fieldName.indexOf(".")));
@@ -108,36 +116,74 @@ public abstract class RequestConverter<T> {
                     ReflectionUtil.setFieldValue(obj, fld, objAuxValue);
                 }
             }
-            setAttributeValue(objAuxValue, fieldName.substring(fieldName.indexOf(".") + 1), value);
-        } else {
-            if (obj instanceof Collection) {
-                Collection col = (Collection) obj;
-                if (value instanceof Collection) {
-                    Collection colValue = (Collection) value;
-                    for (Object objValue : colValue) {
-                        if (value instanceof RequestConverter) {
-                            col.add(checkResponse((RequestConverter) objValue));
-                        } else {
-                            col.add(objValue);
-                        }
-                    }
-                } else {
-                    if (value instanceof RequestConverter) {
-                        col.add(checkResponse((RequestConverter) value));
+            setAttributeValue(objAuxValue, fieldName.substring(fieldName.indexOf(".") + 1), value, recursiveAttribute);
+        } else if (obj instanceof Collection) {
+            Collection col = (Collection) obj;
+            Object valueToAdd;
+            if (value instanceof Collection) {
+                Collection colValue = (Collection) value;
+                for (Object objValue : colValue) {
+                    if (objValue instanceof RequestConverter) {
+                        valueToAdd = checkResponse((RequestConverter) objValue);
                     } else {
-                        col.add(value);
+                        valueToAdd = objValue;
                     }
+                    if (recursiveAttribute != null) {
+                        ReflectionUtil.setFieldValue(valueToAdd, recursiveAttribute, obj);
+                    }
+                    col.add(valueToAdd);
                 }
             } else {
-                // Remover para o ReflectionUtil
                 if (value instanceof RequestConverter) {
-                    Object objAuxValue = checkResponse((RequestConverter) value);
-                    ReflectionUtil.setFieldValue(obj, fieldName, objAuxValue);
+                    valueToAdd = checkResponse((RequestConverter) value);
                 } else {
-                    ReflectionUtil.setFieldValue(obj, fieldName, value);
+                    valueToAdd = value;
                 }
+                if (recursiveAttribute != null) {
+                    ReflectionUtil.setFieldValue(valueToAdd, recursiveAttribute, obj);
+                }
+                col.add(valueToAdd);
             }
+            ReflectionUtil.setFieldValue(obj, fieldName, col);
+            
+        } else if (value instanceof Collection) { 
+            Field fld = ReflectionUtil.getAttribute(obj.getClass(), fieldName);
+            
+            Collection col = ReflectionUtil.getAttributteValue(obj, fld);
+
+            if (col == null) {
+                col = createCollectionInstance(fld.getType());
+            }
+            
+            Collection colValue = (Collection) value;
+            Object valueToAdd;
+            for (Object objValue : colValue) {
+                if (objValue instanceof RequestConverter) {
+                    valueToAdd = checkResponse((RequestConverter) objValue);
+                } else {
+                    valueToAdd = objValue;
+                }
+                if (recursiveAttribute != null) {
+                    ReflectionUtil.setFieldValue(valueToAdd, recursiveAttribute, obj);
+                }
+                col.add(valueToAdd);
+            }
+            
+            ReflectionUtil.setFieldValue(obj, fieldName, col);
+        }else {
+            Object objAuxValue;
+            if (value instanceof RequestConverter) {
+                objAuxValue = checkResponse((RequestConverter) value);
+            } else {
+                objAuxValue = value;
+            }
+
+            if (recursiveAttribute != null) {
+                ReflectionUtil.setFieldValue(objAuxValue, recursiveAttribute, obj);
+            }
+            ReflectionUtil.setFieldValue(obj, fieldName, objAuxValue);
         }
+
     }
 
     /**
@@ -155,7 +201,7 @@ public abstract class RequestConverter<T> {
             return new HashSet<Object>();
         }
         ApplicationException ae = new ApplicationException(MessageSeverity.ERROR, "error.collection-instance",
-                new String[] { klass.getName() });
+            new String[] { klass.getName() });
         throw ae;
     }
 
@@ -171,8 +217,8 @@ public abstract class RequestConverter<T> {
         Class<?> classAux = DAOUtil.getCollectionClass(fld);
         if (classAux == null) {
             ApplicationException ae = new ApplicationException(MessageSeverity.ERROR,
-                    "query-mapper.field-collection-not-definied",
-                    fld.getDeclaringClass().getName() + "." + fld.getName());
+                "query-mapper.field-collection-not-definied",
+                fld.getDeclaringClass().getName() + "." + fld.getName());
             throw ae;
         } else {
             try {
@@ -185,7 +231,7 @@ public abstract class RequestConverter<T> {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private <N extends RequestConverter, E> E checkResponse(N value)
-            throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         if (value == null) {
             return null;
         }
@@ -197,7 +243,7 @@ public abstract class RequestConverter<T> {
 
     @SuppressWarnings("unchecked")
     private <E> E getInstance(Class<E> klass)
-            throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Constructor<?>[] ctors = klass.getDeclaredConstructors();
         Constructor<?> ctor = null;
         for (int i = 0; i < ctors.length; i++) {

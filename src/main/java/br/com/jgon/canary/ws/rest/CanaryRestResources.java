@@ -26,7 +26,7 @@ import br.com.jgon.canary.ws.rest.exception.RestValidationExceptionMapper;
 import br.com.jgon.canary.ws.rest.link.LinkResponseFeature;
 import br.com.jgon.canary.ws.rest.param.DateFormatter;
 import br.com.jgon.canary.ws.rest.param.WsFieldsParamFormatter;
-import br.com.jgon.canary.ws.rest.param.WsOrderParamFormatter;
+import br.com.jgon.canary.ws.rest.param.WsSortParamFormatter;
 
 /**
  * Mapeamento manual dos resources
@@ -44,7 +44,7 @@ public abstract class CanaryRestResources {
 		resources.add(RestFilter.class);
 		resources.add(DateFormatter.class);
 		resources.add(WsFieldsParamFormatter.class);
-		resources.add(WsOrderParamFormatter.class);
+		resources.add(WsSortParamFormatter.class);
 		resources.add(LinkResponseFeature.class);
 	}
 

@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.CollectionUtil;
+import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.Page;
 import br.com.jgon.canary.util.ReflectionUtil;
 import br.com.jgon.canary.ws.rest.param.WSFieldParam;
@@ -309,12 +310,15 @@ public class LinkResponseFilter implements ContainerResponseFilter {
                 if (linkPaginate != null && StringUtils.isNotBlank(linkPaginate.embeddedCollectionName())) {
                     childName = linkPaginate.embeddedCollectionName();
                 } else {
-                    childName = getChildClassName((Collection<Object>) responseContext.getEntity());
-                    if (StringUtils.isBlank(childName)) {
-                        childName = "items";
+                    String lastPath = getLastPath(path);
+                    if (StringUtils.isNotBlank(lastPath)) {
+                        childName = toCamelCase(lastPath.replace("-", "_"));
                     } else {
-                        childName += "List";
-                    }
+                       logger.error("Adicione o parâmetro 'embeddedCollectionName' na annotation '@LinkPaginate' do recurso" + path.value());
+                       throw new ApplicationException(MessageSeverity.ERROR, "error.pagination-path.invalid");
+                       //childName = getChildClassName((Collection<Object>) responseContext.getEntity());
+                       //childName += "List";
+                    } 
                 }
 
                 JsonCollectionLinkEntity json = new JsonCollectionLinkEntity();
@@ -362,6 +366,24 @@ public class LinkResponseFilter implements ContainerResponseFilter {
         if (!linksHeader.isEmpty()) {
             responseContext.getHeaders().add("Link", linksHeader);
         }
+    }
+    
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 10/04/2020
+     *
+     * @param path {@link Path}
+     * @return {@link String}
+     */
+    private String getLastPath(Path path) {
+        Pattern pattern = Pattern.compile("\\/([a-zA-Z0-9\\-\\_]+)\\/?$");
+        Matcher m = pattern.matcher(path.value());
+    
+        if(m.find()) {
+            return m.group(1);
+        }
+        return null;
     }
 
     /**
@@ -834,6 +856,8 @@ public class LinkResponseFilter implements ContainerResponseFilter {
      * @param list
      * @return
      */
+    
+    @SuppressWarnings("unused")
     private <T> String getChildClassName(Collection<T> list) {
         Class<?> contentClass = ReflectionUtil.colletionContentType(list.getClass());
         if (contentClass == null && list != null) {

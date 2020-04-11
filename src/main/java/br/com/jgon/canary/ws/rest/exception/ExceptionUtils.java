@@ -13,8 +13,6 @@
  */
 package br.com.jgon.canary.ws.rest.exception;
 
-import java.util.stream.StreamSupport;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.WebApplicationException;
@@ -66,7 +64,7 @@ abstract class ExceptionUtils {
             LOG.error("[toResponse]", exception);
         }
         Integer status = retorno.getStatus();
-        if(retorno.getErrors() != null && !retorno.getErrors().isEmpty()) {
+        if (retorno.getErrors() != null && !retorno.getErrors().isEmpty()) {
             retorno.setStatus(null);
         }
         return Response.status(status).entity(retorno).header("Content-type", "application/json").build();
@@ -88,11 +86,13 @@ abstract class ExceptionUtils {
         }
         ResponseError retorno = new ResponseError(Status.BAD_REQUEST, null, null);
         constraintViolationException.getConstraintViolations().forEach(cv -> {
-            String propertyId = StreamSupport.stream(cv.getPropertyPath().spliterator(), false).reduce((first, second) -> second).orElse(null)
-                .getName();
-            
+            // String propertyId = StreamSupport.stream(cv.getPropertyPath().spliterator(),
+            // false).reduce((first, second) -> second).orElse(null)
+            // .getName();
+
             ResponseError re = new ResponseError(Status.BAD_REQUEST, cv.getMessage(), MessageSeverity.WARN);
-            re.setPropertyId(propertyId);
+            String propertyPath = cv.getPropertyPath().toString();
+            re.setPropertyId(propertyPath.substring(propertyPath.indexOf(".") + 1));
             retorno.addError(re);
         });
 
@@ -131,5 +131,5 @@ abstract class ExceptionUtils {
             return Response.Status.INTERNAL_SERVER_ERROR;
         }
     }
-
+    
 }
