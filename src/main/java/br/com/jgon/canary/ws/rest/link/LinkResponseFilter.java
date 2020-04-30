@@ -112,7 +112,7 @@ public class LinkResponseFilter implements ContainerResponseFilter {
         LinkFormat linkFormat = null;
 
         boolean isHalLinks = responseContext.getMediaType() != null
-            && responseContext.getMediaType().toString().equals(MEDIA_TYPE_APPLICATION_HAL_JSON);
+            && responseContext.getMediaType().toString().contains(MEDIA_TYPE_APPLICATION_HAL_JSON);
 
         Map<Path, List<LinkResource>> linkPaginateEntity = null;
 

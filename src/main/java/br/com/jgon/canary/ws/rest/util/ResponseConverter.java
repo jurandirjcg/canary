@@ -48,7 +48,6 @@ public abstract class ResponseConverter<O> {
             N ret = (N) ReflectionUtil.getInstance(this.getClass());
 
             List<Field> thisFields = ReflectionUtil.listAttributes(this.getClass());
-            boolean isResponseConverterType = false;
 
             Object objAux;
             for (Field fld : thisFields) {
@@ -64,14 +63,29 @@ public abstract class ResponseConverter<O> {
                     objAux = ReflectionUtil.getAttributteValue(obj, fld.getName());
                 }
 
-                isResponseConverterType = ResponseConverter.class.isAssignableFrom(fld.getType());
+                if (ReflectionUtil.isCollection(fld.getType())) {
+                    Class<?> colClass;
+                    if (wsa != null && !void.class.equals(wsa.collectionType())) {
+                        colClass = wsa.collectionType();
+                    } else {
+                        colClass = ReflectionUtil.returnParameterType(fld.getGenericType(), 0);
+                    }
 
-                if (!isResponseConverterType) {
-                    ReflectionUtil.setFieldValue(ret, fld, objAux);
+                    if (ResponseConverter.class.isAssignableFrom(colClass)) {
+                        Collection<?> col = checkColResponse((Collection<O>) objAux, colClass);
+                        ReflectionUtil.setFieldValue(ret, fld, col);
+                    } else {
+                        ReflectionUtil.setFieldValue(ret, fld, objAux);
+                    }
                 } else {
-                    ResponseConverter<?> respConv = checkResponse(objAux, fld.getType());
-                    ReflectionUtil.setFieldValue(ret, fld, respConv);
+                    if (!ResponseConverter.class.isAssignableFrom(fld.getType())) {
+                        ReflectionUtil.setFieldValue(ret, fld, objAux);
+                    } else {
+                        ResponseConverter<?> respConv = checkResponse(objAux, fld.getType());
+                        ReflectionUtil.setFieldValue(ret, fld, respConv);
+                    }
                 }
+
             }
 
             return ret;
@@ -82,6 +96,18 @@ public abstract class ResponseConverter<O> {
 
     @SuppressWarnings("unchecked")
     private <T extends ResponseConverter<E>, E> ResponseConverter<E> checkResponse(E value, Class<?> returnClass)
+        throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        if (value == null) {
+            return null;
+        }
+
+        ResponseConverter<E> ret;
+        ret = (ResponseConverter<E>) ReflectionUtil.getInstance(returnClass);
+        return ret.converter(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends ResponseConverter<E>, E> List<ResponseConverter<E>> checkColResponse(Collection<E> value, Class<?> returnClass)
         throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         if (value == null) {
             return null;
@@ -185,4 +211,5 @@ public abstract class ResponseConverter<O> {
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.response-converter", e);
         }
     }
+
 }
