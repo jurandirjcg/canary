@@ -18,6 +18,7 @@ import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -538,7 +539,8 @@ class CriteriaManager<T> {
 
         for (Field field : listFields) {
             // Verifiando se o metodo não é transiente
-            if (checkField(field) && !ReflectionUtil.existAnnotation(field, Transient.class) && !Modifier.isTransient(field.getModifiers())) {
+            if (checkField(field) && !ReflectionUtil.existAnnotation(field, Transient.class)
+                && !Modifier.isTransient(field.getModifiers())) {
                 field.setAccessible(true);
 
                 attributeName = StringUtils.isBlank(attributeParent) ? field.getName()
@@ -571,7 +573,8 @@ class CriteriaManager<T> {
                     auxObj = obj != null ? field.get(obj) : null;
                 } catch (Exception e) {
                     logger.error("[configPredicates]", e);
-                    throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.field.access", field.getName(), obj.getClass().getName());
+                    throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.field.access", field.getName(),
+                        obj.getClass().getName());
                 }
                 isEntityType = field.getType().isAnnotationPresent(Entity.class) || field.getType().isAnnotationPresent(Embeddable.class);
 
@@ -669,7 +672,7 @@ class CriteriaManager<T> {
         String stringValue = null;
         if (isStringType && value != null) {
             stringValue = ((String) value).replace("%", "");
-        } else if(isStringType && value == null && !Where.IS_NULL.equals(operation) && !Where.IS_NOT_NULL.equals(operation)){
+        } else if (isStringType && value == null && !Where.IS_NULL.equals(operation) && !Where.IS_NOT_NULL.equals(operation)) {
             return;
         } else if (value != null) {
             stringValue = value.toString().replace("%", "");
@@ -758,7 +761,7 @@ class CriteriaManager<T> {
             if (value instanceof Collection) {
                 Collection<?> listNe = (Collection<?>) value;
                 for (Object wValue : listNe) {
-                    if(wValue == null) {
+                    if (wValue == null) {
                         continue;
                     }
                     if (isStringType) {
@@ -802,6 +805,9 @@ class CriteriaManager<T> {
             } else if (attributeClass.equals(LocalDateTime.class)) {
                 LocalDateTime[] between = (LocalDateTime[]) value;
                 predicates.add(criteriaBuilder.between(((Expression<LocalDateTime>) pathExpression), between[0], between[1]));
+            } else if (attributeClass.equals(LocalTime.class)) {
+                LocalTime[] between = (LocalTime[]) value;
+                predicates.add(criteriaBuilder.between(((Expression<LocalTime>) pathExpression), between[0], between[1]));
             } else if (attributeClass.equals(BigInteger.class)) {
                 BigInteger[] between = (BigInteger[]) value;
                 predicates.add(criteriaBuilder.between(((Expression<BigInteger>) pathExpression), between[0], between[1]));
@@ -810,6 +816,12 @@ class CriteriaManager<T> {
         case LESS_THAN:
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.lessThan(((Expression<Date>) pathExpression), (Date) value));
+            } else if (value instanceof LocalDateTime) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
+            } else if (value instanceof LocalDate) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
+            } else if (value instanceof LocalTime) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalTime>) pathExpression, (LocalTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.lessThan((Expression) pathExpression, (Expression) value));
             } else {
@@ -819,6 +831,12 @@ class CriteriaManager<T> {
         case LESS_THAN_OR_EQUAL_TO:
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(((Expression<Date>) pathExpression), (Date) value));
+            } else if (value instanceof LocalDateTime) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
+            } else if (value instanceof LocalDate) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
+            } else if (value instanceof LocalTime) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalTime>) pathExpression, (LocalTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression) pathExpression, (Expression) value));
             } else {
@@ -828,6 +846,12 @@ class CriteriaManager<T> {
         case GREATER_THAN:
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.greaterThan((Expression<Date>) pathExpression, (Date) value));
+            } else if (value instanceof LocalDateTime) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
+            } else if (value instanceof LocalDate) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
+            } else if (value instanceof LocalTime) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalTime>) pathExpression, (LocalTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.greaterThan((Expression) pathExpression, (Expression) value));
             } else {
@@ -837,6 +861,12 @@ class CriteriaManager<T> {
         case GREATER_THAN_OR_EQUAL_TO:
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(((Expression<Date>) pathExpression), (Date) value));
+            } else if (value instanceof LocalDateTime) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
+            } else if (value instanceof LocalDate) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
+            } else if (value instanceof LocalTime) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalTime>) pathExpression, (LocalTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression) pathExpression, (Expression) value));
             } else {
@@ -907,7 +937,7 @@ class CriteriaManager<T> {
             if (value instanceof Collection) {
                 Collection<?> list = (Collection<?>) value;
                 for (Object wValue : list) {
-                    if(wValue == null) {
+                    if (wValue == null) {
                         continue;
                     }
                     if (isStringType) {
@@ -950,7 +980,8 @@ class CriteriaManager<T> {
 
         for (Field field : listFields) {
             // Verificando se o metodo não é transiente
-            if (checkField(field) && !ReflectionUtil.existAnnotation(field, Transient.class) && !Modifier.isTransient(field.getModifiers())) {
+            if (checkField(field) && !ReflectionUtil.existAnnotation(field, Transient.class)
+                && !Modifier.isTransient(field.getModifiers())) {
                 field.setAccessible(true);
 
                 attributeName = StringUtils.isBlank(attributeParent) ? field.getName()

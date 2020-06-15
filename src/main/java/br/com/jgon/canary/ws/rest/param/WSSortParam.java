@@ -63,14 +63,6 @@ public class WSSortParam {
         this.returnType = returnType;
     }
 
-    public List<String> getListSort() {
-        return listSort;
-    }
-
-    public void setListSort(List<String> listSort) {
-        this.listSort = listSort;
-    }
-
     public String getSortParam() {
         return sortParam;
     }
@@ -79,4 +71,7 @@ public class WSSortParam {
         this.sortParam = sortParam;
     }
 
+    public List<String> toList() {
+        return listSort;
+    }
 }

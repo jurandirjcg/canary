@@ -15,8 +15,6 @@ package br.com.jgon.canary.ws.rest.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -132,7 +130,8 @@ public class WSMapper {
                                 retorno.add(campoVerificado);
                             }
                         } else {
-                            ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "query-mapper.field-not-found",
+                            ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR,
+                                "query-mapper.field-not-found",
                                 fNome);
                             logger.error("[getCamposAjustados]", ae);
                             throw ae;
@@ -192,7 +191,8 @@ public class WSMapper {
                             retorno.add(fNome.concat(".").concat(campoVerificado));
                         }
                     } else {
-                        ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "query-mapper.field-not-found", fNome);
+                        ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR,
+                            "query-mapper.field-not-found", fNome);
                         logger.error("[verificaCampoObject]", ae);
                         throw ae;
                     }
@@ -210,10 +210,8 @@ public class WSMapper {
     private boolean isPrimitiveBasic(Class<?> klass) {
         return ReflectionUtil.isPrimitive(klass)
             || klass.equals(Date.class)
-            || klass.equals(LocalDate.class)
-            || klass.equals(LocalDateTime.class)
             || klass.equals(Calendar.class)
-            || klass.equals(Temporal.class)
+            || Temporal.class.isAssignableFrom(klass)
             || klass.isEnum();
 
     }

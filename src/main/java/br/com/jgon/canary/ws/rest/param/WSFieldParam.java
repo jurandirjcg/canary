@@ -59,16 +59,8 @@ public class WSFieldParam {
         return returnType;
     }
 
-    public List<String> getListField() {
-        return listField;
-    }
-
     public void setReturnType(Class<?> returnType) {
         this.returnType = returnType;
-    }
-
-    public void setListField(List<String> listField) {
-        this.listField = listField;
     }
 
     public String getFieldParam() {
@@ -79,4 +71,7 @@ public class WSFieldParam {
         this.fieldParam = fieldParam;
     }
 
+    public List<String> toList() {
+        return listField;
+    }
 }

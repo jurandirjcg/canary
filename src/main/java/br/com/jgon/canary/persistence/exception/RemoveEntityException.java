@@ -13,7 +13,7 @@
  */
 package br.com.jgon.canary.persistence.exception;
 
-import br.com.jgon.canary.exception.ApplicationException;
+import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.MessageSeverity;
 
 /**
@@ -23,16 +23,16 @@ import br.com.jgon.canary.util.MessageSeverity;
  * @version 1.0
  *
  */
-@javax.ejb.ApplicationException(rollback=true)
-public class RemoveEntityException extends ApplicationException {
+@javax.ejb.ApplicationException(rollback = true)
+public class RemoveEntityException extends ApplicationRuntimeException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6362902586242197678L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6362902586242197678L;
 
-	public RemoveEntityException(Exception e, Class<?> entityClass) {
-		super(MessageSeverity.ERROR, "error.remove", e, entityClass.getSimpleName());
-	}
+    public RemoveEntityException(Exception e, Class<?> entityClass) {
+        super(MessageSeverity.ERROR, "error.remove", e, entityClass.getSimpleName());
+    }
 
 }

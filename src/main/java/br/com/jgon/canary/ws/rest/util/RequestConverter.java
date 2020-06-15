@@ -23,7 +23,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.json.bind.annotation.JsonbTransient;
+
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
@@ -41,6 +45,9 @@ import br.com.jgon.canary.util.ReflectionUtil;
  */
 public abstract class RequestConverter<T> {
 
+    @JsonbTransient
+    private Logger log = LoggerFactory.getLogger(RequestConverter.class);
+
     public RequestConverter() {
 
     }
@@ -56,6 +63,7 @@ public abstract class RequestConverter<T> {
     }
 
     public T converter() {
+        String fldName = "";
         try {
             T ret = getInstance(parameterizedClass());
 
@@ -68,7 +76,7 @@ public abstract class RequestConverter<T> {
                     continue;
                 }
                 WSAttribute wsa = ReflectionUtil.getAnnotation(fld, WSAttribute.class);
-                String fldName = fld.getName();
+                fldName = fld.getName();
                 String recursiveAttribute = null;
                 if (wsa != null) {
                     if (StringUtils.isNotBlank(wsa.value())) {
@@ -85,6 +93,7 @@ public abstract class RequestConverter<T> {
 
             return ret;
         } catch (Exception e) {
+            log.error("[converter][class.field]" + this.getClass().getCanonicalName() + "." + fldName, e);
             throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.request-converter");
         }
     }
@@ -145,16 +154,16 @@ public abstract class RequestConverter<T> {
                 col.add(valueToAdd);
             }
             ReflectionUtil.setFieldValue(obj, fieldName, col);
-            
-        } else if (value instanceof Collection) { 
+
+        } else if (value instanceof Collection) {
             Field fld = ReflectionUtil.getAttribute(obj.getClass(), fieldName);
-            
+
             Collection col = ReflectionUtil.getAttributteValue(obj, fld);
 
             if (col == null) {
                 col = createCollectionInstance(fld.getType());
             }
-            
+
             Collection colValue = (Collection) value;
             Object valueToAdd;
             for (Object objValue : colValue) {
@@ -168,9 +177,9 @@ public abstract class RequestConverter<T> {
                 }
                 col.add(valueToAdd);
             }
-            
+
             ReflectionUtil.setFieldValue(obj, fieldName, col);
-        }else {
+        } else {
             Object objAuxValue;
             if (value instanceof RequestConverter) {
                 objAuxValue = checkResponse((RequestConverter) value);
