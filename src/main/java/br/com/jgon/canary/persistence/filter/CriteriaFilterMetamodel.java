@@ -15,6 +15,7 @@ package br.com.jgon.canary.persistence.filter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -2054,5 +2055,17 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
      * @return
      */
     public CriteriaFilterMetamodel<T> addWhereEqualField(Attribute<T, ?> attribute, ComplexAttribute anotherAttribute);
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 19/06/2020
+     *
+     * @param attribute
+     * @param startValue
+     * @param endValue
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereBetween(Attribute<T, LocalTime> attribute, LocalTime startValue, LocalTime endValue);
 
 }

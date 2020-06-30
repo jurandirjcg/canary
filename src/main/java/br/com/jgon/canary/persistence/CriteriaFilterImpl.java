@@ -13,10 +13,15 @@
  */
 package br.com.jgon.canary.persistence;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.Temporal;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -651,9 +656,14 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
      * @return
      */
     private <E> CriteriaFilterImpl<T> addWhereListValues(String field, Where where, List<E> values) {
-        if (values != null && !values.isEmpty()) {
-            this.whereRestriction.add(field, where, values);
+        if (values != null) {
+            List<E> listAux = new ArrayList<E>(values);
+            listAux.remove(null);
+            if (!listAux.isEmpty()) {
+                this.whereRestriction.add(field, where, values);
+            }
         }
+
         return this;
     }
 
@@ -712,6 +722,112 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 
     /**
      * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 19/06/2020
+     *
+     * @param type
+     * @param date
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public <E extends Temporal> E toTemporal(final Class<E> type, final Date date) {
+        if (LocalDate.class.isAssignableFrom(type)) {
+            return (E) date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            return (E) date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else if (LocalTime.class.isAssignableFrom(type)) {
+            return (E) date.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
+        }
+
+        return null;
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 19/06/2020
+     *
+     * @param type
+     * @param date
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public <E extends Temporal> E[] toTemporal(final Class<E> type, final Date[] date) {
+        E[] tempAux = (E[]) Array.newInstance(type, date.length);
+        for (int i = 0; i < tempAux.length; i++) {
+            tempAux[i] = toTemporal(type, date[i]);
+        }
+
+        return tempAux;
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 19/06/2020
+     *
+     * @param type
+     * @param field
+     * @param startValue
+     * @param endValue
+     */
+    private void addWhereBetweenDateOrTemporal(Class<?> type, String field, Date startValue, Date endValue) {
+        if (Date.class.isAssignableFrom(type)) {
+            addWhereBetween(field, startValue, endValue);
+        } else if (LocalTime.class.isAssignableFrom(type)) {
+            addWhereBetween(field, toTemporal(LocalTime.class, startValue), toTemporal(LocalTime.class, endValue));
+        } else if (LocalDate.class.isAssignableFrom(type)) {
+            addWhereBetween(field, toTemporal(LocalDate.class, startValue), toTemporal(LocalDate.class, endValue));
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            addWhereBetween(field, toTemporal(LocalDateTime.class, startValue), toTemporal(LocalDateTime.class, endValue));
+        }
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 20/06/2020
+     *
+     * @param type
+     * @param field
+     * @param dates
+     */
+    private void addWhereDateOrTemporal(Class<?> type, Where where, String field, Date[] dates) {
+        if (Date.class.isAssignableFrom(type)) {
+            addWhereListValues(field, where, dates);
+        } else if (LocalTime.class.isAssignableFrom(type)) {
+            addWhereListValues(field, where, toTemporal(LocalTime.class, dates));
+        } else if (LocalDate.class.isAssignableFrom(type)) {
+            addWhereListValues(field, where, toTemporal(LocalDate.class, dates));
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            addWhereListValues(field, where, toTemporal(LocalDateTime.class, dates));
+        }
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 20/06/2020
+     *
+     * @param type
+     * @param where
+     * @param field
+     * @param date
+     */
+    private void addWhereDateOrTemporal(Class<?> type, Where where, String field, Date date) {
+        if (Date.class.isAssignableFrom(type)) {
+            this.whereRestriction.add(field, where, date);
+        } else if (LocalTime.class.isAssignableFrom(type)) {
+            this.whereRestriction.add(field, where, toTemporal(LocalTime.class, date));
+        } else if (LocalDate.class.isAssignableFrom(type)) {
+            this.whereRestriction.add(field, where, toTemporal(LocalDate.class, date));
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            this.whereRestriction.add(field, where, toTemporal(LocalDateTime.class, date));
+        }
+    }
+
+    /**
+     * 
      * @param field
      * @param fieldType
      * @param value
@@ -758,26 +874,22 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
                             dt2 = DateUtils.setSeconds(dt2, 59);
                             dt2 = DateUtils.setMilliseconds(dt2, 999);
                         }
-                        addWhereBetween(field, dt1, dt2);
+                        addWhereBetweenDateOrTemporal(fieldType, field, dt1, dt2);
                         return true;
                     }
                 } else if (where.equals(Where.IN) || where.equals(Where.NOT_IN)) {
                     String[] val = m.group().replace(" ", "").split("\\,");
-                    if (val[0] != null && (Date.class.isAssignableFrom(fieldType) || Calendar.class.isAssignableFrom(fieldType))) {// ||
-                                                                                                                                   // fieldType.equals(Temporal.class)
-                                                                                                                                   // ||
-                                                                                                                                   // val[0].matches(regexPatternDateTime))){
+
+                    if (val[0] != null && (Date.class.isAssignableFrom(fieldType) || Calendar.class.isAssignableFrom(fieldType))
+                        || Temporal.class.isAssignableFrom(fieldType)) { // || val[0].matches(regexPatternDateTime))){
+
                         Date[] dates = new Date[val.length];
                         for (int i = 0; i < val.length; i++) {
                             dates[i] = parseDate(val[i]);
                         }
-                        if (where.equals(Where.IN)) {
-                            addWhereIn(field, dates);
-                            return true;
-                        } else {
-                            addWhereNotIn(field, dates);
-                            return true;
-                        }
+
+                        addWhereDateOrTemporal(fieldType, where, field, dates);
+                        return true;
                     } else {
                         if (where.equals(Where.IN)) {
                             addWhereIn(field, val);
@@ -797,7 +909,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
                             DateUtils.setSeconds(dt, 59);
                             DateUtils.setMilliseconds(dt, 999);
                         }
-                        this.whereRestriction.add(field, where, dt);
+                        addWhereDateOrTemporal(fieldType, where, field, dt);
                         return true;
                     } else if (Number.class.isAssignableFrom(fieldType)) {
                         this.whereRestriction.add(field, where, NumberUtils.createNumber(val));
@@ -1189,6 +1301,17 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
 
     @Override
     public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalDateTime> attribute, LocalDateTime startValue, LocalDateTime endValue) {
+        return addWhereBetween(attribute.getName(), startValue, endValue);
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereBetween(String field, LocalTime startValue, LocalTime endValue) {
+        this.whereRestriction.add(field, Where.BETWEEN, new LocalTime[] { startValue, endValue });
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalTime> attribute, LocalTime startValue, LocalTime endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 

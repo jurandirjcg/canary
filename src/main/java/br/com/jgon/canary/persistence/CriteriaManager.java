@@ -1005,7 +1005,15 @@ class CriteriaManager<T> {
                     }
                 }
 
+                List<SimpleEntry<Where, ?>> listWithValues = criteriaFilter != null ? criteriaFilter.getWhereRestriction(attributeName)
+                    : null;
+
+                if (listWithValues == null || listWithValues.isEmpty()) {
+                    continue;
+                }
+
                 if (isEntityType || isCollectionEntity) {
+
                     boolean contains = false;
                     for (Iterator<Entry<String, List<SimpleEntry<Where, ?>>>> it = criteriaFilter.getWhereRestriction().getRestrictions()
                         .entrySet().iterator(); it.hasNext();) {
@@ -1040,13 +1048,11 @@ class CriteriaManager<T> {
                     }
                 }
                 // --------- COMPLEX ----
-                List<SimpleEntry<Where, ?>> listWithValues = criteriaFilter != null ? criteriaFilter.getWhereRestriction(attributeName)
-                    : null;
-                if (listWithValues != null && !listWithValues.isEmpty()) {
-                    for (SimpleEntry<Where, ?> withValues : listWithValues) {
-                        applyPredicate(pathEntry, predicates, field.getName(), field.getType(), withValues.getKey(), withValues.getValue());
-                    }
+                // if (listWithValues != null && !listWithValues.isEmpty()) {
+                for (SimpleEntry<Where, ?> withValues : listWithValues) {
+                    applyPredicate(pathEntry, predicates, field.getName(), field.getType(), withValues.getKey(), withValues.getValue());
                 }
+                // }
             }
         }
 

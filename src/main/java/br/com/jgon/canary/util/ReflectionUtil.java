@@ -22,7 +22,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Date;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -845,7 +848,10 @@ public final class ReflectionUtil {
             || klass.equals(BigInteger.class)
             || klass.equals(BigDecimal.class)
             || klass.equals(Boolean.class)
-            || klass.equals(Character.class);
+            || klass.equals(Character.class)
+            || Date.class.isAssignableFrom(klass)
+            || Calendar.class.isAssignableFrom(klass)
+            || Temporal.class.isAssignableFrom(klass);
     }
 
     /**
