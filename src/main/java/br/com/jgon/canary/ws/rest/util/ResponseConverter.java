@@ -154,7 +154,7 @@ public abstract class ResponseConverter<O> {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves <jurandir> - Zion Mountain
+     * @author Jurandir C. Gonçalves
      * @since 17/11/2019
      *
      * @param <T>
@@ -200,7 +200,7 @@ public abstract class ResponseConverter<O> {
      * @param <T>
      * @param <O>
      * @param returnType
-     * @param obj
+     * @param list
      * @return
      */
     public static <T extends ResponseConverter<O>, O> Collection<T> converter(Class<T> returnType, Collection<O> list) {

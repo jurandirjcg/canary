@@ -726,7 +726,6 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves <jurandir>
      * @since 19/06/2020
      *
      * @param field

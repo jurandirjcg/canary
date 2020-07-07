@@ -15,6 +15,8 @@ package br.com.jgon.canary.ws.rest.param;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
@@ -34,6 +36,7 @@ public class WSSortParam {
     private Class<?> returnType;
     private List<String> listSort;
     private String sortParam;
+    private String defaultSortParam;
 
     /**
      * Compatibilidade com QueryParam
@@ -45,14 +48,18 @@ public class WSSortParam {
             MessageFactory.getMessage("message", "Construtor somente para compatibilidade com QueryParam REST"));
     }
 
-    public WSSortParam(Class<?> returnType, String fields) {
+    public WSSortParam(Class<?> returnType, String fields, String defaultSortParam) {
         this.returnType = returnType;
         this.sortParam = fields;
+        this.defaultSortParam = defaultSortParam;
         config();
     }
 
     private void config() {
         listSort = new WSMapper().getSort(returnType, this.sortParam);
+        if(listSort.isEmpty() && StringUtils.isNotBlank(this.defaultSortParam)) {
+            listSort = new WSMapper().getFields(returnType, this.defaultSortParam);
+        }
     }
 
     public Class<?> getReturnType() {

@@ -817,11 +817,11 @@ class CriteriaManager<T> {
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.lessThan(((Expression<Date>) pathExpression), (Date) value));
             } else if (value instanceof LocalDateTime) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
+                predicates.add(criteriaBuilder.lessThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
             } else if (value instanceof LocalDate) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
+                predicates.add(criteriaBuilder.lessThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
             } else if (value instanceof LocalTime) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalTime>) pathExpression, (LocalTime) value));
+                predicates.add(criteriaBuilder.lessThan((Expression<LocalTime>) pathExpression, (LocalTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.lessThan((Expression) pathExpression, (Expression) value));
             } else {
@@ -832,11 +832,11 @@ class CriteriaManager<T> {
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(((Expression<Date>) pathExpression), (Date) value));
             } else if (value instanceof LocalDateTime) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
             } else if (value instanceof LocalDate) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression<LocalDate>) pathExpression, (LocalDate) value));
             } else if (value instanceof LocalTime) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalTime>) pathExpression, (LocalTime) value));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression<LocalTime>) pathExpression, (LocalTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression) pathExpression, (Expression) value));
             } else {
@@ -862,11 +862,11 @@ class CriteriaManager<T> {
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(((Expression<Date>) pathExpression), (Date) value));
             } else if (value instanceof LocalDateTime) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
             } else if (value instanceof LocalDate) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression<LocalDate>) pathExpression, (LocalDate) value));
             } else if (value instanceof LocalTime) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalTime>) pathExpression, (LocalTime) value));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression<LocalTime>) pathExpression, (LocalTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression) pathExpression, (Expression) value));
             } else {
@@ -1005,13 +1005,6 @@ class CriteriaManager<T> {
                     }
                 }
 
-                List<SimpleEntry<Where, ?>> listWithValues = criteriaFilter != null ? criteriaFilter.getWhereRestriction(attributeName)
-                    : null;
-
-                if (listWithValues == null || listWithValues.isEmpty()) {
-                    continue;
-                }
-
                 if (isEntityType || isCollectionEntity) {
 
                     boolean contains = false;
@@ -1022,7 +1015,7 @@ class CriteriaManager<T> {
                         if (entry.getKey()
                             .contains(StringUtils.isNotBlank(attributeParent) ? attributeName.concat(".") : field.getName().concat("."))) {
                             for (SimpleEntry<Where, ?> sEntry : entry.getValue()) {
-                                if (entry.getValue() != null
+                                if (sEntry.getValue() != null
                                     || (sEntry.getKey().equals(Where.IS_NULL) || sEntry.getKey().equals(Where.IS_NOT_NULL))) {
                                     contains = true;
                                     break;
@@ -1048,11 +1041,14 @@ class CriteriaManager<T> {
                     }
                 }
                 // --------- COMPLEX ----
-                // if (listWithValues != null && !listWithValues.isEmpty()) {
-                for (SimpleEntry<Where, ?> withValues : listWithValues) {
-                    applyPredicate(pathEntry, predicates, field.getName(), field.getType(), withValues.getKey(), withValues.getValue());
+                List<SimpleEntry<Where, ?>> listWithValues = criteriaFilter != null ? criteriaFilter.getWhereRestriction(attributeName)
+                    : null;
+
+                if (listWithValues != null && !listWithValues.isEmpty()) {
+                    for (SimpleEntry<Where, ?> withValues : listWithValues) {
+                        applyPredicate(pathEntry, predicates, field.getName(), field.getType(), withValues.getKey(), withValues.getValue());
+                    }
                 }
-                // }
             }
         }
 

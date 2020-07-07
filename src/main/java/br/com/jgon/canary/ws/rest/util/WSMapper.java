@@ -73,7 +73,6 @@ public class WSMapper {
      * @param expression
      * @param campos
      * @return
-     * @throws ApplicationException
      */
     protected List<String> getCamposAjustados(Class<?> responseClass, String expression, String campos) {
         boolean sortAux = expression.equals(expSort);
@@ -123,9 +122,13 @@ public class WSMapper {
                                 : fldNomeTemp));
                     } else {
                         String campoVerificado = verificaCampo(responseClass, fNome);
-                        if (StringUtils.isNotBlank(campoVerificado)) {
+                        if (campoVerificado == null) {
+                            continue;
+                        } else if (StringUtils.isNotBlank(campoVerificado)) {
                             if (sortAux) {
                                 retorno.add(campoVerificado.contains(":desc") ? campoVerificado : campoVerificado.concat(":asc"));
+                            } else if (campoVerificado.contains(",")){
+                                Collections.addAll(retorno, campoVerificado.replace(" ", "").split(","));
                             } else {
                                 retorno.add(campoVerificado);
                             }
@@ -183,10 +186,14 @@ public class WSMapper {
                     retorno.addAll(verificaCampoObject(fldCheckAux, fNome.concat(".").concat(fldCheckAux.getName())));
                 } else {
                     String campoVerificado = verificaCampo(type, fldCheckAux.getName());
-                    if (StringUtils.isNotBlank(campoVerificado)) {
+                    if (campoVerificado == null) {
+                        continue;
+                    } else if (StringUtils.isNotBlank(campoVerificado)) {
                         if (wsMapperAttribute != null && StringUtils.isNotBlank(wsMapperAttribute.value())) {
                             String prefix = fNome.contains(".") ? fNome.substring(0, fNome.lastIndexOf('.') + 1) : "";
                             retorno.add(prefix.concat(wsMapperAttribute.value()).concat(".").concat(campoVerificado));
+                        } else if (campoVerificado.contains(",")){
+                            Collections.addAll(retorno, campoVerificado.replace(" ", "").split(","));
                         } else {
                             retorno.add(fNome.concat(".").concat(campoVerificado));
                         }
@@ -249,6 +256,8 @@ public class WSMapper {
     }
 
     /**
+     * Verifica se campo é valido, se retornar null campo mapeado como transiente,
+     * retornar '' campo não encontrado
      * 
      * @param klass
      * @param fieldName
@@ -277,18 +286,15 @@ public class WSMapper {
         List<Field> fieldClass = ReflectionUtil.listAttributes(klass);
 
         for (Field fl : fieldClass) {
-            if (fl.isAnnotationPresent(WSTransient.class)) {
-                continue;
-            }
-            WSAttribute wsMapperAttribute = null;
-            if (fl.isAnnotationPresent(WSAttribute.class)) {
-                wsMapperAttribute = fl.getAnnotation(WSAttribute.class);
-            }
-
-            // boolean isEnum = fl.getClass().isEnum() || (wsMapperAttribute != null &&
-            // wsMapperAttribute.isEnum());
-
             if (fl.getName().equals(partField)) {
+                if (fl.isAnnotationPresent(WSTransient.class)) {
+                    return null;
+                }
+                WSAttribute wsMapperAttribute = null;
+                if (fl.isAnnotationPresent(WSAttribute.class)) {
+                    wsMapperAttribute = fl.getAnnotation(WSAttribute.class);
+                }
+
                 boolean add = true;
                 String campoMultiLevel = null;
                 if (/* !isEnum && */multiLevel) {
@@ -301,6 +307,10 @@ public class WSMapper {
                     }
 
                     campoMultiLevel = verificaCampo(attrType, fieldName.substring(fieldName.indexOf(".") + 1));
+
+                    if (campoMultiLevel == null) {
+                        return null;
+                    }
                     add = StringUtils.isNotBlank(campoMultiLevel);
                 }
 
@@ -315,9 +325,20 @@ public class WSMapper {
                     /*
                      * if(isEnum){ break; }
                      */
-
                     if (StringUtils.isNotBlank(campoMultiLevel)) {
-                        sb.append(".").append(campoMultiLevel);
+                        if(campoMultiLevel.contains(",")) {
+                            String parent = sb.toString();
+                            String[] multiFields = campoMultiLevel.split(",");
+                            for(int i = 0; i < multiFields.length; i++) {
+                                if (i == 0) {
+                                    sb.append(".").append(multiFields[i]);
+                                } else {
+                                   sb.append(",").append(parent).append(".").append(multiFields[i]); 
+                                }
+                            }
+                        } else {
+                            sb.append(".").append(campoMultiLevel);
+                        }
                     } else if (fieldName.contains(":desc")) {
                         sb.append(":desc");
                     }

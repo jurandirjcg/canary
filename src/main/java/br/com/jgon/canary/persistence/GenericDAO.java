@@ -509,7 +509,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
     /**
      * 
      * @param criteriaQuery - {@link CriteriaQuery}
-     * @param restriction   {@link Predicate}
+     * @param predicate   {@link Predicate}
      * @return {@link CriteriaQuery}
      */
     protected CriteriaQuery<?> addPredicateInCriteriaQuery(CriteriaQuery<?> criteriaQuery, Predicate predicate) {
@@ -525,7 +525,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves <jurandir>
+     * @author Jurandir C. Gonçalves
      * @since 11/04/2020
      *
      * @param criteriaQuery {@link CriteriaQuery}

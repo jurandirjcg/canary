@@ -14,8 +14,11 @@
 package br.com.jgon.canary.ws.rest.param;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.ParamConverter;
@@ -39,8 +42,11 @@ public class WsSortParamFormatter implements ParamConverter<WSSortParam>, ParamC
     @Override
     public WSSortParam fromString(String str) {
         Class<?> returnType = null;
-        Annotation[] annotations = resourceInfo.getResourceMethod().getAnnotations();
+        
+        Annotation[] annotations = getParamenterAnnotations(resourceInfo.getResourceMethod());
+
         WSParamFormat wsParamFormat = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class);
+        DefaultValue defaultValue = ReflectionUtil.findAnnotation(annotations, DefaultValue.class);
 
         if (wsParamFormat != null) {
             if (wsParamFormat.value() != null) {
@@ -56,7 +62,16 @@ public class WsSortParamFormatter implements ParamConverter<WSSortParam>, ParamC
             }
         }
 
-        return new WSSortParam(returnType, str);
+        return new WSSortParam(returnType, str, defaultValue == null ? null : defaultValue.value());
+    }
+    
+    private Annotation[] getParamenterAnnotations(Method method) {
+        for (Parameter p : method.getParameters()) {
+            if (WSFieldParam.class.isAssignableFrom(p.getType())) {
+                return p.getAnnotations();
+            }
+        }
+        return null;
     }
 
     @Override

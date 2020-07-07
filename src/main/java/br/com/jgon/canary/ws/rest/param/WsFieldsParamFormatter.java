@@ -15,6 +15,7 @@ package br.com.jgon.canary.ws.rest.param;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.ParamConverter;
@@ -54,9 +56,11 @@ public class WsFieldsParamFormatter implements ParamConverter<WSFieldParam>, Par
     public WSFieldParam fromString(String str) {
         Class<?> returnType = null;
         String[] forceFields = {};
-        Annotation[] annotations = resourceInfo.getResourceMethod().getAnnotations();
+
+        Annotation[] annotations = getParamenterAnnotations(resourceInfo.getResourceMethod());
 
         WSParamFormat wsParamFormat = ReflectionUtil.findAnnotation(annotations, WSParamFormat.class);
+        DefaultValue defaultValue = ReflectionUtil.findAnnotation(annotations, DefaultValue.class);
 
         if (wsParamFormat != null) {
             if (wsParamFormat.value() != null) {
@@ -86,7 +90,16 @@ public class WsFieldsParamFormatter implements ParamConverter<WSFieldParam>, Par
             }
         }
 
-        return new WSFieldParam(returnType, fieldsReconfig);
+        return new WSFieldParam(returnType, fieldsReconfig, defaultValue == null ? null : defaultValue.value());
+    }
+
+    private Annotation[] getParamenterAnnotations(Method method) {
+        for (Parameter p : method.getParameters()) {
+            if (WSFieldParam.class.isAssignableFrom(p.getType())) {
+                return p.getAnnotations();
+            }
+        }
+        return null;
     }
 
     /**
@@ -174,11 +187,6 @@ public class WsFieldsParamFormatter implements ParamConverter<WSFieldParam>, Par
         }
 
         return listResources;
-        /*
-         * }
-         * 
-         * return null;
-         */
     }
 
     @Override

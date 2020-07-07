@@ -901,7 +901,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
                     }
                 } else {
                     String val = m.group();
-                    if (Date.class.isAssignableFrom(fieldType) || Calendar.class.isAssignableFrom(fieldType)) {// val.matches(regexPatternDateTime)){
+                    if (Date.class.isAssignableFrom(fieldType) || Calendar.class.isAssignableFrom(fieldType) || Temporal.class.isAssignableFrom(fieldType)) {// val.matches(regexPatternDateTime)){
                         Date dt = parseDate(m.group());
                         if (val.matches(regexPatternDate) && (where.equals(Where.LESS_THAN) || where.equals(Where.LESS_THAN_OR_EQUAL_TO))) {
                             DateUtils.setHours(dt, 23);

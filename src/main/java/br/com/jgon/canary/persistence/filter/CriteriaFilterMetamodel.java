@@ -2058,7 +2058,7 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves <jurandir>
+     * @author Jurandir C. Gonçalves
      * @since 19/06/2020
      *
      * @param attribute

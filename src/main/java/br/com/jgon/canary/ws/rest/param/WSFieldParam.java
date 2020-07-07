@@ -15,6 +15,8 @@ package br.com.jgon.canary.ws.rest.param;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.util.MessageFactory;
 import br.com.jgon.canary.util.MessageSeverity;
@@ -34,6 +36,7 @@ public class WSFieldParam {
     private Class<?> returnType;
     private List<String> listField;
     private String fieldParam;
+    private String defaultFieldParam;
 
     /**
      * Compatibilidade com QueryParam
@@ -45,14 +48,18 @@ public class WSFieldParam {
             MessageFactory.getMessage("message", "Construtor somente para compatibilidade com QueryParam REST"));
     }
 
-    public WSFieldParam(Class<?> returnType, String fields) {
+    public WSFieldParam(Class<?> returnType, String fields, String defaultFieldParam) {
         this.returnType = returnType;
         this.fieldParam = fields;
+        this.defaultFieldParam = defaultFieldParam;
         config();
     }
 
     private void config() {
         listField = new WSMapper().getFields(returnType, this.fieldParam);
+        if(listField.isEmpty() && StringUtils.isNotBlank(this.defaultFieldParam)) {
+            listField = new WSMapper().getFields(returnType, this.defaultFieldParam);
+        }
     }
 
     public Class<?> getReturnType() {

@@ -49,7 +49,7 @@ public @interface LinkPaginate {
     /**
      * Define o nome do atributo que contem a colecao paginada.
      * Default: ultimo path param da requisicao
-     * Ex: /v1/pacientes -> "pacientes"
+     * Ex: /v1/pacientes : "pacientes"
      */
     String embeddedCollectionName() default "";
 
