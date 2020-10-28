@@ -54,7 +54,7 @@ public class ComplexAttribute {
 	}
 	/**
 	 * Retorna o tipo do ultimo atributo adicionado
-	 * @return
+	 * @return Class
 	 */
 	public Class<?> getFieldType(){
 		return listAttribute.get(listAttribute.size() - 1).getJavaType();

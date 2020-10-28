@@ -27,7 +27,7 @@ import br.com.jgon.canary.exception.ApplicationRuntimeException;
  * 
  * @version 1.0
  *
- * @param <T>
+ * @param <T> Entity
  */
 public interface CriteriaWhere<T> {
 
@@ -152,7 +152,7 @@ public interface CriteriaWhere<T> {
          * Ex: &lt;=100;&gt;10;!=50
          */
         MULTI;
-        
+
         public static RegexWhere[] build(RegexWhere... regexWhere) {
             return regexWhere;
         }
@@ -166,470 +166,481 @@ public interface CriteriaWhere<T> {
      *
      */
     public enum MatchMode {
-        ANYWHERE,
-        EXACT,
-        START,
-        END
+        ANYWHERE, EXACT, START, END
     }
 
     /**
      * 
-     * @return
+     * @return T
      */
     public T getObjBase();
 
     /**
      * 
-     * @param field
-     * @return
+     * @param field field
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereEqual(String field);
 
     /**
      * 
-     * @param field
-     * @param values
-     * @return
+     * @param <E>    E
+     * @param field  field
+     * @param values values
+     * @return {@link CriteriaWhere}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhere<T> addWhereIn(String field, E... values);
 
     /**
      * 
-     * @param field
-     * @param values
-     * @return
+     * @param <E>    E
+     * @param field  field
+     * @param values values
+     * @return {@link CriteriaWhere}
      */
     public <E> CriteriaWhere<T> addWhereIn(String field, List<E> values);
 
     /**
      * 
-     * @param field
-     * @param values
-     * @return
+     * @param <E>    E
+     * @param field  field
+     * @param values values
+     * @return {@link CriteriaWhere}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhere<T> addWhereNotIn(String field, E... values);
 
     /**
      * 
-     * @param field
-     * @param values
-     * @return
+     * @param <E>    E
+     * @param field  field
+     * @param values values
+     * @return {@link CriteriaWhere}
      */
     public <E> CriteriaWhere<T> addWhereNotIn(String field, List<E> values);
 
     /**
      * 
-     * @param field
-     * @param values
-     * @return
+     * @param <E>    E
+     * @param field  field
+     * @param values values
+     * @return {@link CriteriaWhere}
      */
     public <E> CriteriaWhere<T> addWhereEqual(String field, List<E> values);
 
     /**
      * 
-     * @param field
-     * @param values
-     * @return
+     * @param <E>    E
+     * @param field  field
+     * @param values values
+     * @return {@link CriteriaWhere}
      */
     public <E> CriteriaWhere<T> addWhereNotEqual(String field, List<E> values);
 
     /**
      * 
-     * @param field
-     * @param values
-     * @return
+     * @param <E>    E
+     * @param field  field
+     * @param values values
+     * @return {@link CriteriaWhere}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhere<T> addWhereEqual(String field, E... values);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param <E>   E
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public <E> CriteriaWhere<T> addWhereEqual(String field, E value);
 
     /**
      * 
-     * @param field
-     * @param values
-     * @return
+     * @param <E>    E
+     * @param field  field
+     * @param values values
+     * @return {@link CriteriaWhere}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhere<T> addWhereNotEqual(String field, E... values);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param <E>   E
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public <E> CriteriaWhere<T> addWhereNotEqual(String field, E value);
 
     /**
      * 
-     * @param field
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param field      field
+     * @param startValue startValue
+     * @param endValue   endValue
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereBetween(String field, Integer startValue, Integer endValue);
 
     /**
      * 
-     * @param field
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param field      field
+     * @param startValue starValue
+     * @param endValue   endValue
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereBetween(String field, Short startValue, Short endValue);
 
     /**
      * 
-     * @param field
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param field      field
+     * @param startValue startValue
+     * @param endValue   endValue
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereBetween(String field, Long startValue, Long endValue);
 
     /**
      * 
-     * @param field
-     * @param anotherField
-     * @return
+     * @param field        field
+     * @param anotherField anotherField
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThanField(String field, String anotherField);
 
     /**
      * 
-     * @param field
-     * @param anotherField
-     * @return
+     * @param field        field
+     * @param anotherField anotherField
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereGreaterThanField(String field, String anotherField);
 
     /**
      * 
-     * @param field
-     * @param anotherField
-     * @return
+     * @param field        field
+     * @param anotherField anotherField
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThanOrEqualToField(String field, String anotherField);
 
     /**
      * 
-     * @param field
-     * @param anotherField
-     * @return
+     * @param field        field
+     * @param anotherField anotherField
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereGreaterThanOrEqualToField(String field, String anotherField);
 
     /**
      * 
-     * @param field
-     * @param anotherField
-     * @return
+     * @param field        field
+     * @param anotherField anotherField
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereEqualField(String field, String anotherField);
 
     /**
      * 
-     * @param field
-     * @param anotherField
-     * @return
+     * @param field        field
+     * @param anotherField anotherField
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereNotEqualField(String field, String anotherField);
 
     /**
      * 
-     * @param field
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param field      field
+     * @param startValue startValue
+     * @param endValue   endValue
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereBetween(String field, Date startValue, Date endValue);
 
     /**
      * 
-     * @param field
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param field      field
+     * @param startValue startValue
+     * @param endValue   endValue
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereBetween(String field, LocalDate startValue, LocalDate endValue);
 
     /**
      * 
-     * @param field
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param field      field
+     * @param startValue startValue
+     * @param endValue   endValue
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereBetween(String field, LocalDateTime startValue, LocalDateTime endValue);
 
     /**
      * 
-     * @param field
-     * @return
+     * @param field field
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereGreaterThan(String field);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param <E>   E
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public <E> CriteriaWhere<T> addWhereGreaterThan(String field, Date value);
 
     /**
      * 
-     * @param <E>
-     * @param field
-     * @param value
-     * @return
+     * @param <E>   E
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public <E> CriteriaWhere<T> addWhereGreaterThan(String field, LocalDate value);
 
     /**
      * 
-     * @param <E>
-     * @param field
-     * @param value
-     * @return
+     * @param <E>   E
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public <E> CriteriaWhere<T> addWhereGreaterThan(String field, LocalDateTime value);
 
     /**
-     * 
-     * @param field
-     * @param value
-     * @return
+     *
+     * @param <E>   E
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public <E> CriteriaWhere<T> addWhereGreaterThan(String field, Number value);
 
     /**
      * 
-     * @param field
-     * @return
+     * @param field field
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereGreaterThanOrEqualTo(String field);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereGreaterThanOrEqualTo(String field, Date value);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereGreaterThanOrEqualTo(String field, LocalDate value);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereGreaterThanOrEqualTo(String field, LocalDateTime value);
 
     /**
      *
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereGreaterThanOrEqualTo(String field, Number value);
 
     /**
      * 
-     * @param field
-     * @return
+     * @param field field
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereIn(String field);
 
     /**
      * 
-     * @param field
-     * @return
+     * @param field field
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereIsNotNull(String field);
 
     /**
      * 
-     * @param field
-     * @return
+     * @param field field
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereIsNull(String field);
 
     /**
      * 
-     * @param field
-     * @return
+     * @param field field
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThan(String field);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThan(String field, Date value);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThan(String field, LocalDate value);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThan(String field, LocalDateTime value);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThan(String field, Number value);
 
     /**
      * 
-     * @param field
-     * @return
+     * @param field field
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThanOrEqualTo(String field);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThanOrEqualTo(String field, Date value);
-    
+
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThanOrEqualTo(String field, LocalDate value);
-    
+
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThanOrEqualTo(String field, LocalDateTime value);
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value value
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLessThanOrEqualTo(String field, Number value);
 
     /**
-     * @param field
+     * 
+     * @param field     field
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLike(String field, MatchMode matchMode);
 
     /**
-     * @param field
+     * @param field     field
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereNotLike(String field, MatchMode matchMode);
 
     /**
-     * @param field
+     * @param field     field
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereNotILike(String field, MatchMode matchMode);
 
     /**
-     * @param field
-     * @param value
+     * @param field     field
+     * @param value     value
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereLike(String field, String value, MatchMode matchMode);
 
     /**
-     * @param field
-     * @param value
+     * @param field     field
+     * @param value     value
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereNotLike(String field, String value, MatchMode matchMode);
 
     /**
-     * @param field
-     * @param value
+     * @param field     field
+     * @param value     value
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereNotILike(String field, String value, MatchMode matchMode);
 
     /**
-     * @param field
+     * @param field     field
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereILike(String field, MatchMode matchMode);
 
     /**
-     * @param field
-     * @param value
+     * 
+     * @param field     field
+     * @param value     value
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereILike(String field, String value, MatchMode matchMode);
 
     /**
      * 
-     * @param field
-     * @return
+     * @param field field
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereNotEqual(String field);
 
     /**
      * 
-     * @param field
-     * @return
+     * @param field field
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereNotIn(String field);
 
     /**
      * 
-     * @param field
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param field      field
+     * @param startValue startValue
+     * @param endValue   endValue
+     * @return {@link CriteriaWhere}
      */
     public CriteriaWhere<T> addWhereBetween(String field, Double startValue, Double endValue);
 
@@ -660,19 +671,15 @@ public interface CriteriaWhere<T> {
      * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam
      * valores com formato data/hora. Ex: &lt;=2000-10-20
      * 
-     * @param field
-     * @param fieldType
+     * @param field             field
+     * @param fieldType         fieldType
      * @param value             regex com valor. Ex: &gt;10
      * @param regexToAnalyse    condicoes (Where) para analisar para analisar, se
      *                          null verifica todas.
      * @param defaultIfNotMatch padrao caso nao encontre referencia
-     * @return
-     * @throws ApplicationRuntimeException
+     * @return {@link CriteriaWhere}
+     * @throws ApplicationRuntimeException erro ao aplicar regex
      */
-    public CriteriaWhere<T> addWhereRegex(
-        String field,
-        Class<?> fieldType,
-        String value,
-        RegexWhere[] regexToAnalyse,
-        RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
+    public CriteriaWhere<T> addWhereRegex(String field, Class<?> fieldType, String value, RegexWhere[] regexToAnalyse,
+            RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
 }

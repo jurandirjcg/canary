@@ -31,7 +31,7 @@ import br.com.jgon.canary.exception.ApplicationRuntimeException;
  * 
  * @version 1.0
  *
- * @param <T>
+ * @param <T> Entity
  */
 public interface CriteriaFilter<T> extends CriteriaWhere<T> {
 

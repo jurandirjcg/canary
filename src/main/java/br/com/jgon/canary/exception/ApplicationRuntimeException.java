@@ -43,7 +43,7 @@ public class ApplicationRuntimeException extends RuntimeException {
 
     /**
      * 
-     * @param e
+     * @param e {@link ApplicationException}
      */
     public ApplicationRuntimeException(ApplicationException e) {
         super(e.getMessage(), e);
@@ -52,8 +52,8 @@ public class ApplicationRuntimeException extends RuntimeException {
 
     /**
      * 
-     * @param severity
-     * @param key
+     * @param severity {@link MessageSeverity}
+     * @param key {@link String}
      */
     public ApplicationRuntimeException(MessageSeverity severity, String key) {
         super(MessageFactory.getMessage(key));
@@ -62,9 +62,9 @@ public class ApplicationRuntimeException extends RuntimeException {
 
     /**
      * 
-     * @param severity
-     * @param key
-     * @param params
+     * @param severity {@link MessageSeverity}
+     * @param key chave
+     * @param params parametros
      */
     public ApplicationRuntimeException(MessageSeverity severity, String key, String... params) {
         super(MessageFactory.getMessage(key, params));
@@ -73,8 +73,8 @@ public class ApplicationRuntimeException extends RuntimeException {
 
     /**
      * 
-     * @param key
-     * @param e
+     * @param key chave
+     * @param e {@link Exception}
      */
     public ApplicationRuntimeException(String key, Exception e) {
         super(MessageFactory.getMessage(key), e);
@@ -83,9 +83,9 @@ public class ApplicationRuntimeException extends RuntimeException {
 
     /**
      * 
-     * @param severity
-     * @param key
-     * @param e
+     * @param severity {@link MessageSeverity}
+     * @param key chave
+     * @param e {@link Exception}
      */
     public ApplicationRuntimeException(MessageSeverity severity, String key, Exception e) {
         super(MessageFactory.getMessage(key), e);
@@ -94,10 +94,10 @@ public class ApplicationRuntimeException extends RuntimeException {
 
     /**
      * 
-     * @param severity
-     * @param key
-     * @param e
-     * @param params
+     * @param severity {@link MessageSeverity}
+     * @param key chave
+     * @param e {@link Exception}
+     * @param params parametros
      */
     public ApplicationRuntimeException(MessageSeverity severity, String key, Exception e, String... params) {
         super(MessageFactory.getMessage(key, params), e);
@@ -108,6 +108,10 @@ public class ApplicationRuntimeException extends RuntimeException {
         return messageSeverity;
     }
 
+    /**
+     * 
+     * @param messageSeverity {@link MessageSeverity}
+     */
     public void setMessageSeverity(MessageSeverity messageSeverity) {
         this.messageSeverity = messageSeverity;
     }

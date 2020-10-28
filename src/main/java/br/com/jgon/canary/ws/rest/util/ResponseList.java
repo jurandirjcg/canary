@@ -25,7 +25,7 @@ import javax.ws.rs.core.Link;
  * 
  * @version 1.0
  *
- * @param <T>
+ * @param <T> Tipo
  */
 public class ResponseList<T> {
 

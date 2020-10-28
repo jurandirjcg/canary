@@ -32,7 +32,7 @@ import br.com.jgon.canary.exception.ApplicationRuntimeException;
  * 
  * @version 1.0
  *
- * @param <T>
+ * @param <T> Entity
  */
 public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
 

@@ -36,12 +36,12 @@ import br.com.jgon.canary.util.MessageSeverity;
 import br.com.jgon.canary.util.ReflectionUtil;
 
 /**
- * Auxlia na conversao do objeto para o objeto de request
+ * Auxilia na conversao do objeto para o objeto de request
  * 
  * @author Jurandir C. Gonçalves
  * @since 23/10/2019
  *
- * @param <T>
+ * @param <T> Tipo
  */
 public abstract class RequestConverter<T> {
 

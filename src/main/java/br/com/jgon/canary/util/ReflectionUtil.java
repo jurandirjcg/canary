@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Date;
@@ -33,8 +34,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 /**
  * Biblioteca de Reflection, baseada na bilioteca de reflection do Framework
@@ -1024,7 +1023,7 @@ public final class ReflectionUtil {
         if (type instanceof ParameterizedType) {
             ParameterizedType aType = (ParameterizedType) type;
             Type fieldArgTypes = aType.getActualTypeArguments()[position];
-            if (fieldArgTypes != null && !(fieldArgTypes instanceof TypeVariableImpl)) {
+            if (fieldArgTypes != null && !(fieldArgTypes instanceof TypeVariable)) {
                 return (Class<?>) fieldArgTypes;
             }
         }
