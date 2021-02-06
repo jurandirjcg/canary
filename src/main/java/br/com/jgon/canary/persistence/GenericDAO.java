@@ -40,6 +40,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -1707,9 +1708,8 @@ public abstract class GenericDAO<T, K extends Serializable> {
         List<Order> orderList = new ArrayList<Order>(criteriaQuery.getOrderList());
         criteriaQuery.getOrderList().clear();
         // GROUP
-        // List<Expression<?>> groupList = new
-        // ArrayList<Expression<?>>(criteriaQuery.getGroupList());
-        // criteriaQuery.getGroupList().clear();
+        List<Expression<?>> groupList = new ArrayList<Expression<?>>(criteriaQuery.getGroupList());
+        criteriaQuery.getGroupList().clear();
 
         criteriaQuery.select(configCount(root, distinct));
 
@@ -1717,6 +1717,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
 
         criteriaQuery.select((Selection) sel);
         criteriaQuery.orderBy(orderList);
+        criteriaQuery.groupBy(groupList);
 
         return count;
     }

@@ -690,6 +690,13 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
 
     /**
      * 
+     * @param fields
+     * @return
+     */
+    public CriteriaFilter<T> addGroupBy(List<String> fields);
+
+    /**
+     * 
      * @param field
      * @param joinType
      * @param fetch

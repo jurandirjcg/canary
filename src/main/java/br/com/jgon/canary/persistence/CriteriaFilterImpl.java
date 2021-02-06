@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.filter.ComplexAttribute;
+import br.com.jgon.canary.persistence.filter.CriteriaFilter;
 import br.com.jgon.canary.persistence.filter.CriteriaFilterDelete;
 import br.com.jgon.canary.persistence.filter.CriteriaFilterMetamodel;
 import br.com.jgon.canary.persistence.filter.CriteriaFilterUpdate;
@@ -60,16 +61,22 @@ import br.com.jgon.canary.util.MessageSeverity;
  *
  * @param <T>
  */
-class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilterUpdate<T>, CriteriaFilterDelete<T> {
+class CriteriaFilterImpl<T>
+        implements CriteriaFilterMetamodel<T>, CriteriaFilterUpdate<T>, CriteriaFilterDelete<T> {
 
     private static final String regexPatternAlpha = "[a-zA-Z0-9\u00C0-\u00FF\\s_-]+";
-    private static final String regexPatternDate = "(((0?[1-9]|[12][0-9]|3[01])[/-](0[1-9]|1[0-2])[/-]((19|20)\\d\\d))|((19|20)\\d\\d[-/](0[1-9]|1[012])[-/](0[1-9]|[12][0-9]|3[01])))";
-    private static final String regexTime = "((0\\d|1\\d|2[0-3]):[0-5]\\d)?(:[0-5]\\d)?(.\\d\\d\\d)?(Z)?(\\+[0-2][0-4]:[0-5]\\d)?";
+    private static final String regexPatternDate =
+            "(((0?[1-9]|[12][0-9]|3[01])[/-](0[1-9]|1[0-2])[/-]((19|20)\\d\\d))|((19|20)\\d\\d[-/](0[1-9]|1[012])[-/](0[1-9]|[12][0-9]|3[01])))";
+    private static final String regexTime =
+            "((0\\d|1\\d|2[0-3]):[0-5]\\d)?(:[0-5]\\d)?(.\\d\\d\\d)?(Z)?(\\+[0-2][0-4]:[0-5]\\d)?";
     // OLD private static final String regexPatternDateTime = regexPatternDate
     // +"(([\\s]?(0\\d|1\\d|2[0-3]):[0-5]\\d)?(:[0-5]\\d)?)?";
-    private static final String regexPatternDateTime = regexPatternDate + "(([\\s]|T|'T')?" + regexTime + ")?";
-    private static final String regexPatternDateTimeOrNumber = "((" + regexPatternDateTime + ")|[0-9]+)";
-    private static final String regexPatternMultiDateTimeOrNumber = "(([a-zA-Z0-9,\\s_-\u00C0-\u00FF]+)|[" + regexPatternDateTime + ",]+)";
+    private static final String regexPatternDateTime =
+            regexPatternDate + "(([\\s]|T|'T')?" + regexTime + ")?";
+    private static final String regexPatternDateTimeOrNumber =
+            "((" + regexPatternDateTime + ")|[0-9]+)";
+    private static final String regexPatternMultiDateTimeOrNumber =
+            "(([a-zA-Z0-9,\\s_-\u00C0-\u00FF]+)|[" + regexPatternDateTime + ",]+)";
 
     private Logger logger = LoggerFactory.getLogger(CriteriaFilterImpl.class);
 
@@ -82,41 +89,115 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
      *
      */
     enum Where {
-        IGNORE(null, null),
-        EQUAL(RegexWhere.EQUAL, "(?<=^\\=)" + regexPatternAlpha + "$"),
-        LESS_THAN(RegexWhere.LESS_THAN, "(?<=^\\<)" + regexPatternDateTimeOrNumber + "$"),
-        LESS_THAN_OR_EQUAL_TO(RegexWhere.LESS_THAN_OR_EQUAL_TO, "(?<=^\\<\\=)" + regexPatternDateTimeOrNumber + "$"),
-        GREATER_THAN(RegexWhere.GREATER_THAN, "(?<=^\\>)" + regexPatternDateTimeOrNumber + "$"),
-        GREATER_THAN_OR_EQUAL_TO(RegexWhere.GREATER_THAN_OR_EQUAL_TO, "(?<=^\\>\\=)" + regexPatternDateTimeOrNumber + "$"),
-        NOT_EQUAL(RegexWhere.NOT_EQUAL, "(?<=^\\!\\=)" + regexPatternAlpha + "$"),
-        IN(RegexWhere.IN, "(?<=^\\()" + regexPatternMultiDateTimeOrNumber + "(?=\\)$)"),
-        NOT_IN(RegexWhere.NOT_IN, "(?<=^!\\()" + regexPatternMultiDateTimeOrNumber + "(?=\\)$)"),
-        LIKE_EXACT(RegexWhere.LIKE_EXACT, "(?<=^\\=\\%)" + regexPatternAlpha + "(?!\\%$)"),
-        LIKE_NOT_EXACT(RegexWhere.LIKE_NOT_EXACT, "(?<=^\\!\\=\\%)" + regexPatternAlpha + "(?!\\%$)"),
-        LIKE_MATCH_ANYWHERE(RegexWhere.LIKE_MATCH_ANYWHERE, "(?<=^\\%)" + regexPatternAlpha + "(?=(\\!)?\\%$)"),
-        LIKE_MATCH_END(RegexWhere.LIKE_MATCH_END, "(?<=^\\%)" + regexPatternAlpha + "(?!\\%$)"),
-        LIKE_MATCH_START(RegexWhere.LIKE_MATCH_START, "(?<!^\\%)" + regexPatternAlpha + "(?=\\%$)"),
-        LIKE_NOT_MATCH_ANYWHERE(RegexWhere.LIKE_NOT_MATCH_ANYWHERE, "(?<=^\\!\\%)" + regexPatternAlpha + "(?=\\!\\%$)"),
-        LIKE_NOT_MATCH_END(RegexWhere.LIKE_NOT_MATCH_END, "(?<=^\\!\\%)" + regexPatternAlpha + "(?!\\%$)"),
-        LIKE_NOT_MATCH_START(RegexWhere.LIKE_NOT_MATCH_START, "(?<!^\\%)" + regexPatternAlpha + "(?=\\!\\%$)"),
-        ILIKE_EXACT(RegexWhere.ILIKE_EXACT, "(?<=^\\=\\*)" + regexPatternAlpha + "(?!\\*$)"),
-        ILIKE_NOT_EXACT(RegexWhere.ILIKE_NOT_EXACT, "(?<=^\\!\\=\\*)" + regexPatternAlpha + "(?!\\*$)"),
-        ILIKE_MATCH_ANYWHERE(RegexWhere.ILIKE_MATCH_ANYWHERE, "(?<=^\\*)" + regexPatternAlpha + "(?=\\*$)"),
-        ILIKE_MATCH_END(RegexWhere.ILIKE_MATCH_END, "(?<=^\\*)" + regexPatternAlpha + "(?!\\*$)"),
-        ILIKE_MATCH_START(RegexWhere.ILIKE_MATCH_START, "(?<!^\\*)" + regexPatternAlpha + "(?=\\*$)"),
-        ILIKE_NOT_MATCH_ANYWHERE(RegexWhere.ILIKE_NOT_MATCH_ANYWHERE, "(?<=^\\!\\*)" + regexPatternAlpha + "(?=\\!\\*$)"),
-        ILIKE_NOT_MATCH_END(RegexWhere.ILIKE_NOT_MATCH_END, "(?<=^\\!\\*)" + regexPatternAlpha + "(?!\\*$)"),
-        ILIKE_NOT_MATCH_START(RegexWhere.ILIKE_NOT_MATCH_START, "(?<!^\\*)" + regexPatternAlpha + "(?=\\!\\*$)"),
-        IS_NULL(RegexWhere.IS_NULL, "^null$"),
-        IS_NOT_NULL(RegexWhere.IS_NOT_NULL, "^not null$"),
-        BETWEEN(RegexWhere.BETWEEN,
-            "(?<=^)" + regexPatternDateTimeOrNumber + "(\\s(btwn|between)\\s)" + regexPatternDateTimeOrNumber + "(?=$)"),
-        EQUAL_OTHER_FIELD(null, null),
-        LESS_THAN_OTHER_FIELD(null, null),
-        GREATER_THAN_OTHER_FIELD(null, null),
-        LESS_THAN_OR_EQUAL_TO_OTHER_FIELD(null, null),
-        GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD(null, null),
-        NOT_EQUAL_OTHER_FIELD(null, null);
+        IGNORE(null, null), EQUAL(RegexWhere.EQUAL,
+                "(?<=^\\=)" + regexPatternAlpha + "$"), LESS_THAN(RegexWhere.LESS_THAN,
+                        "(?<=^\\<)" + regexPatternDateTimeOrNumber + "$"), LESS_THAN_OR_EQUAL_TO(
+                                RegexWhere.LESS_THAN_OR_EQUAL_TO,
+                                "(?<=^\\<\\=)" + regexPatternDateTimeOrNumber + "$"), GREATER_THAN(
+                                        RegexWhere.GREATER_THAN,
+                                        "(?<=^\\>)" + regexPatternDateTimeOrNumber
+                                                + "$"), GREATER_THAN_OR_EQUAL_TO(
+                                                        RegexWhere.GREATER_THAN_OR_EQUAL_TO,
+                                                        "(?<=^\\>\\=)"
+                                                                + regexPatternDateTimeOrNumber
+                                                                + "$"), NOT_EQUAL(
+                                                                        RegexWhere.NOT_EQUAL,
+                                                                        "(?<=^\\!\\=)"
+                                                                                + regexPatternAlpha
+                                                                                + "$"), IN(
+                                                                                        RegexWhere.IN,
+                                                                                        "(?<=^\\()"
+                                                                                                + regexPatternMultiDateTimeOrNumber
+                                                                                                + "(?=\\)$)"), NOT_IN(
+                                                                                                        RegexWhere.NOT_IN,
+                                                                                                        "(?<=^!\\()"
+                                                                                                                + regexPatternMultiDateTimeOrNumber
+                                                                                                                + "(?=\\)$)"), LIKE_EXACT(
+                                                                                                                        RegexWhere.LIKE_EXACT,
+                                                                                                                        "(?<=^\\=\\%)"
+                                                                                                                                + regexPatternAlpha
+                                                                                                                                + "(?!\\%$)"), LIKE_NOT_EXACT(
+                                                                                                                                        RegexWhere.LIKE_NOT_EXACT,
+                                                                                                                                        "(?<=^\\!\\=\\%)"
+                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                + "(?!\\%$)"), LIKE_MATCH_ANYWHERE(
+                                                                                                                                                        RegexWhere.LIKE_MATCH_ANYWHERE,
+                                                                                                                                                        "(?<=^\\%)"
+                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                + "(?=(\\!)?\\%$)"), LIKE_MATCH_END(
+                                                                                                                                                                        RegexWhere.LIKE_MATCH_END,
+                                                                                                                                                                        "(?<=^\\%)"
+                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                + "(?!\\%$)"), LIKE_MATCH_START(
+                                                                                                                                                                                        RegexWhere.LIKE_MATCH_START,
+                                                                                                                                                                                        "(?<!^\\%)"
+                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                + "(?=\\%$)"), LIKE_NOT_MATCH_ANYWHERE(
+                                                                                                                                                                                                        RegexWhere.LIKE_NOT_MATCH_ANYWHERE,
+                                                                                                                                                                                                        "(?<=^\\!\\%)"
+                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                + "(?=\\!\\%$)"), LIKE_NOT_MATCH_END(
+                                                                                                                                                                                                                        RegexWhere.LIKE_NOT_MATCH_END,
+                                                                                                                                                                                                                        "(?<=^\\!\\%)"
+                                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                                + "(?!\\%$)"), LIKE_NOT_MATCH_START(
+                                                                                                                                                                                                                                        RegexWhere.LIKE_NOT_MATCH_START,
+                                                                                                                                                                                                                                        "(?<!^\\%)"
+                                                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                                                + "(?=\\!\\%$)"), ILIKE_EXACT(
+                                                                                                                                                                                                                                                        RegexWhere.ILIKE_EXACT,
+                                                                                                                                                                                                                                                        "(?<=^\\=\\*)"
+                                                                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                                                                + "(?!\\*$)"), ILIKE_NOT_EXACT(
+                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_NOT_EXACT,
+                                                                                                                                                                                                                                                                        "(?<=^\\!\\=\\*)"
+                                                                                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                                                                                + "(?!\\*$)"), ILIKE_MATCH_ANYWHERE(
+                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_MATCH_ANYWHERE,
+                                                                                                                                                                                                                                                                                        "(?<=^\\*)"
+                                                                                                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                                                                                                + "(?=\\*$)"), ILIKE_MATCH_END(
+                                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_MATCH_END,
+                                                                                                                                                                                                                                                                                                        "(?<=^\\*)"
+                                                                                                                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                                                                                                                + "(?!\\*$)"), ILIKE_MATCH_START(
+                                                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_MATCH_START,
+                                                                                                                                                                                                                                                                                                                        "(?<!^\\*)"
+                                                                                                                                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                                                                                                                                + "(?=\\*$)"), ILIKE_NOT_MATCH_ANYWHERE(
+                                                                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_NOT_MATCH_ANYWHERE,
+                                                                                                                                                                                                                                                                                                                                        "(?<=^\\!\\*)"
+                                                                                                                                                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                                                                                                                                                + "(?=\\!\\*$)"), ILIKE_NOT_MATCH_END(
+                                                                                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_NOT_MATCH_END,
+                                                                                                                                                                                                                                                                                                                                                        "(?<=^\\!\\*)"
+                                                                                                                                                                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                                                                                                                                                                + "(?!\\*$)"), ILIKE_NOT_MATCH_START(
+                                                                                                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_NOT_MATCH_START,
+                                                                                                                                                                                                                                                                                                                                                                        "(?<!^\\*)"
+                                                                                                                                                                                                                                                                                                                                                                                + regexPatternAlpha
+                                                                                                                                                                                                                                                                                                                                                                                + "(?=\\!\\*$)"), IS_NULL(
+                                                                                                                                                                                                                                                                                                                                                                                        RegexWhere.IS_NULL,
+                                                                                                                                                                                                                                                                                                                                                                                        "^null$"), IS_NOT_NULL(
+                                                                                                                                                                                                                                                                                                                                                                                                RegexWhere.IS_NOT_NULL,
+                                                                                                                                                                                                                                                                                                                                                                                                "^not null$"), BETWEEN(
+                                                                                                                                                                                                                                                                                                                                                                                                        RegexWhere.BETWEEN,
+                                                                                                                                                                                                                                                                                                                                                                                                        "(?<=^)" + regexPatternDateTimeOrNumber
+                                                                                                                                                                                                                                                                                                                                                                                                                + "(\\s(btwn|between)\\s)"
+                                                                                                                                                                                                                                                                                                                                                                                                                + regexPatternDateTimeOrNumber
+                                                                                                                                                                                                                                                                                                                                                                                                                + "(?=$)"), EQUAL_OTHER_FIELD(
+                                                                                                                                                                                                                                                                                                                                                                                                                        null,
+                                                                                                                                                                                                                                                                                                                                                                                                                        null), LESS_THAN_OTHER_FIELD(
+                                                                                                                                                                                                                                                                                                                                                                                                                                null,
+                                                                                                                                                                                                                                                                                                                                                                                                                                null), GREATER_THAN_OTHER_FIELD(
+                                                                                                                                                                                                                                                                                                                                                                                                                                        null,
+                                                                                                                                                                                                                                                                                                                                                                                                                                        null), LESS_THAN_OR_EQUAL_TO_OTHER_FIELD(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                null,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                null), GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        null,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        null), NOT_EQUAL_OTHER_FIELD(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                null,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                null);
 
         public String exp;
         public RegexWhere regexWhere;
@@ -132,8 +213,7 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
      *
      */
     enum Order {
-        ASC,
-        DESC
+        ASC, DESC
     }
 
     /**
@@ -141,22 +221,17 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
      * 
      */
     enum SelectAggregate {
-        FIELD,
-        COUNT,
-        MAX,
-        MIN,
-        SUM,
-        UPPER,
-        LOWER
+        FIELD, COUNT, MAX, MIN, SUM, UPPER, LOWER
     }
 
     private boolean collectionSelectionControl = true;
 
     private Map<String, Where> listWhere = new LinkedHashMap<String, Where>(0);
     private WhereRestriction whereRestriction = new WhereRestriction();
-    private Map<String, SimpleEntry<SelectAggregate, String>> listSelection = new LinkedHashMap<String, SimpleEntry<SelectAggregate, String>>(
-        0);
-    private Map<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>> collectionSelection = new LinkedHashMap<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>>();
+    private Map<String, SimpleEntry<SelectAggregate, String>> listSelection =
+            new LinkedHashMap<String, SimpleEntry<SelectAggregate, String>>(0);
+    private Map<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>> collectionSelection =
+            new LinkedHashMap<Class<?>, Map<String, SimpleEntry<SelectAggregate, String>>>();
     private Map<String, Order> listOrder = new LinkedHashMap<String, Order>(0);
     private Set<String> listGroupBy = new LinkedHashSet<String>();
     private Map<String, JoinMapper> listJoin = new LinkedHashMap<String, JoinMapper>();
@@ -295,8 +370,10 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
      * @param alias
      * @return
      */
-    private CriteriaFilterImpl<T> addSelect(String field, SelectAggregate selectFunction, String alias) {
-        this.listSelection.put(field, new SimpleEntry<CriteriaFilterImpl.SelectAggregate, String>(selectFunction, alias));
+    private CriteriaFilterImpl<T> addSelect(String field, SelectAggregate selectFunction,
+            String alias) {
+        this.listSelection.put(field,
+                new SimpleEntry<CriteriaFilterImpl.SelectAggregate, String>(selectFunction, alias));
         return this;
     }
 
@@ -326,7 +403,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
                 fieldAux.append(f);
             }
         }
-        List<SimpleEntry<String, String>> listaCampos = new SelectMapper(returnTypeAux, fieldAux.toString()).getFields();
+        List<SimpleEntry<String, String>> listaCampos =
+                new SelectMapper(returnTypeAux, fieldAux.toString()).getFields();
 
         for (SimpleEntry<String, String> se : listaCampos) {
             addSelect(se.getKey(), se.getValue());
@@ -336,7 +414,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addSelect(Class<?> returnType, String... fields) throws ApplicationRuntimeException {
+    public CriteriaFilterImpl<T> addSelect(Class<?> returnType, String... fields)
+            throws ApplicationRuntimeException {
         return addSelect(returnType, fields == null ? null : Arrays.asList(fields));
     }
 
@@ -522,12 +601,14 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addOrder(Class<?> returnType, String... order) throws ApplicationRuntimeException {
+    public CriteriaFilterImpl<T> addOrder(Class<?> returnType, String... order)
+            throws ApplicationRuntimeException {
         return addOrder(returnType, Arrays.asList(order));
     }
 
     @Override
-    public CriteriaFilterImpl<T> addOrder(Class<?> returnType, List<String> order) throws ApplicationRuntimeException {
+    public CriteriaFilterImpl<T> addOrder(Class<?> returnType, List<String> order)
+            throws ApplicationRuntimeException {
         StringBuilder orderAux = new StringBuilder();
         if (order != null) {
             for (String f : order) {
@@ -537,7 +618,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
                 orderAux.append(f);
             }
 
-            List<SimpleEntry<String, String>> listOrder = new OrderMapper(returnType, orderAux.toString()).getOrder();
+            List<SimpleEntry<String, String>> listOrder =
+                    new OrderMapper(returnType, orderAux.toString()).getOrder();
 
             for (SimpleEntry<String, String> se : listOrder) {
                 if (se.getValue().equals("asc")) {
@@ -655,7 +737,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
      * @param values
      * @return
      */
-    private <E> CriteriaFilterImpl<T> addWhereListValues(String field, Where where, List<E> values) {
+    private <E> CriteriaFilterImpl<T> addWhereListValues(String field, Where where,
+            List<E> values) {
         if (values != null) {
             List<E> listAux = new ArrayList<E>(values);
             listAux.remove(null);
@@ -702,18 +785,17 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereRegex(
-        String field,
-        Class<?> fieldType,
-        String value,
-        RegexWhere[] regexToAnalyse,
-        RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException {
+    public CriteriaFilterImpl<T> addWhereRegex(String field, Class<?> fieldType, String value,
+            RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
+            throws ApplicationRuntimeException {
         if (StringUtils.isBlank(value)) {
             return this;
         }
-        boolean added = configWhereRegex(field, fieldType, value, regexToAnalyse, defaultIfNotMatch);
+        boolean added =
+                configWhereRegex(field, fieldType, value, regexToAnalyse, defaultIfNotMatch);
         if (!added && defaultIfNotMatch != null) {
-            ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "error.regex-config", value, field);
+            ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR,
+                    "error.regex-config", value, field);
             logger.error("addWhereRegex]", ae);
             throw ae;
         }
@@ -771,15 +853,19 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
      * @param startValue
      * @param endValue
      */
-    private void addWhereBetweenDateOrTemporal(Class<?> type, String field, Date startValue, Date endValue) {
+    private void addWhereBetweenDateOrTemporal(Class<?> type, String field, Date startValue,
+            Date endValue) {
         if (Date.class.isAssignableFrom(type)) {
             addWhereBetween(field, startValue, endValue);
         } else if (LocalTime.class.isAssignableFrom(type)) {
-            addWhereBetween(field, toTemporal(LocalTime.class, startValue), toTemporal(LocalTime.class, endValue));
+            addWhereBetween(field, toTemporal(LocalTime.class, startValue),
+                    toTemporal(LocalTime.class, endValue));
         } else if (LocalDate.class.isAssignableFrom(type)) {
-            addWhereBetween(field, toTemporal(LocalDate.class, startValue), toTemporal(LocalDate.class, endValue));
+            addWhereBetween(field, toTemporal(LocalDate.class, startValue),
+                    toTemporal(LocalDate.class, endValue));
         } else if (LocalDateTime.class.isAssignableFrom(type)) {
-            addWhereBetween(field, toTemporal(LocalDateTime.class, startValue), toTemporal(LocalDateTime.class, endValue));
+            addWhereBetween(field, toTemporal(LocalDateTime.class, startValue),
+                    toTemporal(LocalDateTime.class, endValue));
         }
     }
 
@@ -836,15 +922,14 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
      * @return
      * @throws ApplicationRuntimeException
      */
-    private boolean configWhereRegex(
-        String field,
-        Class<?> fieldType,
-        String value,
-        RegexWhere[] regexToAnalyse,
-        RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException {
+    private boolean configWhereRegex(String field, Class<?> fieldType, String value,
+            RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
+            throws ApplicationRuntimeException {
         Where where = null;
         for (Where wh : Where.values()) {
-            if (wh.exp != null && (regexToAnalyse == null || containsRegex(regexToAnalyse, wh.regexWhere)) && checkRegex(value, wh.exp)) {
+            if (wh.exp != null
+                    && (regexToAnalyse == null || containsRegex(regexToAnalyse, wh.regexWhere))
+                    && checkRegex(value, wh.exp)) {
                 where = wh;
                 break;
             }
@@ -862,7 +947,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
                     String[] val = m.group().split("\\s(btwn|between)\\s");
                     if (NumberUtils.isCreatable(val[0])) {
                         this.whereRestriction.add(field, Where.BETWEEN,
-                            new Number[] { NumberUtils.createNumber(val[0]), NumberUtils.createNumber(val[1]) });
+                                new Number[] {NumberUtils.createNumber(val[0]),
+                                        NumberUtils.createNumber(val[1])});
                         return true;
                     } else {
                         Date dt1, dt2;
@@ -880,8 +966,11 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
                 } else if (where.equals(Where.IN) || where.equals(Where.NOT_IN)) {
                     String[] val = m.group().replace(" ", "").split("\\,");
 
-                    if (val[0] != null && (Date.class.isAssignableFrom(fieldType) || Calendar.class.isAssignableFrom(fieldType))
-                        || Temporal.class.isAssignableFrom(fieldType)) { // || val[0].matches(regexPatternDateTime))){
+                    if (val[0] != null
+                            && (Date.class.isAssignableFrom(fieldType)
+                                    || Calendar.class.isAssignableFrom(fieldType))
+                            || Temporal.class.isAssignableFrom(fieldType)) { // ||
+                                                                             // val[0].matches(regexPatternDateTime))){
 
                         Date[] dates = new Date[val.length];
                         for (int i = 0; i < val.length; i++) {
@@ -901,9 +990,12 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
                     }
                 } else {
                     String val = m.group();
-                    if (Date.class.isAssignableFrom(fieldType) || Calendar.class.isAssignableFrom(fieldType) || Temporal.class.isAssignableFrom(fieldType)) {// val.matches(regexPatternDateTime)){
+                    if (Date.class.isAssignableFrom(fieldType)
+                            || Calendar.class.isAssignableFrom(fieldType)
+                            || Temporal.class.isAssignableFrom(fieldType)) {// val.matches(regexPatternDateTime)){
                         Date dt = parseDate(m.group());
-                        if (val.matches(regexPatternDate) && (where.equals(Where.LESS_THAN) || where.equals(Where.LESS_THAN_OR_EQUAL_TO))) {
+                        if (val.matches(regexPatternDate) && (where.equals(Where.LESS_THAN)
+                                || where.equals(Where.LESS_THAN_OR_EQUAL_TO))) {
                             DateUtils.setHours(dt, 23);
                             DateUtils.setMinutes(dt, 59);
                             DateUtils.setSeconds(dt, 59);
@@ -923,8 +1015,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
         } else {
             boolean found = false;
             if (ArrayUtils.contains(regexToAnalyse, RegexWhere.MULTI)) {
-                final String multiWhere = "^(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber + "(\\s?&\\s?(<|<=|=|!=|>=|>|)"
-                    + regexPatternDateTimeOrNumber + "){1,}$";
+                final String multiWhere = "^(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber
+                        + "(\\s?&\\s?(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber + "){1,}$";
                 Pattern p = Pattern.compile(multiWhere);
                 Matcher m = p.matcher(value);
 
@@ -933,13 +1025,12 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
                     String[] val = m.group().split(";");
 
                     for (String v : val) {
-                        boolean add = configWhereRegex(field, fieldType, v, new RegexWhere[] {
-                            RegexWhere.LESS_THAN,
-                            RegexWhere.LESS_THAN_OR_EQUAL_TO,
-                            RegexWhere.EQUAL,
-                            RegexWhere.NOT_EQUAL,
-                            RegexWhere.GREATER_THAN,
-                            RegexWhere.GREATER_THAN_OR_EQUAL_TO }, defaultIfNotMatch);
+                        boolean add = configWhereRegex(field, fieldType, v,
+                                new RegexWhere[] {RegexWhere.LESS_THAN,
+                                        RegexWhere.LESS_THAN_OR_EQUAL_TO, RegexWhere.EQUAL,
+                                        RegexWhere.NOT_EQUAL, RegexWhere.GREATER_THAN,
+                                        RegexWhere.GREATER_THAN_OR_EQUAL_TO},
+                                defaultIfNotMatch);
 
                         if (!add) {
                             return false;
@@ -950,14 +1041,17 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
             }
 
             if (!found && defaultIfNotMatch != null) {
-                if (defaultIfNotMatch.equals(RegexWhere.EQUAL) && value.matches("^" + regexPatternDateTime + "$")) {
+                if (defaultIfNotMatch.equals(RegexWhere.EQUAL)
+                        && value.matches("^" + regexPatternDateTime + "$")) {
                     this.whereRestriction.add(field, Where.EQUAL, parseDate(value));
                     return true;
-                } else if (defaultIfNotMatch.equals(RegexWhere.EQUAL) && value.matches("^[a-zA-Z0-9]" + regexPatternAlpha + "$")) {
+                } else if (defaultIfNotMatch.equals(RegexWhere.EQUAL)
+                        && value.matches("^[a-zA-Z0-9]" + regexPatternAlpha + "$")) {
                     this.whereRestriction.add(field, Where.EQUAL, value);
                     return true;
                 } else {
-                    boolean ret = configWhereRegex(field, fieldType, value, new RegexWhere[] { defaultIfNotMatch }, null);
+                    boolean ret = configWhereRegex(field, fieldType, value,
+                            new RegexWhere[] {defaultIfNotMatch}, null);
                     if (!ret) {
                         Where whereAux = getWhereFromRegexWhere(defaultIfNotMatch);
                         if (whereAux != null) {
@@ -982,7 +1076,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
         try {
             return DateUtil.parseDate(dateValue);
         } catch (ParseException e) {
-            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.parse-date", e, dateValue);
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.parse-date", e,
+                    dateValue);
         }
     }
 
@@ -1002,19 +1097,18 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereRegex(
-        Attribute<T, ?> attribute,
-        String value,
-        RegexWhere[] regexToAnalyse,
-        RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException {
+    public CriteriaFilterImpl<T> addWhereRegex(Attribute<T, ?> attribute, String value,
+            RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
+            throws ApplicationRuntimeException {
         if (StringUtils.isBlank(value)) {
             return this;
         }
 
-        boolean added = configWhereRegex(attribute.getName(), attribute.getJavaType(), value, regexToAnalyse, defaultIfNotMatch);
+        boolean added = configWhereRegex(attribute.getName(), attribute.getJavaType(), value,
+                regexToAnalyse, defaultIfNotMatch);
         if (!added && defaultIfNotMatch != null) {
-            ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR, "error.regex-config", value,
-                attribute.getName());
+            ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR,
+                    "error.regex-config", value, attribute.getName());
             logger.error("[addWhereRegex]", ae.getMessage());
             throw ae;
         }
@@ -1131,7 +1225,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
      * @param listComplexWhere
      * @return
      */
-    public CriteriaFilterImpl<T> addAllWhereComplex(Map<String, List<SimpleEntry<Where, ?>>> listComplexWhere) {
+    public CriteriaFilterImpl<T> addAllWhereComplex(
+            Map<String, List<SimpleEntry<Where, ?>>> listComplexWhere) {
         this.whereRestriction.getRestrictions().putAll(listComplexWhere);
         return this;
     }
@@ -1151,47 +1246,52 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
      * @param listSelection
      * @return
      */
-    public CriteriaFilterImpl<T> addAllSelection(Map<String, SimpleEntry<SelectAggregate, String>> listSelection) {
+    public CriteriaFilterImpl<T> addAllSelection(
+            Map<String, SimpleEntry<SelectAggregate, String>> listSelection) {
         this.listSelection.putAll(listSelection);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(String field, Integer startValue, Integer endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new Integer[] { startValue, endValue });
+    public CriteriaFilterImpl<T> addWhereBetween(String field, Integer startValue,
+            Integer endValue) {
+        this.whereRestriction.add(field, Where.BETWEEN, new Integer[] {startValue, endValue});
         return this;
     }
 
     @Override
     public CriteriaFilterImpl<T> addWhereBetween(String field, Double startValue, Double endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new Double[] { startValue, endValue });
+        this.whereRestriction.add(field, Where.BETWEEN, new Double[] {startValue, endValue});
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, Integer> attribute, Integer startValue, Integer endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, Integer> attribute,
+            Integer startValue, Integer endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
     public CriteriaFilterImpl<T> addWhereBetween(String field, Short startValue, Short endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new Short[] { startValue, endValue });
+        this.whereRestriction.add(field, Where.BETWEEN, new Short[] {startValue, endValue});
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, Short> attribute, Short startValue, Short endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, Short> attribute, Short startValue,
+            Short endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
     public CriteriaFilterImpl<T> addWhereBetween(String field, Long startValue, Long endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new Long[] { startValue, endValue });
+        this.whereRestriction.add(field, Where.BETWEEN, new Long[] {startValue, endValue});
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, Long> attribute, Long startValue, Long endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, Long> attribute, Long startValue,
+            Long endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
@@ -1202,7 +1302,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public <E> CriteriaFilterImpl<T> addWhereLessThanField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute) {
+    public <E> CriteriaFilterImpl<T> addWhereLessThanField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute) {
         return addWhereLessThanField(attribute.getName(), anotherAttribute.getName());
     }
 
@@ -1213,7 +1314,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public <E> CriteriaFilterImpl<T> addWhereGreaterThanField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute) {
+    public <E> CriteriaFilterImpl<T> addWhereGreaterThanField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute) {
         return addWhereGreaterThanField(attribute.getName(), anotherAttribute.getName());
     }
 
@@ -1224,18 +1326,21 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public <E> CriteriaFilterImpl<T> addWhereLessThanOrEqualToField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute) {
+    public <E> CriteriaFilterImpl<T> addWhereLessThanOrEqualToField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute) {
         return addWhereLessThanOrEqualToField(attribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualToField(String field, String anotherField) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualToField(String field,
+            String anotherField) {
         this.whereRestriction.add(field, Where.GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD, anotherField);
         return this;
     }
 
     @Override
-    public <E> CriteriaFilterImpl<T> addWhereGreaterThanOrEqualToField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute) {
+    public <E> CriteriaFilterImpl<T> addWhereGreaterThanOrEqualToField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute) {
         return addWhereGreaterThanOrEqualToField(attribute.getName(), anotherAttribute.getName());
     }
 
@@ -1246,12 +1351,14 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public <E> CriteriaFilterImpl<T> addWhereEqualField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute) {
+    public <E> CriteriaFilterImpl<T> addWhereEqualField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute) {
         return addWhereEqualField(attribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereEqualField(Attribute<T, ?> attribute, ComplexAttribute anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereEqualField(Attribute<T, ?> attribute,
+            ComplexAttribute anotherAttribute) {
         return addWhereEqualField(attribute.getName(), anotherAttribute.getName());
     }
 
@@ -1262,56 +1369,65 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public <E> CriteriaFilterImpl<T> addWhereNotEqualField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute) {
+    public <E> CriteriaFilterImpl<T> addWhereNotEqualField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute) {
         return addWhereNotEqualField(attribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereNotEqualField(Attribute<T, ?> attribute, ComplexAttribute anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereNotEqualField(Attribute<T, ?> attribute,
+            ComplexAttribute anotherAttribute) {
         return addWhereNotEqualField(attribute.getName(), anotherAttribute.getName());
     }
 
     @Override
     public CriteriaFilterImpl<T> addWhereBetween(String field, Date startValue, Date endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new Date[] { startValue, endValue });
+        this.whereRestriction.add(field, Where.BETWEEN, new Date[] {startValue, endValue});
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, Date> attribute, Date startValue, Date endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, Date> attribute, Date startValue,
+            Date endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(String field, LocalDate startValue, LocalDate endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new LocalDate[] { startValue, endValue });
+    public CriteriaFilterImpl<T> addWhereBetween(String field, LocalDate startValue,
+            LocalDate endValue) {
+        this.whereRestriction.add(field, Where.BETWEEN, new LocalDate[] {startValue, endValue});
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalDate> attribute, LocalDate startValue, LocalDate endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalDate> attribute,
+            LocalDate startValue, LocalDate endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(String field, LocalDateTime startValue, LocalDateTime endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new LocalDateTime[] { startValue, endValue });
+    public CriteriaFilterImpl<T> addWhereBetween(String field, LocalDateTime startValue,
+            LocalDateTime endValue) {
+        this.whereRestriction.add(field, Where.BETWEEN, new LocalDateTime[] {startValue, endValue});
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalDateTime> attribute, LocalDateTime startValue, LocalDateTime endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalDateTime> attribute,
+            LocalDateTime startValue, LocalDateTime endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(String field, LocalTime startValue, LocalTime endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new LocalTime[] { startValue, endValue });
+    public CriteriaFilterImpl<T> addWhereBetween(String field, LocalTime startValue,
+            LocalTime endValue) {
+        this.whereRestriction.add(field, Where.BETWEEN, new LocalTime[] {startValue, endValue});
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalTime> attribute, LocalTime startValue, LocalTime endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalTime> attribute,
+            LocalTime startValue, LocalTime endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
@@ -1395,19 +1511,19 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     @Override
     public CriteriaFilterImpl<T> addWhereLike(String field, MatchMode matchMode) {
         switch (matchMode) {
-        case ANYWHERE:
-            this.listWhere.put(field, Where.LIKE_MATCH_ANYWHERE);
-            break;
-        case START:
-            this.listWhere.put(field, Where.LIKE_MATCH_START);
-            break;
-        case END:
-            this.listWhere.put(field, Where.LIKE_MATCH_END);
-            break;
-        case EXACT:
-        default:
-            this.listWhere.put(field, Where.LIKE_EXACT);
-            break;
+            case ANYWHERE:
+                this.listWhere.put(field, Where.LIKE_MATCH_ANYWHERE);
+                break;
+            case START:
+                this.listWhere.put(field, Where.LIKE_MATCH_START);
+                break;
+            case END:
+                this.listWhere.put(field, Where.LIKE_MATCH_END);
+                break;
+            case EXACT:
+            default:
+                this.listWhere.put(field, Where.LIKE_EXACT);
+                break;
         }
         return this;
     }
@@ -1415,25 +1531,26 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     @Override
     public CriteriaFilterImpl<T> addWhereNotLike(String field, MatchMode matchMode) {
         switch (matchMode) {
-        case ANYWHERE:
-            this.listWhere.put(field, Where.LIKE_NOT_MATCH_ANYWHERE);
-            break;
-        case START:
-            this.listWhere.put(field, Where.LIKE_NOT_MATCH_START);
-            break;
-        case END:
-            this.listWhere.put(field, Where.LIKE_NOT_MATCH_END);
-            break;
-        case EXACT:
-        default:
-            this.listWhere.put(field, Where.LIKE_NOT_EXACT);
-            break;
+            case ANYWHERE:
+                this.listWhere.put(field, Where.LIKE_NOT_MATCH_ANYWHERE);
+                break;
+            case START:
+                this.listWhere.put(field, Where.LIKE_NOT_MATCH_START);
+                break;
+            case END:
+                this.listWhere.put(field, Where.LIKE_NOT_MATCH_END);
+                break;
+            case EXACT:
+            default:
+                this.listWhere.put(field, Where.LIKE_NOT_EXACT);
+                break;
         }
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereNotLike(Attribute<T, String> attribute, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereNotLike(Attribute<T, String> attribute,
+            MatchMode matchMode) {
         return addWhereNotLike(attribute.getName(), matchMode);
     }
 
@@ -1445,19 +1562,19 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     @Override
     public CriteriaFilterImpl<T> addWhereILike(String field, MatchMode matchMode) {
         switch (matchMode) {
-        case ANYWHERE:
-            this.listWhere.put(field, Where.ILIKE_MATCH_ANYWHERE);
-            break;
-        case START:
-            this.listWhere.put(field, Where.ILIKE_MATCH_START);
-            break;
-        case END:
-            this.listWhere.put(field, Where.ILIKE_MATCH_END);
-            break;
-        case EXACT:
-        default:
-            this.listWhere.put(field, Where.ILIKE_EXACT);
-            break;
+            case ANYWHERE:
+                this.listWhere.put(field, Where.ILIKE_MATCH_ANYWHERE);
+                break;
+            case START:
+                this.listWhere.put(field, Where.ILIKE_MATCH_START);
+                break;
+            case END:
+                this.listWhere.put(field, Where.ILIKE_MATCH_END);
+                break;
+            case EXACT:
+            default:
+                this.listWhere.put(field, Where.ILIKE_EXACT);
+                break;
         }
         return this;
     }
@@ -1465,30 +1582,32 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     @Override
     public CriteriaFilterImpl<T> addWhereNotILike(String field, MatchMode matchMode) {
         switch (matchMode) {
-        case ANYWHERE:
-            this.listWhere.put(field, Where.ILIKE_NOT_MATCH_ANYWHERE);
-            break;
-        case START:
-            this.listWhere.put(field, Where.ILIKE_NOT_MATCH_START);
-            break;
-        case END:
-            this.listWhere.put(field, Where.ILIKE_NOT_MATCH_END);
-            break;
-        case EXACT:
-        default:
-            this.listWhere.put(field, Where.ILIKE_NOT_EXACT);
-            break;
+            case ANYWHERE:
+                this.listWhere.put(field, Where.ILIKE_NOT_MATCH_ANYWHERE);
+                break;
+            case START:
+                this.listWhere.put(field, Where.ILIKE_NOT_MATCH_START);
+                break;
+            case END:
+                this.listWhere.put(field, Where.ILIKE_NOT_MATCH_END);
+                break;
+            case EXACT:
+            default:
+                this.listWhere.put(field, Where.ILIKE_NOT_EXACT);
+                break;
         }
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereNotILike(Attribute<T, String> attribute, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereNotILike(Attribute<T, String> attribute,
+            MatchMode matchMode) {
         return addWhereNotILike(attribute.getName(), matchMode);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereILike(Attribute<T, String> attribute, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereILike(Attribute<T, String> attribute,
+            MatchMode matchMode) {
         return addWhereILike(attribute.getName(), matchMode);
     }
 
@@ -1532,7 +1651,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addJoin(Attribute<T, ?> attribute, JoinType joinType, boolean fetch) {
+    public CriteriaFilterImpl<T> addJoin(Attribute<T, ?> attribute, JoinType joinType,
+            boolean fetch) {
         this.listJoin.put(attribute.getName(), new JoinMapper(joinType, fetch, false));
         return this;
     }
@@ -1612,7 +1732,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, Date> attribute, Date value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, Date> attribute,
+            Date value) {
         return addWhereGreaterThanOrEqualTo(attribute.getName(), value);
     }
 
@@ -1623,7 +1744,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, Number> attribute, Number value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, Number> attribute,
+            Number value) {
         return addWhereGreaterThanOrEqualTo(attribute.getName(), value);
     }
 
@@ -1656,7 +1778,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, Date> attribute, Date value) {
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, Date> attribute,
+            Date value) {
         return addWhereLessThanOrEqualTo(attribute.getName(), value);
     }
 
@@ -1667,26 +1790,27 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, Number> attribute, Number value) {
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, Number> attribute,
+            Number value) {
         return addWhereLessThanOrEqualTo(attribute.getName(), value);
     }
 
     @Override
     public CriteriaFilterImpl<T> addWhereLike(String field, String value, MatchMode matchMode) {
         switch (matchMode) {
-        case ANYWHERE:
-            this.whereRestriction.add(field, Where.LIKE_MATCH_ANYWHERE, value);
-            break;
-        case START:
-            this.whereRestriction.add(field, Where.LIKE_MATCH_START, value);
-            break;
-        case END:
-            this.whereRestriction.add(field, Where.LIKE_MATCH_END, value);
-            break;
-        case EXACT:
-        default:
-            this.whereRestriction.add(field, Where.LIKE_EXACT, value);
-            break;
+            case ANYWHERE:
+                this.whereRestriction.add(field, Where.LIKE_MATCH_ANYWHERE, value);
+                break;
+            case START:
+                this.whereRestriction.add(field, Where.LIKE_MATCH_START, value);
+                break;
+            case END:
+                this.whereRestriction.add(field, Where.LIKE_MATCH_END, value);
+                break;
+            case EXACT:
+            default:
+                this.whereRestriction.add(field, Where.LIKE_EXACT, value);
+                break;
         }
         return this;
     }
@@ -1694,19 +1818,19 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     @Override
     public CriteriaFilterImpl<T> addWhereNotLike(String field, String value, MatchMode matchMode) {
         switch (matchMode) {
-        case ANYWHERE:
-            this.whereRestriction.add(field, Where.LIKE_NOT_MATCH_ANYWHERE, value);
-            break;
-        case START:
-            this.whereRestriction.add(field, Where.LIKE_NOT_MATCH_START, value);
-            break;
-        case END:
-            this.whereRestriction.add(field, Where.LIKE_NOT_MATCH_END, value);
-            break;
-        case EXACT:
-        default:
-            this.whereRestriction.add(field, Where.LIKE_NOT_EXACT, value);
-            break;
+            case ANYWHERE:
+                this.whereRestriction.add(field, Where.LIKE_NOT_MATCH_ANYWHERE, value);
+                break;
+            case START:
+                this.whereRestriction.add(field, Where.LIKE_NOT_MATCH_START, value);
+                break;
+            case END:
+                this.whereRestriction.add(field, Where.LIKE_NOT_MATCH_END, value);
+                break;
+            case EXACT:
+            default:
+                this.whereRestriction.add(field, Where.LIKE_NOT_EXACT, value);
+                break;
         }
         return this;
     }
@@ -1714,19 +1838,19 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     @Override
     public CriteriaFilterImpl<T> addWhereILike(String field, String value, MatchMode matchMode) {
         switch (matchMode) {
-        case ANYWHERE:
-            this.whereRestriction.add(field, Where.ILIKE_MATCH_ANYWHERE, value);
-            break;
-        case START:
-            this.whereRestriction.add(field, Where.ILIKE_MATCH_START, value);
-            break;
-        case END:
-            this.whereRestriction.add(field, Where.ILIKE_MATCH_END, value);
-            break;
-        case EXACT:
-        default:
-            this.whereRestriction.add(field, Where.ILIKE_EXACT, value);
-            break;
+            case ANYWHERE:
+                this.whereRestriction.add(field, Where.ILIKE_MATCH_ANYWHERE, value);
+                break;
+            case START:
+                this.whereRestriction.add(field, Where.ILIKE_MATCH_START, value);
+                break;
+            case END:
+                this.whereRestriction.add(field, Where.ILIKE_MATCH_END, value);
+                break;
+            case EXACT:
+            default:
+                this.whereRestriction.add(field, Where.ILIKE_EXACT, value);
+                break;
         }
         return this;
     }
@@ -1734,45 +1858,50 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     @Override
     public CriteriaFilterImpl<T> addWhereNotILike(String field, String value, MatchMode matchMode) {
         switch (matchMode) {
-        case ANYWHERE:
-            this.whereRestriction.add(field, Where.ILIKE_NOT_MATCH_ANYWHERE, value);
-            break;
-        case START:
-            this.whereRestriction.add(field, Where.ILIKE_NOT_MATCH_START, value);
-            break;
-        case END:
-            this.whereRestriction.add(field, Where.ILIKE_NOT_MATCH_END, value);
-            break;
-        case EXACT:
-        default:
-            this.whereRestriction.add(field, Where.ILIKE_NOT_EXACT, value);
-            break;
+            case ANYWHERE:
+                this.whereRestriction.add(field, Where.ILIKE_NOT_MATCH_ANYWHERE, value);
+                break;
+            case START:
+                this.whereRestriction.add(field, Where.ILIKE_NOT_MATCH_START, value);
+                break;
+            case END:
+                this.whereRestriction.add(field, Where.ILIKE_NOT_MATCH_END, value);
+                break;
+            case EXACT:
+            default:
+                this.whereRestriction.add(field, Where.ILIKE_NOT_EXACT, value);
+                break;
         }
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereNotLike(Attribute<T, String> attribute, String value, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereNotLike(Attribute<T, String> attribute, String value,
+            MatchMode matchMode) {
         return addWhereNotLike(attribute.getName(), value, matchMode);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLike(Attribute<T, String> attribute, String value, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereLike(Attribute<T, String> attribute, String value,
+            MatchMode matchMode) {
         return addWhereLike(attribute.getName(), value, matchMode);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereILike(Attribute<T, String> attribute, String value, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereILike(Attribute<T, String> attribute, String value,
+            MatchMode matchMode) {
         return addWhereILike(attribute.getName(), value, matchMode);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereNotILike(Attribute<T, String> attribute, String value, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereNotILike(Attribute<T, String> attribute, String value,
+            MatchMode matchMode) {
         return addWhereNotILike(attribute.getName(), value, matchMode);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereILike(ComplexAttribute attribute, String value, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereILike(ComplexAttribute attribute, String value,
+            MatchMode matchMode) {
         return addWhereILike(attribute.getName(), value, matchMode);
     }
 
@@ -1782,17 +1911,20 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereNotILike(ComplexAttribute attribute, String value, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereNotILike(ComplexAttribute attribute, String value,
+            MatchMode matchMode) {
         return addWhereNotILike(attribute.getName(), value, matchMode);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereNotLike(ComplexAttribute attribute, String value, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereNotLike(ComplexAttribute attribute, String value,
+            MatchMode matchMode) {
         return addWhereNotLike(attribute.getName(), value, matchMode);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLike(ComplexAttribute attribute, String value, MatchMode matchMode) {
+    public CriteriaFilterImpl<T> addWhereLike(ComplexAttribute attribute, String value,
+            MatchMode matchMode) {
         return addWhereLike(attribute.getName(), value, matchMode);
     }
 
@@ -1949,62 +2081,74 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, Integer startValue, Integer endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, Integer startValue,
+            Integer endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, Short startValue, Short endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, Short startValue,
+            Short endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, Long startValue, Long endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, Long startValue,
+            Long endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereLessThanField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute) {
         return addWhereLessThanField(attribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute) {
         return addWhereGreaterThanField(attribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute) {
         return addWhereLessThanOrEqualToField(attribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute) {
         return addWhereGreaterThanOrEqualToField(attribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereEqualField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereEqualField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute) {
         return addWhereEqualField(attribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereNotEqualField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereNotEqualField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute) {
         return addWhereNotEqualField(attribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, Date startValue, Date endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, Date startValue,
+            Date endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, LocalDate startValue, LocalDate endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, LocalDate startValue,
+            LocalDate endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, LocalDateTime startValue, LocalDateTime endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute,
+            LocalDateTime startValue, LocalDateTime endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
@@ -2059,7 +2203,8 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addJoin(ComplexAttribute attribute, JoinType joinType, boolean fetch) {
+    public CriteriaFilterImpl<T> addJoin(ComplexAttribute attribute, JoinType joinType,
+            boolean fetch) {
         return addJoin(attribute.getName(), joinType, fetch);
     }
 
@@ -2094,12 +2239,14 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, Date value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
+            Date value) {
         return addWhereGreaterThanOrEqualTo(attribute.getName(), value);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, Number value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
+            Number value) {
         return addWhereGreaterThanOrEqualTo(attribute.getName(), value);
     }
 
@@ -2119,46 +2266,54 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, Number value) {
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
+            Number value) {
         return addWhereLessThanOrEqualTo(attribute.getName(), value);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereRegex(
-        ComplexAttribute attribute,
-        String value,
-        RegexWhere[] regexToAnalyse,
-        RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException {
-        return addWhereRegex(attribute.getName(), attribute.getFieldType(), value, regexToAnalyse, defaultIfNotMatch);
+    public CriteriaFilterImpl<T> addWhereRegex(ComplexAttribute attribute, String value,
+            RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
+            throws ApplicationRuntimeException {
+        return addWhereRegex(attribute.getName(), attribute.getFieldType(), value, regexToAnalyse,
+                defaultIfNotMatch);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereLessThanField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute) {
         return addWhereLessThanField(anotherAttribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute) {
         return addWhereGreaterThanField(anotherAttribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
-        return addWhereLessThanOrEqualToField(anotherAttribute.getName(), anotherAttribute.getName());
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute) {
+        return addWhereLessThanOrEqualToField(anotherAttribute.getName(),
+                anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
-        return addWhereGreaterThanOrEqualToField(anotherAttribute.getName(), anotherAttribute.getName());
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute) {
+        return addWhereGreaterThanOrEqualToField(anotherAttribute.getName(),
+                anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereEqualField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereEqualField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute) {
         return addWhereEqualField(anotherAttribute.getName(), anotherAttribute.getName());
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereNotEqualField(ComplexAttribute attribute, ComplexAttribute anotherAttribute) {
+    public CriteriaFilterImpl<T> addWhereNotEqualField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute) {
         return addWhereNotEqualField(anotherAttribute.getName(), anotherAttribute.getName());
     }
 
@@ -2175,19 +2330,22 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addJoin(String field, JoinType joinType, boolean fetch, boolean force) {
+    public CriteriaFilterImpl<T> addJoin(String field, JoinType joinType, boolean fetch,
+            boolean force) {
         this.listJoin.put(field, new JoinMapper(joinType, fetch, force));
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addJoin(ComplexAttribute attribute, JoinType joinType, boolean fetch, boolean force) {
+    public CriteriaFilterImpl<T> addJoin(ComplexAttribute attribute, JoinType joinType,
+            boolean fetch, boolean force) {
         this.addJoin(attribute.getName(), joinType, fetch, force);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addJoin(Attribute<T, ?> attribute, JoinType joinType, boolean fetch, boolean force) {
+    public CriteriaFilterImpl<T> addJoin(Attribute<T, ?> attribute, JoinType joinType,
+            boolean fetch, boolean force) {
         this.addJoin(attribute.getName(), joinType, fetch, force);
         return this;
     }
@@ -2199,19 +2357,22 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThan(ComplexAttribute attribute, LocalDateTime value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThan(ComplexAttribute attribute,
+            LocalDateTime value) {
         this.addWhereGreaterThan(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, LocalDate value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
+            LocalDate value) {
         this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, LocalDateTime value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
+            LocalDateTime value) {
         this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
         return this;
     }
@@ -2229,13 +2390,15 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, LocalDate value) {
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
+            LocalDate value) {
         this.addWhereLessThanOrEqualTo(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, LocalDateTime value) {
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
+            LocalDateTime value) {
         this.addWhereLessThanOrEqualTo(attribute.getName(), value);
         return this;
     }
@@ -2289,50 +2452,68 @@ class CriteriaFilterImpl<T> implements CriteriaFilterMetamodel<T>, CriteriaFilte
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, LocalDate> attribute, LocalDate value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, LocalDate> attribute,
+            LocalDate value) {
         this.addWhereGreaterThan(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, LocalDateTime> attribute, LocalDateTime value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, LocalDateTime> attribute,
+            LocalDateTime value) {
         this.addWhereGreaterThan(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, LocalDate> attribute, LocalDate value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, LocalDate> attribute,
+            LocalDate value) {
         this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, LocalDateTime> attribute, LocalDateTime value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, LocalDateTime> attribute,
+            LocalDateTime value) {
         this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, LocalDate> attribute, LocalDate value) {
+    public CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, LocalDate> attribute,
+            LocalDate value) {
         this.addWhereLessThan(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, LocalDateTime> attribute, LocalDateTime value) {
+    public CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, LocalDateTime> attribute,
+            LocalDateTime value) {
         this.addWhereLessThan(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, LocalDate> attribute, LocalDate value) {
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, LocalDate> attribute,
+            LocalDate value) {
         this.addWhereLessThanOrEqualTo(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, LocalDateTime> attribute, LocalDateTime value) {
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, LocalDateTime> attribute,
+            LocalDateTime value) {
         this.addWhereLessThanOrEqualTo(attribute.getName(), value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilter<T> addGroupBy(List<String> fields) {
+        if (fields != null) {
+            fields.forEach(item -> {
+                addGroupBy(item);
+            });
+        }
         return this;
     }
 }
