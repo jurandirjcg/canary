@@ -767,7 +767,7 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
      * @return
      */
     @Override
-    public CriteriaFilter<T> addGroupBy(List<String> fields);
+    public CriteriaFilterMetamodel<T> addGroupBy(List<String> fields);
 
     /**
      * 
