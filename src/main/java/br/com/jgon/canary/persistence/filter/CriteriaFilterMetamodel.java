@@ -763,6 +763,14 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
 
     /**
      * 
+     * @param fields
+     * @return
+     */
+    @Override
+    public CriteriaFilter<T> addGroupBy(List<String> fields);
+
+    /**
+     * 
      * @param field
      * @param joinType
      * @param fetch

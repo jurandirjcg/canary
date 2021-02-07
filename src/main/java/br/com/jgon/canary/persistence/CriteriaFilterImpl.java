@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.filter.ComplexAttribute;
-import br.com.jgon.canary.persistence.filter.CriteriaFilter;
 import br.com.jgon.canary.persistence.filter.CriteriaFilterDelete;
 import br.com.jgon.canary.persistence.filter.CriteriaFilterMetamodel;
 import br.com.jgon.canary.persistence.filter.CriteriaFilterUpdate;
@@ -2508,7 +2507,7 @@ class CriteriaFilterImpl<T>
     }
 
     @Override
-    public CriteriaFilter<T> addGroupBy(List<String> fields) {
+    public CriteriaFilterImpl<T> addGroupBy(List<String> fields) {
         if (fields != null) {
             fields.forEach(item -> {
                 addGroupBy(item);
