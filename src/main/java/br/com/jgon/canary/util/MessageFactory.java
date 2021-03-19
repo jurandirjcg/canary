@@ -48,7 +48,7 @@ public class MessageFactory {
 			//Nao e necessario lancar execao pois aplicacao sempre apresentara mensagem de erro generica
 		}
 		try {
-			customMessageResource = ResourceBundle.getBundle(CUSTOM_MESSAGE_RESOURCE, Locale.getDefault());
+			customMessageResource = ResourceBundle.getBundle(CUSTOM_MESSAGE_RESOURCE, Locale.getDefault(), Thread.currentThread().getContextClassLoader());
 		} catch (MissingResourceException e) {
 			logger.error("[static] - Arquivo ApplicationMessages não encontrado", e);
 			//Nao e necessario lancar execao pois aplicacao sempre apresentara mensagem de erro generica
