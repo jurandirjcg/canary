@@ -17,7 +17,6 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +108,30 @@ public class MessageFactory {
 		
 		return (msg == null ? "" : msg );
 	}
+
+    /**
+     * 
+     * @param locale - {@link Locale}
+     * @param key - message key
+     * @param params - message params
+     * @return {@link String}
+     */
+    public static String getMessage(Locale locale, String key, String... params) {
+        ResourceBundle resourceBundle = ResourceBundle.getBundle(CUSTOM_MESSAGE_RESOURCE, locale, Thread.currentThread().getContextClassLoader());
+        return getMessage(resourceBundle, key, params);
+    }
+
+    /**
+     * 
+     * @param locale - {@link Locale}
+     * @param key - message key
+     * @return {@link String}
+     */
+    public static String getMessage(Locale locale, String key) {
+        ResourceBundle resourceBundle = ResourceBundle.getBundle(CUSTOM_MESSAGE_RESOURCE, locale, Thread.currentThread().getContextClassLoader());
+        return getMessage(resourceBundle, key);
+    }
+    
 	/**
 	 * 
 	 * @param resourceBundle - arquivo de mensagens
