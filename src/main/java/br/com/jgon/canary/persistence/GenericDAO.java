@@ -492,10 +492,20 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @param criteriaQuery - {@link CriteriaQuery}
      * @return {@link Root}
      */
+    protected Root<T> getCriteriaQueryRoot(CriteriaQuery<?> criteriaQuery) {
+        return getCriteriaQueryRoot(criteriaQuery, getPrimaryClass());
+    }
+
+    /**
+     * 
+     * @param criteriaQuery - {@link CriteriaQuery}
+     * @param rootType - Root type
+     * @return {@link Root}
+     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected Root<T> getRootFromCriteriaQuery(CriteriaQuery<?> criteriaQuery) {
+    protected <E> Root<E> getCriteriaQueryRoot(CriteriaQuery<?> criteriaQuery, Class<E> rootType) {
         for (Root rAux : criteriaQuery.getRoots()) {
-            if (rAux.getJavaType().equals(getPrimaryClass())) {
+            if (rAux.getJavaType().equals(rootType)) {
                 return rAux;
             }
         }
