@@ -13,6 +13,7 @@
  */
 package br.com.jgon.canary.persistence.filter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class ComplexAttribute {
 	}
 	
 	public ComplexAttribute(Attribute<?, ?>... attributes) {
-		listAttribute.addAll(Arrays.asList(attributes));
+		listAttribute.addAll(new ArrayList<Attribute<?, ?>>(Arrays.asList(attributes)));
 	}
 		
 	public String getName(){
@@ -59,4 +60,13 @@ public class ComplexAttribute {
 	public Class<?> getFieldType(){
 		return listAttribute.get(listAttribute.size() - 1).getJavaType();
 	}
+
+    /**
+     * 
+     * @param attribute
+     * @return
+     */
+    public boolean addAtribute(Attribute<?, ?> attribute) {
+        return this.listAttribute.add(attribute);
+    }
 }
