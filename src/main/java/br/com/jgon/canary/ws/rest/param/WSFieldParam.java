@@ -14,7 +14,7 @@
 package br.com.jgon.canary.ws.rest.param;
 
 import java.util.List;
-
+import javax.ws.rs.WebApplicationException;
 import org.apache.commons.lang3.StringUtils;
 
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
@@ -44,8 +44,8 @@ public class WSFieldParam {
      * @param fields
      */
     public WSFieldParam(String fields) {
-        throw new ApplicationRuntimeException(MessageSeverity.ERROR, null,
-            MessageFactory.getMessage("message", "Construtor somente para compatibilidade com QueryParam REST"));
+        throw new WebApplicationException(new ApplicationRuntimeException(MessageSeverity.ERROR, null,
+            MessageFactory.getMessage("message", "Construtor somente para compatibilidade com QueryParam REST")));
     }
 
     public WSFieldParam(Class<?> returnType, String fields, String defaultFieldParam) {

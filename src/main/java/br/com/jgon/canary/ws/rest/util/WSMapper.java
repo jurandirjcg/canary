@@ -25,13 +25,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.enterprise.context.RequestScoped;
-
+import javax.ws.rs.WebApplicationException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import br.com.jgon.canary.exception.ApplicationException;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.DAOUtil;
@@ -136,8 +134,12 @@ public class WSMapper {
                             ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR,
                                 "query-mapper.field-not-found",
                                 fNome);
-                            logger.error("[getCamposAjustados]", ae);
-                            throw ae;
+
+                            logger.debug("[getCamposAjustados]", ae);
+
+                            WebApplicationException we = new WebApplicationException(ae);
+
+                            throw we;
                         }
                     }
                 }
@@ -201,7 +203,10 @@ public class WSMapper {
                         ApplicationRuntimeException ae = new ApplicationRuntimeException(MessageSeverity.ERROR,
                             "query-mapper.field-not-found", fNome);
                         logger.error("[verificaCampoObject]", ae);
-                        throw ae;
+
+                        WebApplicationException we = new WebApplicationException(ae);
+
+                        throw we;
                     }
                 }
             }
