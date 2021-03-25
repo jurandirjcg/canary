@@ -1617,6 +1617,22 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
     /**
      * 
      * @param attribute
+     * @param value
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute, LocalDate value);
+    
+    /**
+     * 
+     * @param attribute
+     * @param value
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute, LocalDateTime value);
+
+    /**
+     * 
+     * @param attribute
      * @return
      */
     public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, ?> attribute);
@@ -1627,6 +1643,22 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
      * @return
      */
     public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute);
+
+    /**
+     * 
+     * @param attribute
+     * @param value
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, LocalDate value);
+    
+    /**
+     * 
+     * @param attribute
+     * @param value
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, LocalDateTime value);
 
     /**
      * 
@@ -1687,6 +1719,22 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
     /**
      * 
      * @param attribute
+     * @param value
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereLessThan(ComplexAttribute attribute, LocalDate value);
+    
+    /**
+     * 
+     * @param attribute
+     * @param value
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereLessThan(ComplexAttribute attribute, LocalDateTime value);
+
+    /**
+     * 
+     * @param attribute
      * @return
      */
     public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(Attribute<T, ?> attribute);
@@ -1697,6 +1745,22 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
      * @return
      */
     public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute);
+
+     /**
+     * 
+     * @param attribute
+     * @param value
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, LocalDate value);
+    
+    /**
+     * 
+     * @param attribute
+     * @param value
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, LocalDateTime value);
 
     /**
      * 

@@ -32,17 +32,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.Attribute;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 import br.com.jgon.canary.persistence.filter.ComplexAttribute;
 import br.com.jgon.canary.persistence.filter.CriteriaFilterDelete;
@@ -88,115 +85,40 @@ class CriteriaFilterImpl<T>
      *
      */
     enum Where {
-        IGNORE(null, null), EQUAL(RegexWhere.EQUAL,
-                "(?<=^\\=)" + regexPatternAlpha + "$"), LESS_THAN(RegexWhere.LESS_THAN,
-                        "(?<=^\\<)" + regexPatternDateTimeOrNumber + "$"), LESS_THAN_OR_EQUAL_TO(
-                                RegexWhere.LESS_THAN_OR_EQUAL_TO,
-                                "(?<=^\\<\\=)" + regexPatternDateTimeOrNumber + "$"), GREATER_THAN(
-                                        RegexWhere.GREATER_THAN,
-                                        "(?<=^\\>)" + regexPatternDateTimeOrNumber
-                                                + "$"), GREATER_THAN_OR_EQUAL_TO(
-                                                        RegexWhere.GREATER_THAN_OR_EQUAL_TO,
-                                                        "(?<=^\\>\\=)"
-                                                                + regexPatternDateTimeOrNumber
-                                                                + "$"), NOT_EQUAL(
-                                                                        RegexWhere.NOT_EQUAL,
-                                                                        "(?<=^\\!\\=)"
-                                                                                + regexPatternAlpha
-                                                                                + "$"), IN(
-                                                                                        RegexWhere.IN,
-                                                                                        "(?<=^\\()"
-                                                                                                + regexPatternMultiDateTimeOrNumber
-                                                                                                + "(?=\\)$)"), NOT_IN(
-                                                                                                        RegexWhere.NOT_IN,
-                                                                                                        "(?<=^!\\()"
-                                                                                                                + regexPatternMultiDateTimeOrNumber
-                                                                                                                + "(?=\\)$)"), LIKE_EXACT(
-                                                                                                                        RegexWhere.LIKE_EXACT,
-                                                                                                                        "(?<=^\\=\\%)"
-                                                                                                                                + regexPatternAlpha
-                                                                                                                                + "(?!\\%$)"), LIKE_NOT_EXACT(
-                                                                                                                                        RegexWhere.LIKE_NOT_EXACT,
-                                                                                                                                        "(?<=^\\!\\=\\%)"
-                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                + "(?!\\%$)"), LIKE_MATCH_ANYWHERE(
-                                                                                                                                                        RegexWhere.LIKE_MATCH_ANYWHERE,
-                                                                                                                                                        "(?<=^\\%)"
-                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                + "(?=(\\!)?\\%$)"), LIKE_MATCH_END(
-                                                                                                                                                                        RegexWhere.LIKE_MATCH_END,
-                                                                                                                                                                        "(?<=^\\%)"
-                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                + "(?!\\%$)"), LIKE_MATCH_START(
-                                                                                                                                                                                        RegexWhere.LIKE_MATCH_START,
-                                                                                                                                                                                        "(?<!^\\%)"
-                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                + "(?=\\%$)"), LIKE_NOT_MATCH_ANYWHERE(
-                                                                                                                                                                                                        RegexWhere.LIKE_NOT_MATCH_ANYWHERE,
-                                                                                                                                                                                                        "(?<=^\\!\\%)"
-                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                + "(?=\\!\\%$)"), LIKE_NOT_MATCH_END(
-                                                                                                                                                                                                                        RegexWhere.LIKE_NOT_MATCH_END,
-                                                                                                                                                                                                                        "(?<=^\\!\\%)"
-                                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                                + "(?!\\%$)"), LIKE_NOT_MATCH_START(
-                                                                                                                                                                                                                                        RegexWhere.LIKE_NOT_MATCH_START,
-                                                                                                                                                                                                                                        "(?<!^\\%)"
-                                                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                                                + "(?=\\!\\%$)"), ILIKE_EXACT(
-                                                                                                                                                                                                                                                        RegexWhere.ILIKE_EXACT,
-                                                                                                                                                                                                                                                        "(?<=^\\=\\*)"
-                                                                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                                                                + "(?!\\*$)"), ILIKE_NOT_EXACT(
-                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_NOT_EXACT,
-                                                                                                                                                                                                                                                                        "(?<=^\\!\\=\\*)"
-                                                                                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                                                                                + "(?!\\*$)"), ILIKE_MATCH_ANYWHERE(
-                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_MATCH_ANYWHERE,
-                                                                                                                                                                                                                                                                                        "(?<=^\\*)"
-                                                                                                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                                                                                                + "(?=\\*$)"), ILIKE_MATCH_END(
-                                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_MATCH_END,
-                                                                                                                                                                                                                                                                                                        "(?<=^\\*)"
-                                                                                                                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                                                                                                                + "(?!\\*$)"), ILIKE_MATCH_START(
-                                                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_MATCH_START,
-                                                                                                                                                                                                                                                                                                                        "(?<!^\\*)"
-                                                                                                                                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                                                                                                                                + "(?=\\*$)"), ILIKE_NOT_MATCH_ANYWHERE(
-                                                                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_NOT_MATCH_ANYWHERE,
-                                                                                                                                                                                                                                                                                                                                        "(?<=^\\!\\*)"
-                                                                                                                                                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                                                                                                                                                + "(?=\\!\\*$)"), ILIKE_NOT_MATCH_END(
-                                                                                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_NOT_MATCH_END,
-                                                                                                                                                                                                                                                                                                                                                        "(?<=^\\!\\*)"
-                                                                                                                                                                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                                                                                                                                                                + "(?!\\*$)"), ILIKE_NOT_MATCH_START(
-                                                                                                                                                                                                                                                                                                                                                                        RegexWhere.ILIKE_NOT_MATCH_START,
-                                                                                                                                                                                                                                                                                                                                                                        "(?<!^\\*)"
-                                                                                                                                                                                                                                                                                                                                                                                + regexPatternAlpha
-                                                                                                                                                                                                                                                                                                                                                                                + "(?=\\!\\*$)"), IS_NULL(
-                                                                                                                                                                                                                                                                                                                                                                                        RegexWhere.IS_NULL,
-                                                                                                                                                                                                                                                                                                                                                                                        "^null$"), IS_NOT_NULL(
-                                                                                                                                                                                                                                                                                                                                                                                                RegexWhere.IS_NOT_NULL,
-                                                                                                                                                                                                                                                                                                                                                                                                "^not null$"), BETWEEN(
-                                                                                                                                                                                                                                                                                                                                                                                                        RegexWhere.BETWEEN,
-                                                                                                                                                                                                                                                                                                                                                                                                        "(?<=^)" + regexPatternDateTimeOrNumber
-                                                                                                                                                                                                                                                                                                                                                                                                                + "(\\s(btwn|between)\\s)"
-                                                                                                                                                                                                                                                                                                                                                                                                                + regexPatternDateTimeOrNumber
-                                                                                                                                                                                                                                                                                                                                                                                                                + "(?=$)"), EQUAL_OTHER_FIELD(
-                                                                                                                                                                                                                                                                                                                                                                                                                        null,
-                                                                                                                                                                                                                                                                                                                                                                                                                        null), LESS_THAN_OTHER_FIELD(
-                                                                                                                                                                                                                                                                                                                                                                                                                                null,
-                                                                                                                                                                                                                                                                                                                                                                                                                                null), GREATER_THAN_OTHER_FIELD(
-                                                                                                                                                                                                                                                                                                                                                                                                                                        null,
-                                                                                                                                                                                                                                                                                                                                                                                                                                        null), LESS_THAN_OR_EQUAL_TO_OTHER_FIELD(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                null,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                null), GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        null,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        null), NOT_EQUAL_OTHER_FIELD(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                null,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                null);
+        IGNORE(null, null),
+        EQUAL(RegexWhere.EQUAL, "(?<=^\\=)" + regexPatternAlpha + "$"),
+        LESS_THAN(RegexWhere.LESS_THAN, "(?<=^\\<)" + regexPatternDateTimeOrNumber + "$"), 
+        LESS_THAN_OR_EQUAL_TO(RegexWhere.LESS_THAN_OR_EQUAL_TO, "(?<=^\\<\\=)" + regexPatternDateTimeOrNumber + "$"),
+        GREATER_THAN(RegexWhere.GREATER_THAN,"(?<=^\\>)" + regexPatternDateTimeOrNumber + "$"),
+        GREATER_THAN_OR_EQUAL_TO(RegexWhere.GREATER_THAN_OR_EQUAL_TO, "(?<=^\\>\\=)" + regexPatternDateTimeOrNumber + "$"),
+        NOT_EQUAL(RegexWhere.NOT_EQUAL, "(?<=^\\!\\=)" + regexPatternAlpha + "$"),
+        IN(RegexWhere.IN, "(?<=^\\()" + regexPatternMultiDateTimeOrNumber + "(?=\\)$)"),
+        NOT_IN(RegexWhere.NOT_IN, "(?<=^!\\()" + regexPatternMultiDateTimeOrNumber + "(?=\\)$)"),
+        LIKE_EXACT(RegexWhere.LIKE_EXACT, "(?<=^\\=\\%)" + regexPatternAlpha + "(?!\\%$)"),
+        LIKE_NOT_EXACT(RegexWhere.LIKE_NOT_EXACT, "(?<=^\\!\\=\\%)" + regexPatternAlpha + "(?!\\%$)"),
+        LIKE_MATCH_ANYWHERE(RegexWhere.LIKE_MATCH_ANYWHERE, "(?<=^\\%)" + regexPatternAlpha + "(?=(\\!)?\\%$)"),
+        LIKE_MATCH_END(RegexWhere.LIKE_MATCH_END, "(?<=^\\%)" + regexPatternAlpha + "(?!\\%$)"),
+        LIKE_MATCH_START(RegexWhere.LIKE_MATCH_START, "(?<!^\\%)" + regexPatternAlpha + "(?=\\%$)"),
+        LIKE_NOT_MATCH_ANYWHERE(RegexWhere.LIKE_NOT_MATCH_ANYWHERE, "(?<=^\\!\\%)" + regexPatternAlpha + "(?=\\!\\%$)"),
+        LIKE_NOT_MATCH_END(RegexWhere.LIKE_NOT_MATCH_END, "(?<=^\\!\\%)" + regexPatternAlpha + "(?!\\%$)"),
+        LIKE_NOT_MATCH_START(RegexWhere.LIKE_NOT_MATCH_START, "(?<!^\\%)" + regexPatternAlpha + "(?=\\!\\%$)"),
+        ILIKE_EXACT(RegexWhere.ILIKE_EXACT, "(?<=^\\=\\*)" + regexPatternAlpha + "(?!\\*$)"),
+        ILIKE_NOT_EXACT(RegexWhere.ILIKE_NOT_EXACT, "(?<=^\\!\\=\\*)" + regexPatternAlpha + "(?!\\*$)"),
+        ILIKE_MATCH_ANYWHERE(RegexWhere.ILIKE_MATCH_ANYWHERE, "(?<=^\\*)" + regexPatternAlpha + "(?=\\*$)"),
+        ILIKE_MATCH_END(RegexWhere.ILIKE_MATCH_END, "(?<=^\\*)" + regexPatternAlpha + "(?!\\*$)"),
+        ILIKE_MATCH_START(RegexWhere.ILIKE_MATCH_START, "(?<!^\\*)" + regexPatternAlpha + "(?=\\*$)"),
+        ILIKE_NOT_MATCH_ANYWHERE(RegexWhere.ILIKE_NOT_MATCH_ANYWHERE, "(?<=^\\!\\*)" + regexPatternAlpha + "(?=\\!\\*$)"),
+        ILIKE_NOT_MATCH_END(RegexWhere.ILIKE_NOT_MATCH_END, "(?<=^\\!\\*)" + regexPatternAlpha + "(?!\\*$)"),
+        ILIKE_NOT_MATCH_START(RegexWhere.ILIKE_NOT_MATCH_START, "(?<!^\\*)" + regexPatternAlpha + "(?=\\!\\*$)"),
+        IS_NULL(RegexWhere.IS_NULL, "^null$"),
+        IS_NOT_NULL(RegexWhere.IS_NOT_NULL, "^not null$"),
+        BETWEEN(RegexWhere.BETWEEN, "(?<=^)" + regexPatternDateTimeOrNumber + "(\\s(btwn|between)\\s)" + regexPatternDateTimeOrNumber + "(?=$)"),
+        EQUAL_OTHER_FIELD(null, null),
+        LESS_THAN_OTHER_FIELD(null, null),
+        GREATER_THAN_OTHER_FIELD(null, null),
+        LESS_THAN_OR_EQUAL_TO_OTHER_FIELD(null, null),
+        GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD(null, null),
+        NOT_EQUAL_OTHER_FIELD(null, null);
 
         public String exp;
         public RegexWhere regexWhere;

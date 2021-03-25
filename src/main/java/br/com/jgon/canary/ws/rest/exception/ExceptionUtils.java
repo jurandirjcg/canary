@@ -35,7 +35,7 @@ import br.com.jgon.canary.ws.rest.util.ResponseError;
  * @since 24/11/2019
  *
  */
-abstract class ExceptionUtils {
+public abstract class ExceptionUtils {
 
     private static Logger LOG = LoggerFactory.getLogger(ExceptionUtils.class);
 
