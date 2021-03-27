@@ -414,6 +414,9 @@ class CriteriaManager<T> {
                 case LOWER:
                     lista.add(criteriaBuilder.lower(path).alias(se.getValue()));
                     break;
+                case AVG:
+                    lista.add(criteriaBuilder.avg(path).alias(se.getValue()));
+                    break;
                 case FIELD:
                 default:
                     lista.add(path.alias(se.getValue()));

@@ -19,10 +19,8 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.Attribute;
-
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 
 /**
@@ -182,6 +180,22 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
      * @return
      */
     public CriteriaFilterMetamodel<T> addSelectSum(String field);
+
+    /**
+     * 
+     * @param field
+     * @param alias
+     * @return
+     */
+    @Override
+    public CriteriaFilterMetamodel<T> addSelectAvg(String field, String alias);
+
+    /**
+     * 
+     * @param field
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addSelectAvg(String field);
 
     /**
      * 
@@ -800,7 +814,8 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
     /**
      * 
      */
-    public CriteriaFilter<T> addJoin(String field, JoinType joinType, boolean fetch, boolean force);
+    @Override
+    public CriteriaFilterMetamodel<T> addJoin(String field, JoinType joinType, boolean fetch, boolean force);
 
     /**
      * @param attribute
@@ -1136,6 +1151,35 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
      * @return
      */
     public CriteriaFilterMetamodel<T> addSelectSum(ComplexAttribute attribute);
+    /**
+     * 
+     * @param attribute
+     * @param alias
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addSelectAvg(Attribute<T, ?> attribute, String alias);
+
+    /**
+     * 
+     * @param attribute
+     * @param alias
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addSelectAvg(ComplexAttribute attribute, String alias);
+
+    /**
+     *
+     * @param attribute
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addSelectAvg(Attribute<T, ?> attribute);
+
+    /**
+     *
+     * @param attribute
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addSelectAvg(ComplexAttribute attribute);
 
     /**
      * 
@@ -1633,6 +1677,22 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
     /**
      * 
      * @param attribute
+     * @param value
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereGreaterThan(Attribute<T, LocalDate> attribute, LocalDate value);
+    
+    /**
+     * 
+     * @param attribute
+     * @param value
+     * @return
+     */
+    public CriteriaFilterMetamodel<T> addWhereGreaterThan(Attribute<T, LocalDateTime> attribute, LocalDateTime value);
+
+    /**
+     * 
+     * @param attribute
      * @return
      */
     public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, ?> attribute);
@@ -1846,7 +1906,7 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T> {
      * @param force
      * @return
      */
-    public CriteriaFilter<T> addJoin(Attribute<T, ?> attribute, JoinType joinType, boolean fetch, boolean force);
+    public CriteriaFilterMetamodel<T> addJoin(Attribute<T, ?> attribute, JoinType joinType, boolean fetch, boolean force);
 
     /**
      * 

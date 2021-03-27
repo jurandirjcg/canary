@@ -169,6 +169,21 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
     /**
      * 
      * @param field
+     * @param alias
+     * @return
+     */
+    public CriteriaFilter<T> addSelectAvg(String field, String alias);
+
+    /**
+     * 
+     * @param field
+     * @return
+     */
+    public CriteriaFilter<T> addSelectAvg(String field);
+
+    /**
+     * 
+     * @param field
      * @return
      */
     public CriteriaFilter<T> addSelect(String field);

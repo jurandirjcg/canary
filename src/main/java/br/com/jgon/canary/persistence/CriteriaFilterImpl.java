@@ -142,7 +142,7 @@ class CriteriaFilterImpl<T>
      * 
      */
     enum SelectAggregate {
-        FIELD, COUNT, MAX, MIN, SUM, UPPER, LOWER
+        FIELD, COUNT, MAX, MIN, SUM, UPPER, LOWER, AVG
     }
 
     private boolean collectionSelectionControl = true;
@@ -291,10 +291,9 @@ class CriteriaFilterImpl<T>
      * @param alias
      * @return
      */
-    private CriteriaFilterImpl<T> addSelect(String field, SelectAggregate selectFunction,
-            String alias) {
-        this.listSelection.put(field,
-                new SimpleEntry<CriteriaFilterImpl.SelectAggregate, String>(selectFunction, alias));
+    private CriteriaFilterImpl<T> addSelect(String field, SelectAggregate selectFunction, String alias) {
+        this.listSelection.put(field, new SimpleEntry<CriteriaFilterImpl.SelectAggregate, String>(selectFunction, alias));
+
         return this;
     }
 
@@ -1938,6 +1937,36 @@ class CriteriaFilterImpl<T>
     }
 
     @Override
+    public CriteriaFilterMetamodel<T> addSelectAvg(String field, String alias) {
+        return addSelect(field, SelectAggregate.AVG, alias);
+    }
+    
+    @Override
+    public CriteriaFilterMetamodel<T> addSelectAvg(String field) {
+        return addSelectAvg(field, field);
+    }
+    
+    @Override
+    public CriteriaFilterMetamodel<T> addSelectAvg(Attribute<T, ?> attribute, String alias) {
+        return addSelectAvg(attribute.getName(), alias);
+    }
+    
+    @Override
+    public CriteriaFilterMetamodel<T> addSelectAvg(ComplexAttribute attribute, String alias) {
+        return addSelectAvg(attribute.getName(), alias);
+    }
+    
+    @Override
+    public CriteriaFilterMetamodel<T> addSelectAvg(Attribute<T, ?> attribute) {
+        return addSelectAvg(attribute.getName());
+    }
+    
+    @Override
+    public CriteriaFilterMetamodel<T> addSelectAvg(ComplexAttribute attribute) {
+        return addSelectAvg(attribute.getName());
+    }
+
+    @Override
     public CriteriaFilterImpl<T> addSelect(ComplexAttribute attribute) {
         return addSelect(attribute.getName());
     }
@@ -2437,4 +2466,5 @@ class CriteriaFilterImpl<T>
         }
         return this;
     }
+
 }
