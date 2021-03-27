@@ -31,7 +31,7 @@ import br.com.jgon.canary.persistence.filter.CriteriaWhere.RegexWhere;
  *
  * @param <T> Entity
  */
-interface CriteriaWhereMetamodel<T> {
+public interface CriteriaWhereMetamodel<T> {
 
     /**
      * 

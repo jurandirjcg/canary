@@ -28,7 +28,7 @@ import br.com.jgon.canary.exception.ApplicationRuntimeException;
  *
  * @param <T> Entity
  */
-interface CriteriaWhere<T> {
+public interface CriteriaWhere<T> {
 
     /**
      * Regex de consulta
