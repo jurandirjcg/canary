@@ -13,11 +13,10 @@
  */
 package br.com.jgon.canary.persistence.filter;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.temporal.Temporal;
 import java.util.Date;
 import java.util.List;
-
+import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.Attribute;
 
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
@@ -31,233 +30,75 @@ import br.com.jgon.canary.exception.ApplicationRuntimeException;
  *
  * @param <T> Entity
  */
-public interface CriteriaFilterDelete<T> extends CriteriaWhereMetamodel<T> {
+public interface CriteriaFilterDelete<T> extends CriteriaWhere<T>, CriteriaWhereMetamodel<T> {
 
     @Override
-    public CriteriaFilterDelete<T> addWhereEqual(String field);
+    public CriteriaFilterDelete<T> addWhere(Attribute<T, ?> attribute, Predicate value);
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <E> CriteriaFilterDelete<T> addWhereIn(String field, E... values);
+    public CriteriaFilterDelete<T> addWhere(ComplexAttribute attribute, Predicate value);
 
     @Override
     public <E> CriteriaFilterDelete<T> addWhereIn(String field, List<E> values);
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <E> CriteriaFilterDelete<T> addWhereNotIn(String field, E... values);
+    public CriteriaFilterDelete<T> addWhereILike(Attribute<T, String> attribute, String value,
+            MatchMode matchMode);
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereNotIn(String field, List<E> values);
+    public CriteriaFilterDelete<T> addWhereILike(ComplexAttribute attribute, String value,
+            MatchMode matchMode);
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereEqual(String field, List<E> values);
-
-    @Override
-    public <E> CriteriaFilterDelete<T> addWhereNotEqual(String field, List<E> values);
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <E> CriteriaFilterDelete<T> addWhereEqual(String field, E... values);
-
-    public <E> CriteriaFilterDelete<T> addWhereEqual(String field, E value);
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <E> CriteriaFilterDelete<T> addWhereNotEqual(String field, E... values);
-
-    @Override
-    public <E> CriteriaFilterDelete<T> addWhereNotEqual(String field, E value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereBetween(String field, Integer startValue, Integer endValue);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereBetween(String field, Short startValue, Short endValue);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereBetween(String field, Long startValue, Long endValue);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThanField(String field, String anotherField);
-
-    public CriteriaFilterDelete<T> addWhereGreaterThanField(String field, String anotherField);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualToField(String field, String anotherField);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualToField(String field, String anotherField);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereEqualField(String field, String anotherField);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereNotEqualField(String field, String anotherField);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereBetween(String field, Date startValue, Date endValue);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereBetween(String field, LocalDate startValue, LocalDate endValue);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereBetween(String field, LocalDateTime startValue, LocalDateTime endValue);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThan(String field);
-
-    @Override
-    public <E> CriteriaFilterDelete<T> addWhereGreaterThan(String field, Date value);
-
-    @Override
-    public <E> CriteriaFilterDelete<T> addWhereGreaterThan(String field, LocalDate value);
-
-    @Override
-    public <E> CriteriaFilterDelete<T> addWhereGreaterThan(String field, LocalDateTime value);
-
-    @Override
-    public <E> CriteriaFilterDelete<T> addWhereGreaterThan(String field, Number value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field, Date value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field, LocalDate value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field, LocalDateTime value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field, Number value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereIn(String field);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereIsNotNull(String field);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereIsNull(String field);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThan(String field);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThan(String field, Date value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThan(String field, LocalDate value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThan(String field, LocalDateTime value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThan(String field, Number value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field, Date value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field, LocalDate value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field, LocalDateTime value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field, Number value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLike(String field, MatchMode matchMode);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereNotLike(String field, MatchMode matchMode);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereNotILike(String field, MatchMode matchMode);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLike(String field, String value, MatchMode matchMode);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereNotLike(String field, String value, MatchMode matchMode);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereNotILike(String field, String value, MatchMode matchMode);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereILike(String field, MatchMode matchMode);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereILike(String field, String value, MatchMode matchMode);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereNotEqual(String field);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereNotIn(String field);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereBetween(String field, Double startValue, Double endValue);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereRegex(
-        String field,
-        Class<?> fieldType,
-        String value,
-        RegexWhere[] regexToAnalyse,
-        RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereILike(Attribute<T, String> attribute, String value, MatchMode matchMode);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereILike(ComplexAttribute attribute, String value, MatchMode matchMode);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereILike(Attribute<T, String> attribute, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereILike(Attribute<T, String> attribute,
+            MatchMode matchMode);
 
     @Override
     public CriteriaFilterDelete<T> addWhereILike(ComplexAttribute attribute, MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotILike(Attribute<T, String> attribute, String value, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereNotILike(Attribute<T, String> attribute, String value,
+            MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotILike(ComplexAttribute attribute, String value, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereNotILike(ComplexAttribute attribute, String value,
+            MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotLike(Attribute<T, String> attribute, String value, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereNotLike(Attribute<T, String> attribute, String value,
+            MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotLike(ComplexAttribute attribute, String value, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereNotLike(ComplexAttribute attribute, String value,
+            MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLike(Attribute<T, String> attribute, String value, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereLike(Attribute<T, String> attribute, String value,
+            MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLike(ComplexAttribute attribute, String value, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereLike(ComplexAttribute attribute, String value,
+            MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotILike(Attribute<T, String> attribute, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereNotILike(Attribute<T, String> attribute,
+            MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotILike(ComplexAttribute attribute, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereNotILike(ComplexAttribute attribute,
+            MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotLike(Attribute<T, String> attribute, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereNotLike(Attribute<T, String> attribute,
+            MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotLike(ComplexAttribute attribute, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereNotLike(ComplexAttribute attribute,
+            MatchMode matchMode);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLike(Attribute<T, String> attribute, MatchMode matchMode);
+    public CriteriaFilterDelete<T> addWhereLike(Attribute<T, String> attribute,
+            MatchMode matchMode);
 
     @Override
     public CriteriaFilterDelete<T> addWhereLike(ComplexAttribute attribute, MatchMode matchMode);
@@ -319,100 +160,124 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhereMetamodel<T> {
     public <E> CriteriaFilterDelete<T> addWhereNotEqual(ComplexAttribute attribute, E... values);
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereNotEqual(Attribute<T, E> attribute, List<E> values);
+    public <E> CriteriaFilterDelete<T> addWhereNotEqual(Attribute<T, E> attribute,
+            List<E> values);
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereNotEqual(ComplexAttribute attribute, List<E> values);
+    public <E> CriteriaFilterDelete<T> addWhereNotEqual(ComplexAttribute attribute,
+            List<E> values);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(Attribute<T, Integer> attribute, Integer startValue, Integer endValue);
+    public CriteriaFilterDelete<T> addWhereBetween(Attribute<T, Integer> attribute,
+            Integer startValue, Integer endValue);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, Integer startValue, Integer endValue);
+    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, Integer startValue,
+            Integer endValue);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(Attribute<T, Short> attribute, Short startValue, Short endValue);
+    public CriteriaFilterDelete<T> addWhereBetween(Attribute<T, Short> attribute,
+            Short startValue, Short endValue);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, Short startValue, Short endValue);
+    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, Short startValue,
+            Short endValue);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(Attribute<T, Long> attribute, Long startValue, Long endValue);
+    public CriteriaFilterDelete<T> addWhereBetween(Attribute<T, Long> attribute, Long startValue,
+            Long endValue);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, Long startValue, Long endValue);
+    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, Long startValue,
+            Long endValue);
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereLessThanField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
+    public <E> CriteriaFilterDelete<T> addWhereLessThanField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereLessThanField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereLessThanField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute);
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereGreaterThanField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
+    public <E> CriteriaFilterDelete<T> addWhereGreaterThanField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereGreaterThanField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereGreaterThanField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute);
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereLessThanOrEqualToField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
+    public <E> CriteriaFilterDelete<T> addWhereLessThanOrEqualToField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute);
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereGreaterThanOrEqualToField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
+    public <E> CriteriaFilterDelete<T> addWhereGreaterThanOrEqualToField(
+            Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute);
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereEqualField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
+    public <E> CriteriaFilterDelete<T> addWhereEqualField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereEqualField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereEqualField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereEqualField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereEqualField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute);
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereNotEqualField(Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
+    public <E> CriteriaFilterDelete<T> addWhereNotEqualField(Attribute<T, E> attribute,
+            Attribute<T, E> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotEqualField(ComplexAttribute attribute, Attribute<T, ?> anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereNotEqualField(ComplexAttribute attribute,
+            Attribute<T, ?> anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotEqualField(ComplexAttribute attribute, ComplexAttribute anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereNotEqualField(ComplexAttribute attribute,
+            ComplexAttribute anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(Attribute<T, Date> attribute, Date startValue, Date endValue);
+    public CriteriaFilterDelete<T> addWhereBetween(Attribute<T, Date> attribute, Date startValue,
+            Date endValue);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, Date startValue, Date endValue);
+    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, Date startValue,
+            Date endValue);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(Attribute<T, LocalDate> attribute, LocalDate startValue, LocalDate endValue);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereBetween(Attribute<T, E> attribute,
+            Temporal startValue, Temporal endValue);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, LocalDate startValue, LocalDate endValue);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereBetween(Attribute<T, LocalDateTime> attribute, LocalDateTime startValue, LocalDateTime endValue);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, LocalDateTime startValue, LocalDateTime endValue);
+    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute,
+            Temporal startValue, Temporal endValue);
 
     @Override
     public CriteriaFilterDelete<T> addWhereGreaterThan(Attribute<T, ?> attribute);
@@ -484,49 +349,59 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhereMetamodel<T> {
     public CriteriaFilterDelete<T> addWhereGreaterThan(Attribute<T, Date> attribute, Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThan(Attribute<T, LocalDate> attribute, LocalDate value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThan(Attribute<T, LocalDateTime> attribute, LocalDateTime value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereGreaterThan(
+            Attribute<T, E> attribute, Temporal value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereGreaterThan(ComplexAttribute attribute, Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThan(Attribute<T, Number> attribute, Number value);
+    public CriteriaFilterDelete<T> addWhereGreaterThan(ComplexAttribute attribute,
+            Temporal value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereGreaterThan(Attribute<T, Number> attribute,
+            Number value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereGreaterThan(ComplexAttribute attribute, Number value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(Attribute<T, Date> attribute, Date value);
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(Attribute<T, Date> attribute,
+            Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(Attribute<T, LocalDate> attribute, LocalDate value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(
+            Attribute<T, E> attribute, Temporal value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(Attribute<T, LocalDateTime> attribute, LocalDateTime value);
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
+            Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, Date value);
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
+            Temporal value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(Attribute<T, Number> attribute, Number value);
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(Attribute<T, Number> attribute,
+            Number value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, Number value);
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
+            Number value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereLessThan(Attribute<T, Date> attribute, Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThan(Attribute<T, LocalDate> attribute, LocalDate value);
-
-    @Override
-    public CriteriaFilterDelete<T> addWhereLessThan(Attribute<T, LocalDateTime> attribute, LocalDateTime value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereLessThan(
+            Attribute<T, E> attribute, Temporal value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereLessThan(ComplexAttribute attribute, Date value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThan(ComplexAttribute attribute, Temporal value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereLessThan(Attribute<T, Number> attribute, Number value);
@@ -535,41 +410,215 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhereMetamodel<T> {
     public CriteriaFilterDelete<T> addWhereLessThan(ComplexAttribute attribute, Number value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(Attribute<T, Date> attribute, Date value);
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(Attribute<T, Date> attribute,
+            Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(Attribute<T, LocalDate> attribute, LocalDate value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(
+            Attribute<T, E> attribute, Temporal value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(Attribute<T, LocalDateTime> attribute, LocalDateTime value);
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
+            Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, Date value);
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
+            Temporal value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(Attribute<T, Number> attribute, Number value);
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(Attribute<T, Number> attribute,
+            Number value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, Number value);
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
+    Number value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereRegex(
-        Attribute<T, ?> attribute,
-        String value,
-        RegexWhere[] regexToAnalyse,
-        RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
+    public CriteriaFilterDelete<T> addWhereRegex(Attribute<T, ?> attribute, String value,
+    RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
+    throws ApplicationRuntimeException;
 
     @Override
-    public CriteriaFilterDelete<T> addWhereRegex(
-        ComplexAttribute attribute,
-        String value,
-        RegexWhere[] regexToAnalyse,
-        RegexWhere defaultIfNotMatch) throws ApplicationRuntimeException;
+    public CriteriaFilterDelete<T> addWhereRegex(ComplexAttribute attribute, String value,
+            RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
+            throws ApplicationRuntimeException;
 
     @Override
-    public CriteriaFilterDelete<T> addWhereNotEqualField(Attribute<T, ?> attribute, ComplexAttribute anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereNotEqualField(Attribute<T, ?> attribute,
+            ComplexAttribute anotherAttribute);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereEqualField(Attribute<T, ?> attribute, ComplexAttribute anotherAttribute);
+    public CriteriaFilterDelete<T> addWhereEqualField(Attribute<T, ?> attribute,
+            ComplexAttribute anotherAttribute);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereEqual(String field);
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <E> CriteriaFilterDelete<T> addWhereIn(String field, E... values);
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <E> CriteriaFilterDelete<T> addWhereNotIn(String field, E... values);
+
+    @Override
+    public <E> CriteriaFilterDelete<T> addWhereNotIn(String field, List<E> values);
+
+    @Override
+    public <E> CriteriaFilterDelete<T> addWhereEqual(String field, List<E> values);
+
+    @Override
+    public <E> CriteriaFilterDelete<T> addWhereNotEqual(String field, List<E> values);
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <E> CriteriaFilterDelete<T> addWhereEqual(String field, E... values);
+
+    @Override
+    public <E> CriteriaFilterDelete<T> addWhereEqual(String field, E value);
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <E> CriteriaFilterDelete<T> addWhereNotEqual(String field, E... values);
+
+    @Override
+    public <E> CriteriaFilterDelete<T> addWhereNotEqual(String field, E value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereBetween(String field, Integer startValue,
+            Integer endValue);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereBetween(String field, Short startValue,
+            Short endValue);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereBetween(String field, Long startValue, Long endValue);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThanField(String field, String anotherField);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereGreaterThanField(String field, String anotherField);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualToField(String field,
+            String anotherField);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualToField(String field,
+            String anotherField);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereEqualField(String field, String anotherField);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereNotEqualField(String field, String anotherField);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereBetween(String field, Date startValue, Date endValue);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereBetween(String field, Temporal startValue,
+            Temporal endValue);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereGreaterThan(String field);
+
+    @Override
+    public <E> CriteriaFilterDelete<T> addWhereGreaterThan(String field, Date value);
+
+    @Override
+    public <E> CriteriaFilterDelete<T> addWhereGreaterThan(String field, Number value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field, Date value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field, Number value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereIn(String field);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereIsNotNull(String field);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereIsNull(String field);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThan(String field);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThan(String field, Date value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThan(String field, Number value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field, Date value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field, Number value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLike(String field, MatchMode matchMode);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereNotLike(String field, MatchMode matchMode);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereNotILike(String field, MatchMode matchMode);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLike(String field, String value, MatchMode matchMode);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereNotLike(String field, String value,
+            MatchMode matchMode);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereNotILike(String field, String value,
+            MatchMode matchMode);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereILike(String field, MatchMode matchMode);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereILike(String field, String value, MatchMode matchMode);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereNotEqual(String field);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereNotIn(String field);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereBetween(String field, Double startValue,
+            Double endValue);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereRegex(String field, Class<?> fieldType, String value,
+            RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
+            throws ApplicationRuntimeException;
+
+    @Override
+    public <E> CriteriaFilterDelete<T> addWhereGreaterThan(String field, Temporal value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field, Temporal value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThan(String field, Temporal value);
+
+    @Override
+    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field, Temporal value);
 
 }

@@ -41,6 +41,8 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.From;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -492,8 +494,8 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @param criteriaQuery - {@link CriteriaQuery}
      * @return {@link Root}
      */
-    protected Root<T> getCriteriaQueryRoot(CriteriaQuery<?> criteriaQuery) {
-        return getCriteriaQueryRoot(criteriaQuery, getPrimaryClass());
+    protected Root<T> getRoot(CriteriaQuery<?> criteriaQuery) {
+        return getRoot(criteriaQuery, getPrimaryClass());
     }
 
     /**
@@ -503,10 +505,43 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @return {@link Root}
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected <E> Root<E> getCriteriaQueryRoot(CriteriaQuery<?> criteriaQuery, Class<E> rootType) {
+    protected <E> Root<E> getRoot(CriteriaQuery<?> criteriaQuery, Class<E> rootType) {
         for (Root rAux : criteriaQuery.getRoots()) {
             if (rAux.getJavaType().equals(rootType)) {
                 return rAux;
+            }
+        }
+        return null;
+    }
+
+    protected <X> Join<?, X> getJoin(CriteriaQuery<?> criteriaQuery, Class<X> joinType) {
+        Join<?, X> retJoin;
+        for(Root<?> root : criteriaQuery.getRoots()) {
+            retJoin = getJoin(root, joinType);
+
+            if(retJoin != null) {
+                return retJoin;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 
+     * @param <X>
+     * @param from
+     * @param joinType
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private <X> Join<?, X> getJoin(From<?, ?> from, Class<X> joinType){
+        if(from.getJavaType().equals(joinType)) {
+            return (Join<?, X>) from;
+        }
+        for(Join<?, ?> join : from.getJoins()){
+            if(join.getJavaType().equals(joinType)) {
+                return (Join<?, X>) join;
             }
         }
         return null;

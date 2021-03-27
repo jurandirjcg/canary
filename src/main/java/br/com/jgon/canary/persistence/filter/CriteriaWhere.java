@@ -13,11 +13,10 @@
  */
 package br.com.jgon.canary.persistence.filter;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.temporal.Temporal;
 import java.util.Date;
 import java.util.List;
-
+import javax.persistence.criteria.Predicate;
 import br.com.jgon.canary.exception.ApplicationRuntimeException;
 
 /**
@@ -29,7 +28,7 @@ import br.com.jgon.canary.exception.ApplicationRuntimeException;
  *
  * @param <T> Entity
  */
-public interface CriteriaWhere<T> {
+interface CriteriaWhere<T> {
 
     /**
      * Regex de consulta
@@ -175,6 +174,14 @@ public interface CriteriaWhere<T> {
      */
     public T getObjBase();
 
+    /**
+     * 
+     * @param field
+     * @param value
+     * @return
+     */
+    public CriteriaFilter<T> addWhere(String field, Predicate value);
+    
     /**
      * 
      * @param field field
@@ -367,16 +374,7 @@ public interface CriteriaWhere<T> {
      * @param endValue   endValue
      * @return {@link CriteriaWhere}
      */
-    public CriteriaWhere<T> addWhereBetween(String field, LocalDate startValue, LocalDate endValue);
-
-    /**
-     * 
-     * @param field      field
-     * @param startValue startValue
-     * @param endValue   endValue
-     * @return {@link CriteriaWhere}
-     */
-    public CriteriaWhere<T> addWhereBetween(String field, LocalDateTime startValue, LocalDateTime endValue);
+    public CriteriaWhere<T> addWhereBetween(String field, Temporal startValue, Temporal endValue);
 
     /**
      * 
@@ -401,16 +399,7 @@ public interface CriteriaWhere<T> {
      * @param value value
      * @return {@link CriteriaWhere}
      */
-    public <E> CriteriaWhere<T> addWhereGreaterThan(String field, LocalDate value);
-
-    /**
-     * 
-     * @param <E>   E
-     * @param field field
-     * @param value value
-     * @return {@link CriteriaWhere}
-     */
-    public <E> CriteriaWhere<T> addWhereGreaterThan(String field, LocalDateTime value);
+    public <E> CriteriaWhere<T> addWhereGreaterThan(String field, Temporal value);
 
     /**
      *
@@ -442,15 +431,7 @@ public interface CriteriaWhere<T> {
      * @param value value
      * @return {@link CriteriaWhere}
      */
-    public CriteriaWhere<T> addWhereGreaterThanOrEqualTo(String field, LocalDate value);
-
-    /**
-     * 
-     * @param field field
-     * @param value value
-     * @return {@link CriteriaWhere}
-     */
-    public CriteriaWhere<T> addWhereGreaterThanOrEqualTo(String field, LocalDateTime value);
+    public CriteriaWhere<T> addWhereGreaterThanOrEqualTo(String field, Temporal value);
 
     /**
      *
@@ -502,15 +483,7 @@ public interface CriteriaWhere<T> {
      * @param value value
      * @return {@link CriteriaWhere}
      */
-    public CriteriaWhere<T> addWhereLessThan(String field, LocalDate value);
-
-    /**
-     * 
-     * @param field field
-     * @param value value
-     * @return {@link CriteriaWhere}
-     */
-    public CriteriaWhere<T> addWhereLessThan(String field, LocalDateTime value);
+    public CriteriaWhere<T> addWhereLessThan(String field, Temporal value);
 
     /**
      * 
@@ -541,15 +514,7 @@ public interface CriteriaWhere<T> {
      * @param value value
      * @return {@link CriteriaWhere}
      */
-    public CriteriaWhere<T> addWhereLessThanOrEqualTo(String field, LocalDate value);
-
-    /**
-     * 
-     * @param field field
-     * @param value value
-     * @return {@link CriteriaWhere}
-     */
-    public CriteriaWhere<T> addWhereLessThanOrEqualTo(String field, LocalDateTime value);
+    public CriteriaWhere<T> addWhereLessThanOrEqualTo(String field, Temporal value);
 
     /**
      * 

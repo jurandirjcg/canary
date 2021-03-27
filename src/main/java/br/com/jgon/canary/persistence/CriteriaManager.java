@@ -684,6 +684,9 @@ class CriteriaManager<T> {
         Expression<?> pathExpression = pathEntry.get(attributeName);
 
         switch (operation) {
+        case PREDICATE:
+            predicates.add((Predicate) value);
+            break;
         case IS_NULL:
             // if(value == null){
             predicates.add(pathExpression.isNull());
@@ -802,15 +805,15 @@ class CriteriaManager<T> {
             } else if (attributeClass.equals(Date.class)) {
                 Date[] between = (Date[]) value;
                 predicates.add(criteriaBuilder.between(((Expression<Date>) pathExpression), between[0], between[1]));
+            } else if (attributeClass.equals(LocalTime.class)) {
+                LocalTime[] between = (LocalTime[]) value;
+                predicates.add(criteriaBuilder.between(((Expression<LocalTime>) pathExpression), between[0], between[1]));
             } else if (attributeClass.equals(LocalDate.class)) {
                 LocalDate[] between = (LocalDate[]) value;
                 predicates.add(criteriaBuilder.between(((Expression<LocalDate>) pathExpression), between[0], between[1]));
             } else if (attributeClass.equals(LocalDateTime.class)) {
                 LocalDateTime[] between = (LocalDateTime[]) value;
                 predicates.add(criteriaBuilder.between(((Expression<LocalDateTime>) pathExpression), between[0], between[1]));
-            } else if (attributeClass.equals(LocalTime.class)) {
-                LocalTime[] between = (LocalTime[]) value;
-                predicates.add(criteriaBuilder.between(((Expression<LocalTime>) pathExpression), between[0], between[1]));
             } else if (attributeClass.equals(BigInteger.class)) {
                 BigInteger[] between = (BigInteger[]) value;
                 predicates.add(criteriaBuilder.between(((Expression<BigInteger>) pathExpression), between[0], between[1]));
@@ -819,12 +822,12 @@ class CriteriaManager<T> {
         case LESS_THAN:
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.lessThan(((Expression<Date>) pathExpression), (Date) value));
-            } else if (value instanceof LocalDateTime) {
-                predicates.add(criteriaBuilder.lessThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
-            } else if (value instanceof LocalDate) {
-                predicates.add(criteriaBuilder.lessThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
             } else if (value instanceof LocalTime) {
                 predicates.add(criteriaBuilder.lessThan((Expression<LocalTime>) pathExpression, (LocalTime) value));
+            } else if (value instanceof LocalDate) {
+                predicates.add(criteriaBuilder.lessThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
+            } else if (value instanceof LocalDateTime) {
+                predicates.add(criteriaBuilder.lessThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.lessThan((Expression) pathExpression, (Expression) value));
             } else {
@@ -834,12 +837,12 @@ class CriteriaManager<T> {
         case LESS_THAN_OR_EQUAL_TO:
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(((Expression<Date>) pathExpression), (Date) value));
-            } else if (value instanceof LocalDateTime) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
-            } else if (value instanceof LocalDate) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression<LocalDate>) pathExpression, (LocalDate) value));
             } else if (value instanceof LocalTime) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression<LocalTime>) pathExpression, (LocalTime) value));
+            } else if (value instanceof LocalDate) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression<LocalDate>) pathExpression, (LocalDate) value));
+            } else if (value instanceof LocalDateTime) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo((Expression) pathExpression, (Expression) value));
             } else {
@@ -849,12 +852,12 @@ class CriteriaManager<T> {
         case GREATER_THAN:
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.greaterThan((Expression<Date>) pathExpression, (Date) value));
-            } else if (value instanceof LocalDateTime) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
-            } else if (value instanceof LocalDate) {
-                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
             } else if (value instanceof LocalTime) {
                 predicates.add(criteriaBuilder.greaterThan((Expression<LocalTime>) pathExpression, (LocalTime) value));
+            } else if (value instanceof LocalDate) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDate>) pathExpression, (LocalDate) value));
+            } else if (value instanceof LocalDateTime) {
+                predicates.add(criteriaBuilder.greaterThan((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.greaterThan((Expression) pathExpression, (Expression) value));
             } else {
@@ -864,12 +867,12 @@ class CriteriaManager<T> {
         case GREATER_THAN_OR_EQUAL_TO:
             if (value instanceof Date) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(((Expression<Date>) pathExpression), (Date) value));
-            } else if (value instanceof LocalDateTime) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
-            } else if (value instanceof LocalDate) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression<LocalDate>) pathExpression, (LocalDate) value));
             } else if (value instanceof LocalTime) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression<LocalTime>) pathExpression, (LocalTime) value));
+            } else if (value instanceof LocalDate) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression<LocalDate>) pathExpression, (LocalDate) value));
+            } else if (value instanceof LocalDateTime) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression<LocalDateTime>) pathExpression, (LocalDateTime) value));
             } else if (value instanceof Expression) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo((Expression) pathExpression, (Expression) value));
             } else {

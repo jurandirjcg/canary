@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.Attribute;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -118,7 +119,8 @@ class CriteriaFilterImpl<T>
         GREATER_THAN_OTHER_FIELD(null, null),
         LESS_THAN_OR_EQUAL_TO_OTHER_FIELD(null, null),
         GREATER_THAN_OR_EQUAL_TO_OTHER_FIELD(null, null),
-        NOT_EQUAL_OTHER_FIELD(null, null);
+        NOT_EQUAL_OTHER_FIELD(null, null),
+        PREDICATE(null, null);
 
         public String exp;
         public RegexWhere regexWhere;
@@ -299,10 +301,403 @@ class CriteriaFilterImpl<T>
 
     /**
      * 
-     * @param returnType
+     * @param field
+     * @param where
+     * @param values
+     * @return
+     */
+    private <E> CriteriaFilterImpl<T> addWhereListValues(String field, Where where,
+            List<E> values) {
+        if (values != null) {
+            List<E> listAux = new ArrayList<E>(values);
+            listAux.remove(null);
+            if (!listAux.isEmpty()) {
+                this.whereRestriction.add(field, where, values);
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * 
+     * @param field
+     * @param where
+     * @param values
+     * @return
+     */
+    private <E> CriteriaFilterImpl<T> addWhereListValues(String field, Where where, E[] values) {
+        if (values != null) {
+            return addWhereListValues(field, where, Arrays.asList(values));
+        }
+        return this;
+    }
+    /**
+     * 
+     * @param regexToAnalyse
+     * @param search
+     * @return
+     */
+    private boolean containsRegex(RegexWhere[] regexToAnalyse, RegexWhere rgxSearch) {
+        for (RegexWhere rgx : regexToAnalyse) {
+            if (rgx.equals(rgxSearch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 19/06/2020
+     *
+     * @param type
+     * @param date
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public <E extends Temporal> E toTemporal(final Class<E> type, final Date date) {
+        if (LocalDate.class.isAssignableFrom(type)) {
+            return (E) date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            return (E) date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else if (LocalTime.class.isAssignableFrom(type)) {
+            return (E) date.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
+        }
+
+        return null;
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 19/06/2020
+     *
+     * @param type
+     * @param date
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public <E extends Temporal> E[] toTemporal(final Class<E> type, final Date[] date) {
+        E[] tempAux = (E[]) Array.newInstance(type, date.length);
+        for (int i = 0; i < tempAux.length; i++) {
+            tempAux[i] = toTemporal(type, date[i]);
+        }
+
+        return tempAux;
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 19/06/2020
+     *
+     * @param type
+     * @param field
+     * @param startValue
+     * @param endValue
+     */
+    private void addWhereBetweenDateOrTemporal(Class<?> type, String field, Date startValue,
+            Date endValue) {
+        if (Date.class.isAssignableFrom(type)) {
+            addWhereBetween(field, startValue, endValue);
+        } else if (LocalTime.class.isAssignableFrom(type)) {
+            addWhereBetween(field, toTemporal(LocalTime.class, startValue),
+                    toTemporal(LocalTime.class, endValue));
+        } else if (LocalDate.class.isAssignableFrom(type)) {
+            addWhereBetween(field, toTemporal(LocalDate.class, startValue),
+                    toTemporal(LocalDate.class, endValue));
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            addWhereBetween(field, toTemporal(LocalDateTime.class, startValue),
+                    toTemporal(LocalDateTime.class, endValue));
+        }
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 20/06/2020
+     *
+     * @param type
+     * @param field
+     * @param dates
+     */
+    private void addWhereDateOrTemporal(Class<?> type, Where where, String field, Date[] dates) {
+        if (Date.class.isAssignableFrom(type)) {
+            addWhereListValues(field, where, dates);
+        } else if (LocalTime.class.isAssignableFrom(type)) {
+            addWhereListValues(field, where, toTemporal(LocalTime.class, dates));
+        } else if (LocalDate.class.isAssignableFrom(type)) {
+            addWhereListValues(field, where, toTemporal(LocalDate.class, dates));
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            addWhereListValues(field, where, toTemporal(LocalDateTime.class, dates));
+        }
+    }
+
+    /**
+     * 
+     * @author Jurandir C. Gonçalves <jurandir>
+     * @since 20/06/2020
+     *
+     * @param type
+     * @param where
+     * @param field
+     * @param date
+     */
+    private void addWhereDateOrTemporal(Class<?> type, Where where, String field, Date date) {
+        if (Date.class.isAssignableFrom(type)) {
+            this.whereRestriction.add(field, where, date);
+        } else if (LocalTime.class.isAssignableFrom(type)) {
+            this.whereRestriction.add(field, where, toTemporal(LocalTime.class, date));
+        } else if (LocalDate.class.isAssignableFrom(type)) {
+            this.whereRestriction.add(field, where, toTemporal(LocalDate.class, date));
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            this.whereRestriction.add(field, where, toTemporal(LocalDateTime.class, date));
+        }
+    }
+
+    /**
+     * 
+     * @param field
+     * @param fieldType
+     * @param value
+     * @param regexToAnalyse
+     * @param defaultIfNotMatch
      * @return
      * @throws ApplicationRuntimeException
      */
+    private boolean configWhereRegex(String field, Class<?> fieldType, String value,
+            RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
+            throws ApplicationRuntimeException {
+        Where where = null;
+        for (Where wh : Where.values()) {
+            if (wh.exp != null
+                    && (regexToAnalyse == null || containsRegex(regexToAnalyse, wh.regexWhere))
+                    && checkRegex(value, wh.exp)) {
+                where = wh;
+                break;
+            }
+        }
+        if (where != null) {
+            Pattern p = Pattern.compile(where.exp);
+            Matcher m = p.matcher(value);
+
+            if (m.find()) {
+                if (where.equals(Where.IS_NULL)) {
+                    this.addWhereIsNull(field);
+                } else if (where.equals(Where.IS_NOT_NULL)) {
+                    this.addWhereIsNotNull(field);
+                } else if (where.equals(Where.BETWEEN)) {
+                    String[] val = m.group().split("\\s(btwn|between)\\s");
+                    if (NumberUtils.isCreatable(val[0])) {
+                        this.whereRestriction.add(field, Where.BETWEEN,
+                                new Number[] {NumberUtils.createNumber(val[0]),
+                                        NumberUtils.createNumber(val[1])});
+                        return true;
+                    } else {
+                        Date dt1, dt2;
+                        dt1 = parseDate(val[0]);
+                        dt2 = parseDate(val[1]);
+                        if (val[1].matches(regexPatternDate)) {
+                            dt2 = DateUtils.setHours(dt2, 23);
+                            dt2 = DateUtils.setMinutes(dt2, 59);
+                            dt2 = DateUtils.setSeconds(dt2, 59);
+                            dt2 = DateUtils.setMilliseconds(dt2, 999);
+                        }
+                        addWhereBetweenDateOrTemporal(fieldType, field, dt1, dt2);
+                        return true;
+                    }
+                } else if (where.equals(Where.IN) || where.equals(Where.NOT_IN)) {
+                    String[] val = m.group().replace(" ", "").split("\\,");
+
+                    if (val[0] != null
+                            && (Date.class.isAssignableFrom(fieldType)
+                                    || Calendar.class.isAssignableFrom(fieldType))
+                            || Temporal.class.isAssignableFrom(fieldType)) { // ||
+                                                                             // val[0].matches(regexPatternDateTime))){
+
+                        Date[] dates = new Date[val.length];
+                        for (int i = 0; i < val.length; i++) {
+                            dates[i] = parseDate(val[i]);
+                        }
+
+                        addWhereDateOrTemporal(fieldType, where, field, dates);
+                        return true;
+                    } else {
+                        if (where.equals(Where.IN)) {
+                            addWhereIn(field, val);
+                            return true;
+                        } else {
+                            addWhereNotIn(field, val);
+                            return true;
+                        }
+                    }
+                } else {
+                    String val = m.group();
+                    if (Date.class.isAssignableFrom(fieldType)
+                            || Calendar.class.isAssignableFrom(fieldType)
+                            || Temporal.class.isAssignableFrom(fieldType)) {// val.matches(regexPatternDateTime)){
+                        Date dt = parseDate(m.group());
+                        if (val.matches(regexPatternDate) && (where.equals(Where.LESS_THAN)
+                                || where.equals(Where.LESS_THAN_OR_EQUAL_TO))) {
+                            DateUtils.setHours(dt, 23);
+                            DateUtils.setMinutes(dt, 59);
+                            DateUtils.setSeconds(dt, 59);
+                            DateUtils.setMilliseconds(dt, 999);
+                        }
+                        addWhereDateOrTemporal(fieldType, where, field, dt);
+                        return true;
+                    } else if (Number.class.isAssignableFrom(fieldType)) {
+                        this.whereRestriction.add(field, where, NumberUtils.createNumber(val));
+                        return true;
+                    } else {
+                        this.whereRestriction.add(field, where, val);
+                        return true;
+                    }
+                }
+            }
+        } else {
+            boolean found = false;
+            if (ArrayUtils.contains(regexToAnalyse, RegexWhere.MULTI)) {
+                final String multiWhere = "^(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber
+                        + "(\\s?&\\s?(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber + "){1,}$";
+                Pattern p = Pattern.compile(multiWhere);
+                Matcher m = p.matcher(value);
+
+                if (m.find()) {
+                    found = true;
+                    String[] val = m.group().split(";");
+
+                    for (String v : val) {
+                        boolean add = configWhereRegex(field, fieldType, v,
+                                new RegexWhere[] {RegexWhere.LESS_THAN,
+                                        RegexWhere.LESS_THAN_OR_EQUAL_TO, RegexWhere.EQUAL,
+                                        RegexWhere.NOT_EQUAL, RegexWhere.GREATER_THAN,
+                                        RegexWhere.GREATER_THAN_OR_EQUAL_TO},
+                                defaultIfNotMatch);
+
+                        if (!add) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+
+            if (!found && defaultIfNotMatch != null) {
+                if (defaultIfNotMatch.equals(RegexWhere.EQUAL)
+                        && value.matches("^" + regexPatternDateTime + "$")) {
+                    this.whereRestriction.add(field, Where.EQUAL, parseDate(value));
+                    return true;
+                } else if (defaultIfNotMatch.equals(RegexWhere.EQUAL)
+                        && value.matches("^[a-zA-Z0-9]" + regexPatternAlpha + "$")) {
+                    this.whereRestriction.add(field, Where.EQUAL, value);
+                    return true;
+                } else {
+                    boolean ret = configWhereRegex(field, fieldType, value,
+                            new RegexWhere[] {defaultIfNotMatch}, null);
+                    if (!ret) {
+                        Where whereAux = getWhereFromRegexWhere(defaultIfNotMatch);
+                        if (whereAux != null) {
+                            this.whereRestriction.add(field, whereAux, value);
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 
+     * @param dateValue
+     * @return
+     */
+    private static Date parseDate(String dateValue) {
+        try {
+            return DateUtil.parseDate(dateValue);
+        } catch (ParseException e) {
+            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.parse-date", e,
+                    dateValue);
+        }
+    }
+
+    /**
+     * 
+     * @autor jurandirjcg
+     * @param regexWhr
+     * @return
+     */
+    private Where getWhereFromRegexWhere(RegexWhere regexWhr) {
+        for (Where whr : Where.values()) {
+            if (whr.regexWhere != null && whr.regexWhere.equals(regexWhr)) {
+                return whr;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 
+     * @param value
+     * @param regex
+     * @return
+     */
+    private boolean checkRegex(String value, String regex) {
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(value);
+        return m.find();
+    }
+
+    /**
+     * 
+     * @param listWhere
+     * @return
+     */
+    public CriteriaFilterImpl<T> addAllWhere(Map<String, Where> listWhere) {
+        this.listWhere.putAll(listWhere);
+        return this;
+    }
+
+    /**
+     * 
+     * @param listComplexWhere
+     * @return
+     */
+    public CriteriaFilterImpl<T> addAllWhereComplex(
+            Map<String, List<SimpleEntry<Where, ?>>> listComplexWhere) {
+        this.whereRestriction.getRestrictions().putAll(listComplexWhere);
+        return this;
+    }
+
+    /**
+     * 
+     * @param listJoin
+     * @return
+     */
+    public CriteriaFilterImpl<T> addAllJoin(Map<String, JoinMapper> listJoin) {
+        this.listJoin.putAll(listJoin);
+        return this;
+    }
+
+    /**
+     * 
+     * @param listSelection
+     * @return
+     */
+    public CriteriaFilterImpl<T> addAllSelection(
+            Map<String, SimpleEntry<SelectAggregate, String>> listSelection) {
+        this.listSelection.putAll(listSelection);
+        return this;
+    }
+
+    //----------------- OVERRIDE INTERFACES -------------------
+    @Override
     public CriteriaFilterImpl<T> addSelect(Class<?> returnType) throws ApplicationRuntimeException {
         return addSelect(returnType, (String[]) null);
     }
@@ -650,58 +1045,9 @@ class CriteriaFilterImpl<T>
         return addWhereEqual(attribute.getName());
     }
 
-    /**
-     * 
-     * @param field
-     * @param where
-     * @param values
-     * @return
-     */
-    private <E> CriteriaFilterImpl<T> addWhereListValues(String field, Where where,
-            List<E> values) {
-        if (values != null) {
-            List<E> listAux = new ArrayList<E>(values);
-            listAux.remove(null);
-            if (!listAux.isEmpty()) {
-                this.whereRestriction.add(field, where, values);
-            }
-        }
-
-        return this;
-    }
-
-    /**
-     * 
-     * @param field
-     * @param where
-     * @param values
-     * @return
-     */
-    private <E> CriteriaFilterImpl<T> addWhereListValues(String field, Where where, E[] values) {
-        if (values != null) {
-            return addWhereListValues(field, where, Arrays.asList(values));
-        }
-        return this;
-    }
-
     @Override
     public <E> CriteriaFilterImpl<T> addWhereIn(String field, List<E> values) {
         return addWhereListValues(field, Where.IN, values);
-    }
-
-    /**
-     * 
-     * @param regexToAnalyse
-     * @param search
-     * @return
-     */
-    private boolean containsRegex(RegexWhere[] regexToAnalyse, RegexWhere rgxSearch) {
-        for (RegexWhere rgx : regexToAnalyse) {
-            if (rgx.equals(rgxSearch)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -722,300 +1068,6 @@ class CriteriaFilterImpl<T>
         return this;
     }
 
-    /**
-     * 
-     * @author Jurandir C. Gonçalves <jurandir>
-     * @since 19/06/2020
-     *
-     * @param type
-     * @param date
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public <E extends Temporal> E toTemporal(final Class<E> type, final Date date) {
-        if (LocalDate.class.isAssignableFrom(type)) {
-            return (E) date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        } else if (LocalDateTime.class.isAssignableFrom(type)) {
-            return (E) date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        } else if (LocalTime.class.isAssignableFrom(type)) {
-            return (E) date.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
-        }
-
-        return null;
-    }
-
-    /**
-     * 
-     * @author Jurandir C. Gonçalves <jurandir>
-     * @since 19/06/2020
-     *
-     * @param type
-     * @param date
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public <E extends Temporal> E[] toTemporal(final Class<E> type, final Date[] date) {
-        E[] tempAux = (E[]) Array.newInstance(type, date.length);
-        for (int i = 0; i < tempAux.length; i++) {
-            tempAux[i] = toTemporal(type, date[i]);
-        }
-
-        return tempAux;
-    }
-
-    /**
-     * 
-     * @author Jurandir C. Gonçalves <jurandir>
-     * @since 19/06/2020
-     *
-     * @param type
-     * @param field
-     * @param startValue
-     * @param endValue
-     */
-    private void addWhereBetweenDateOrTemporal(Class<?> type, String field, Date startValue,
-            Date endValue) {
-        if (Date.class.isAssignableFrom(type)) {
-            addWhereBetween(field, startValue, endValue);
-        } else if (LocalTime.class.isAssignableFrom(type)) {
-            addWhereBetween(field, toTemporal(LocalTime.class, startValue),
-                    toTemporal(LocalTime.class, endValue));
-        } else if (LocalDate.class.isAssignableFrom(type)) {
-            addWhereBetween(field, toTemporal(LocalDate.class, startValue),
-                    toTemporal(LocalDate.class, endValue));
-        } else if (LocalDateTime.class.isAssignableFrom(type)) {
-            addWhereBetween(field, toTemporal(LocalDateTime.class, startValue),
-                    toTemporal(LocalDateTime.class, endValue));
-        }
-    }
-
-    /**
-     * 
-     * @author Jurandir C. Gonçalves <jurandir>
-     * @since 20/06/2020
-     *
-     * @param type
-     * @param field
-     * @param dates
-     */
-    private void addWhereDateOrTemporal(Class<?> type, Where where, String field, Date[] dates) {
-        if (Date.class.isAssignableFrom(type)) {
-            addWhereListValues(field, where, dates);
-        } else if (LocalTime.class.isAssignableFrom(type)) {
-            addWhereListValues(field, where, toTemporal(LocalTime.class, dates));
-        } else if (LocalDate.class.isAssignableFrom(type)) {
-            addWhereListValues(field, where, toTemporal(LocalDate.class, dates));
-        } else if (LocalDateTime.class.isAssignableFrom(type)) {
-            addWhereListValues(field, where, toTemporal(LocalDateTime.class, dates));
-        }
-    }
-
-    /**
-     * 
-     * @author Jurandir C. Gonçalves <jurandir>
-     * @since 20/06/2020
-     *
-     * @param type
-     * @param where
-     * @param field
-     * @param date
-     */
-    private void addWhereDateOrTemporal(Class<?> type, Where where, String field, Date date) {
-        if (Date.class.isAssignableFrom(type)) {
-            this.whereRestriction.add(field, where, date);
-        } else if (LocalTime.class.isAssignableFrom(type)) {
-            this.whereRestriction.add(field, where, toTemporal(LocalTime.class, date));
-        } else if (LocalDate.class.isAssignableFrom(type)) {
-            this.whereRestriction.add(field, where, toTemporal(LocalDate.class, date));
-        } else if (LocalDateTime.class.isAssignableFrom(type)) {
-            this.whereRestriction.add(field, where, toTemporal(LocalDateTime.class, date));
-        }
-    }
-
-    /**
-     * 
-     * @param field
-     * @param fieldType
-     * @param value
-     * @param regexToAnalyse
-     * @param defaultIfNotMatch
-     * @return
-     * @throws ApplicationRuntimeException
-     */
-    private boolean configWhereRegex(String field, Class<?> fieldType, String value,
-            RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
-            throws ApplicationRuntimeException {
-        Where where = null;
-        for (Where wh : Where.values()) {
-            if (wh.exp != null
-                    && (regexToAnalyse == null || containsRegex(regexToAnalyse, wh.regexWhere))
-                    && checkRegex(value, wh.exp)) {
-                where = wh;
-                break;
-            }
-        }
-        if (where != null) {
-            Pattern p = Pattern.compile(where.exp);
-            Matcher m = p.matcher(value);
-
-            if (m.find()) {
-                if (where.equals(Where.IS_NULL)) {
-                    this.addWhereIsNull(field);
-                } else if (where.equals(Where.IS_NOT_NULL)) {
-                    this.addWhereIsNotNull(field);
-                } else if (where.equals(Where.BETWEEN)) {
-                    String[] val = m.group().split("\\s(btwn|between)\\s");
-                    if (NumberUtils.isCreatable(val[0])) {
-                        this.whereRestriction.add(field, Where.BETWEEN,
-                                new Number[] {NumberUtils.createNumber(val[0]),
-                                        NumberUtils.createNumber(val[1])});
-                        return true;
-                    } else {
-                        Date dt1, dt2;
-                        dt1 = parseDate(val[0]);
-                        dt2 = parseDate(val[1]);
-                        if (val[1].matches(regexPatternDate)) {
-                            dt2 = DateUtils.setHours(dt2, 23);
-                            dt2 = DateUtils.setMinutes(dt2, 59);
-                            dt2 = DateUtils.setSeconds(dt2, 59);
-                            dt2 = DateUtils.setMilliseconds(dt2, 999);
-                        }
-                        addWhereBetweenDateOrTemporal(fieldType, field, dt1, dt2);
-                        return true;
-                    }
-                } else if (where.equals(Where.IN) || where.equals(Where.NOT_IN)) {
-                    String[] val = m.group().replace(" ", "").split("\\,");
-
-                    if (val[0] != null
-                            && (Date.class.isAssignableFrom(fieldType)
-                                    || Calendar.class.isAssignableFrom(fieldType))
-                            || Temporal.class.isAssignableFrom(fieldType)) { // ||
-                                                                             // val[0].matches(regexPatternDateTime))){
-
-                        Date[] dates = new Date[val.length];
-                        for (int i = 0; i < val.length; i++) {
-                            dates[i] = parseDate(val[i]);
-                        }
-
-                        addWhereDateOrTemporal(fieldType, where, field, dates);
-                        return true;
-                    } else {
-                        if (where.equals(Where.IN)) {
-                            addWhereIn(field, val);
-                            return true;
-                        } else {
-                            addWhereNotIn(field, val);
-                            return true;
-                        }
-                    }
-                } else {
-                    String val = m.group();
-                    if (Date.class.isAssignableFrom(fieldType)
-                            || Calendar.class.isAssignableFrom(fieldType)
-                            || Temporal.class.isAssignableFrom(fieldType)) {// val.matches(regexPatternDateTime)){
-                        Date dt = parseDate(m.group());
-                        if (val.matches(regexPatternDate) && (where.equals(Where.LESS_THAN)
-                                || where.equals(Where.LESS_THAN_OR_EQUAL_TO))) {
-                            DateUtils.setHours(dt, 23);
-                            DateUtils.setMinutes(dt, 59);
-                            DateUtils.setSeconds(dt, 59);
-                            DateUtils.setMilliseconds(dt, 999);
-                        }
-                        addWhereDateOrTemporal(fieldType, where, field, dt);
-                        return true;
-                    } else if (Number.class.isAssignableFrom(fieldType)) {
-                        this.whereRestriction.add(field, where, NumberUtils.createNumber(val));
-                        return true;
-                    } else {
-                        this.whereRestriction.add(field, where, val);
-                        return true;
-                    }
-                }
-            }
-        } else {
-            boolean found = false;
-            if (ArrayUtils.contains(regexToAnalyse, RegexWhere.MULTI)) {
-                final String multiWhere = "^(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber
-                        + "(\\s?&\\s?(<|<=|=|!=|>=|>|)" + regexPatternDateTimeOrNumber + "){1,}$";
-                Pattern p = Pattern.compile(multiWhere);
-                Matcher m = p.matcher(value);
-
-                if (m.find()) {
-                    found = true;
-                    String[] val = m.group().split(";");
-
-                    for (String v : val) {
-                        boolean add = configWhereRegex(field, fieldType, v,
-                                new RegexWhere[] {RegexWhere.LESS_THAN,
-                                        RegexWhere.LESS_THAN_OR_EQUAL_TO, RegexWhere.EQUAL,
-                                        RegexWhere.NOT_EQUAL, RegexWhere.GREATER_THAN,
-                                        RegexWhere.GREATER_THAN_OR_EQUAL_TO},
-                                defaultIfNotMatch);
-
-                        if (!add) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-            }
-
-            if (!found && defaultIfNotMatch != null) {
-                if (defaultIfNotMatch.equals(RegexWhere.EQUAL)
-                        && value.matches("^" + regexPatternDateTime + "$")) {
-                    this.whereRestriction.add(field, Where.EQUAL, parseDate(value));
-                    return true;
-                } else if (defaultIfNotMatch.equals(RegexWhere.EQUAL)
-                        && value.matches("^[a-zA-Z0-9]" + regexPatternAlpha + "$")) {
-                    this.whereRestriction.add(field, Where.EQUAL, value);
-                    return true;
-                } else {
-                    boolean ret = configWhereRegex(field, fieldType, value,
-                            new RegexWhere[] {defaultIfNotMatch}, null);
-                    if (!ret) {
-                        Where whereAux = getWhereFromRegexWhere(defaultIfNotMatch);
-                        if (whereAux != null) {
-                            this.whereRestriction.add(field, whereAux, value);
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 
-     * @param dateValue
-     * @return
-     */
-    private static Date parseDate(String dateValue) {
-        try {
-            return DateUtil.parseDate(dateValue);
-        } catch (ParseException e) {
-            throw new ApplicationRuntimeException(MessageSeverity.ERROR, "error.parse-date", e,
-                    dateValue);
-        }
-    }
-
-    /**
-     * 
-     * @autor jurandirjcg
-     * @param regexWhr
-     * @return
-     */
-    private Where getWhereFromRegexWhere(RegexWhere regexWhr) {
-        for (Where whr : Where.values()) {
-            if (whr.regexWhere != null && whr.regexWhere.equals(regexWhr)) {
-                return whr;
-            }
-        }
-        return null;
-    }
-
     @Override
     public CriteriaFilterImpl<T> addWhereRegex(Attribute<T, ?> attribute, String value,
             RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
@@ -1033,18 +1085,6 @@ class CriteriaFilterImpl<T>
             throw ae;
         }
         return this;
-    }
-
-    /**
-     * 
-     * @param value
-     * @param regex
-     * @return
-     */
-    private boolean checkRegex(String value, String regex) {
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(value);
-        return m.find();
     }
 
     @Override
@@ -1128,48 +1168,6 @@ class CriteriaFilterImpl<T>
     @Override
     public <E> CriteriaFilterImpl<T> addWhereNotEqual(Attribute<T, E> attribute, List<E> values) {
         return addWhereListValues(attribute.getName(), Where.NOT_EQUAL, values);
-    }
-
-    /**
-     * 
-     * @param listWhere
-     * @return
-     */
-    public CriteriaFilterImpl<T> addAllWhere(Map<String, Where> listWhere) {
-        this.listWhere.putAll(listWhere);
-        return this;
-    }
-
-    /**
-     * 
-     * @param listComplexWhere
-     * @return
-     */
-    public CriteriaFilterImpl<T> addAllWhereComplex(
-            Map<String, List<SimpleEntry<Where, ?>>> listComplexWhere) {
-        this.whereRestriction.getRestrictions().putAll(listComplexWhere);
-        return this;
-    }
-
-    /**
-     * 
-     * @param listJoin
-     * @return
-     */
-    public CriteriaFilterImpl<T> addAllJoin(Map<String, JoinMapper> listJoin) {
-        this.listJoin.putAll(listJoin);
-        return this;
-    }
-
-    /**
-     * 
-     * @param listSelection
-     * @return
-     */
-    public CriteriaFilterImpl<T> addAllSelection(
-            Map<String, SimpleEntry<SelectAggregate, String>> listSelection) {
-        this.listSelection.putAll(listSelection);
-        return this;
     }
 
     @Override
@@ -1313,42 +1311,16 @@ class CriteriaFilterImpl<T>
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(String field, LocalDate startValue,
-            LocalDate endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new LocalDate[] {startValue, endValue});
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalDate> attribute,
-            LocalDate startValue, LocalDate endValue) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereBetween(Attribute<T, E> attribute,
+        Temporal startValue, Temporal endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(String field, LocalDateTime startValue,
-            LocalDateTime endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new LocalDateTime[] {startValue, endValue});
+    public CriteriaFilterImpl<T> addWhereBetween(String field, Temporal startValue,
+        Temporal endValue) {
+        this.whereRestriction.add(field, Where.BETWEEN, new Temporal[] {startValue, endValue});
         return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalDateTime> attribute,
-            LocalDateTime startValue, LocalDateTime endValue) {
-        return addWhereBetween(attribute.getName(), startValue, endValue);
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereBetween(String field, LocalTime startValue,
-            LocalTime endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new LocalTime[] {startValue, endValue});
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereBetween(Attribute<T, LocalTime> attribute,
-            LocalTime startValue, LocalTime endValue) {
-        return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
@@ -1937,32 +1909,32 @@ class CriteriaFilterImpl<T>
     }
 
     @Override
-    public CriteriaFilterMetamodel<T> addSelectAvg(String field, String alias) {
+    public CriteriaFilterImpl<T> addSelectAvg(String field, String alias) {
         return addSelect(field, SelectAggregate.AVG, alias);
     }
     
     @Override
-    public CriteriaFilterMetamodel<T> addSelectAvg(String field) {
+    public CriteriaFilterImpl<T> addSelectAvg(String field) {
         return addSelectAvg(field, field);
     }
     
     @Override
-    public CriteriaFilterMetamodel<T> addSelectAvg(Attribute<T, ?> attribute, String alias) {
+    public CriteriaFilterImpl<T> addSelectAvg(Attribute<T, ?> attribute, String alias) {
         return addSelectAvg(attribute.getName(), alias);
     }
     
     @Override
-    public CriteriaFilterMetamodel<T> addSelectAvg(ComplexAttribute attribute, String alias) {
+    public CriteriaFilterImpl<T> addSelectAvg(ComplexAttribute attribute, String alias) {
         return addSelectAvg(attribute.getName(), alias);
     }
     
     @Override
-    public CriteriaFilterMetamodel<T> addSelectAvg(Attribute<T, ?> attribute) {
+    public CriteriaFilterImpl<T> addSelectAvg(Attribute<T, ?> attribute) {
         return addSelectAvg(attribute.getName());
     }
     
     @Override
-    public CriteriaFilterMetamodel<T> addSelectAvg(ComplexAttribute attribute) {
+    public CriteriaFilterImpl<T> addSelectAvg(ComplexAttribute attribute) {
         return addSelectAvg(attribute.getName());
     }
 
@@ -2091,14 +2063,8 @@ class CriteriaFilterImpl<T>
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, LocalDate startValue,
-            LocalDate endValue) {
-        return addWhereBetween(attribute.getName(), startValue, endValue);
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute,
-            LocalDateTime startValue, LocalDateTime endValue) {
+    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, Temporal startValue,
+        Temporal endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
@@ -2301,160 +2267,77 @@ class CriteriaFilterImpl<T>
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThan(ComplexAttribute attribute, LocalDate value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThan(ComplexAttribute attribute, Temporal value) {
         this.addWhereGreaterThan(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThan(ComplexAttribute attribute,
-            LocalDateTime value) {
-        this.addWhereGreaterThan(attribute.getName(), value);
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
-            LocalDate value) {
-        this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
-            LocalDateTime value) {
-        this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereLessThan(ComplexAttribute attribute, LocalDate value) {
-        this.addWhereLessThan(attribute.getName(), value);
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereLessThan(ComplexAttribute attribute, LocalDateTime value) {
+    public CriteriaFilterImpl<T> addWhereLessThan(ComplexAttribute attribute, Temporal value) {
         this.addWhereLessThan(attribute.getName(), value);
         return this;
     }
 
     @Override
     public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
-            LocalDate value) {
+        Temporal value) {
         this.addWhereLessThanOrEqualTo(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
-            LocalDateTime value) {
-        this.addWhereLessThanOrEqualTo(attribute.getName(), value);
-        return this;
-    }
-
-    @Override
-    public <E> CriteriaFilterImpl<T> addWhereGreaterThan(String field, LocalDate value) {
+    public <E> CriteriaFilterImpl<T> addWhereGreaterThan(String field, Temporal value) {
         this.whereRestriction.add(field, Where.GREATER_THAN, value);
         return this;
     }
 
     @Override
-    public <E> CriteriaFilterImpl<T> addWhereGreaterThan(String field, LocalDateTime value) {
-        this.whereRestriction.add(field, Where.GREATER_THAN, value);
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(String field, LocalDate value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(String field, Temporal value) {
         this.whereRestriction.add(field, Where.GREATER_THAN_OR_EQUAL_TO, value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(String field, LocalDateTime value) {
-        this.whereRestriction.add(field, Where.GREATER_THAN_OR_EQUAL_TO, value);
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereLessThan(String field, LocalDate value) {
+    public CriteriaFilterImpl<T> addWhereLessThan(String field, Temporal value) {
         this.whereRestriction.add(field, Where.LESS_THAN, value);
         return this;
     }
 
-    @Override
-    public CriteriaFilterImpl<T> addWhereLessThan(String field, LocalDateTime value) {
-        this.whereRestriction.add(field, Where.LESS_THAN, value);
-        return this;
-    }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(String field, LocalDate value) {
+    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(String field, Temporal value) {
         this.whereRestriction.add(field, Where.LESS_THAN_OR_EQUAL_TO, value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(String field, LocalDateTime value) {
-        this.whereRestriction.add(field, Where.LESS_THAN_OR_EQUAL_TO, value);
-        return this;
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, E> attribute,
+        Temporal value) {
+        return this.addWhereGreaterThan(attribute.getName(), value);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, LocalDate> attribute,
-            LocalDate value) {
-        this.addWhereGreaterThan(attribute.getName(), value);
-        return this;
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, E> attribute,
+        Temporal value) {
+        return this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, LocalDateTime> attribute,
-            LocalDateTime value) {
-        this.addWhereGreaterThan(attribute.getName(), value);
-        return this;
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, E> attribute,
+        Temporal value) {
+        return this.addWhereLessThan(attribute.getName(), value);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, LocalDate> attribute,
-            LocalDate value) {
-        this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
-        return this;
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, E> attribute,
+        Temporal value) {
+        return this.addWhereLessThanOrEqualTo(attribute.getName(), value);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, LocalDateTime> attribute,
-            LocalDateTime value) {
-        this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, LocalDate> attribute,
-            LocalDate value) {
-        this.addWhereLessThan(attribute.getName(), value);
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, LocalDateTime> attribute,
-            LocalDateTime value) {
-        this.addWhereLessThan(attribute.getName(), value);
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, LocalDate> attribute,
-            LocalDate value) {
-        this.addWhereLessThanOrEqualTo(attribute.getName(), value);
-        return this;
-    }
-
-    @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, LocalDateTime> attribute,
-            LocalDateTime value) {
-        this.addWhereLessThanOrEqualTo(attribute.getName(), value);
-        return this;
+    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
+        Temporal value) {
+        return this.addWhereLessThanOrEqualTo(attribute.getName(), value);
     }
 
     @Override
@@ -2465,6 +2348,24 @@ class CriteriaFilterImpl<T>
             });
         }
         return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhere(String field, Predicate value) {
+        this.whereRestriction.add(field, Where.PREDICATE, value);
+        return this;
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhere(Attribute<T, ?> attribute,
+        Predicate value) {
+        return addWhere(attribute.getName(), value);
+    }
+
+    @Override
+    public CriteriaFilterImpl<T> addWhere(ComplexAttribute attribute,
+        Predicate value) {
+        return addWhere(attribute.getName(), value);
     }
 
 }
