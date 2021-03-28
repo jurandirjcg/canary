@@ -85,7 +85,6 @@ public abstract class ResponseConverter<O> {
                         ReflectionUtil.setFieldValue(ret, fld, respConv);
                     }
                 }
-
             }
 
             return ret;
