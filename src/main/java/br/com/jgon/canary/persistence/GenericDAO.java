@@ -539,9 +539,11 @@ public abstract class GenericDAO<T, K extends Serializable> {
         if(from.getJavaType().equals(joinType)) {
             return (Join<?, X>) from;
         }
+        Join<?, ?> joinAux;
         for(Join<?, ?> join : from.getJoins()){
-            if(join.getJavaType().equals(joinType)) {
-                return (Join<?, X>) join;
+            joinAux = getJoin(join, joinType);
+            if(joinAux != null) {
+                return (Join<?, X>) joinAux;
             }
         }
         return null;
