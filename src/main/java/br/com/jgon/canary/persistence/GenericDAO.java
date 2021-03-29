@@ -500,6 +500,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
 
     /**
      * 
+     * @param <E> - type
      * @param criteriaQuery - {@link CriteriaQuery}
      * @param rootType - Root type
      * @return {@link Root}
@@ -514,6 +515,13 @@ public abstract class GenericDAO<T, K extends Serializable> {
         return null;
     }
 
+    /**
+     * 
+     * @param <X> - type
+     * @param criteriaQuery {@link CriteriaQuery}
+     * @param joinType join type
+     * @return {@link Join}
+     */
     protected <X> Join<?, X> getJoin(CriteriaQuery<?> criteriaQuery, Class<X> joinType) {
         Join<?, X> retJoin;
         for(Root<?> root : criteriaQuery.getRoots()) {

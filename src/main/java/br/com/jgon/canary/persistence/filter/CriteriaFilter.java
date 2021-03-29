@@ -34,26 +34,26 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
 
     /**
      * 
-     * @param returnType
-     * @return
+     * @param returnType type
+     * @return CriteriaFilter
      * @throws ApplicationRuntimeException
      */
     public CriteriaFilter<T> addSelect(Class<?> returnType) throws ApplicationRuntimeException;
 
     /**
      * 
-     * @param returnType
-     * @param fields
-     * @return
+     * @param returnType type
+     * @param fields {@link List}
+     * @return {@link CriteriaFilter}
      * @throws ApplicationRuntimeException
      */
     public CriteriaFilter<T> addSelect(Class<?> returnType, List<String> fields) throws ApplicationRuntimeException;
 
     /**
      * 
-     * @param returnType
-     * @param fields
-     * @return
+     * @param returnType type
+     * @param fields fields
+     * @return {@link CriteriaFilter}
      * @throws ApplicationRuntimeException
      */
     public CriteriaFilter<T> addSelect(Class<?> returnType, String... fields) throws ApplicationRuntimeException;
@@ -62,14 +62,14 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param field
      * @param alias
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelect(String field, String alias);
 
     /**
      * 
      * @param fieldAlias
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelect(Map<String, String> fieldAlias);
 
@@ -77,21 +77,21 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param field
      * @param alias
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectCount(String field, String alias);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectCount(String field);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectUpper(String field);
 
@@ -99,14 +99,14 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param field
      * @param alias
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectUpper(String field, String alias);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectLower(String field);
 
@@ -114,7 +114,7 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param field
      * @param alias
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectLower(String field, String alias);
 
@@ -122,14 +122,14 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param field
      * @param alias
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectMax(String field, String alias);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectMax(String field);
 
@@ -137,14 +137,14 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param field
      * @param alias
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectMin(String field, String alias);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectMin(String field);
 
@@ -152,14 +152,14 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param field
      * @param alias
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectSum(String field, String alias);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectSum(String field);
 
@@ -167,35 +167,35 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param field
      * @param alias
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectAvg(String field, String alias);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelectAvg(String field);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelect(String field);
 
     /**
      * 
      * @param fields
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelect(String[] fields);
 
     /**
      * 
      * @param fields
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addSelect(List<String> fields);
 
@@ -203,7 +203,7 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param returnType
      * @param order
-     * @return
+     * @return {@link CriteriaFilter}
      * @throws ApplicationRuntimeException
      */
     public CriteriaFilter<T> addOrder(Class<?> returnType, String... order) throws ApplicationRuntimeException;
@@ -212,7 +212,7 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param returnType
      * @param order
-     * @return
+     * @return {@link CriteriaFilter}
      * @throws ApplicationRuntimeException
      */
     public CriteriaFilter<T> addOrder(Class<?> returnType, List<String> order) throws ApplicationRuntimeException;
@@ -220,28 +220,28 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
     /**
      * 
      * @param order
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addOrder(List<String> order);
 
     /**
      * 
      * @param order
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addOrder(String... order);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addOrderAsc(String field);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addOrderDesc(String field);
 
@@ -249,7 +249,7 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * Ex: id:asc or id:desc - default :asc
      * 
      * @param fields
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addOrderAsc(List<String> fields);
 
@@ -257,21 +257,21 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * Ex: id:asc or id:desc - default :asc
      * 
      * @param fields
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addOrderDesc(List<String> fields);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addGroupBy(String field);
 
     /**
      * 
      * @param fields
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addGroupBy(List<String> fields);
 
@@ -280,7 +280,7 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * @param field
      * @param joinType
      * @param fetch
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addJoin(String field, JoinType joinType, boolean fetch);
 
@@ -289,14 +289,14 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * 
      * @param field
      * @param joinType
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addJoin(String field, JoinType joinType);
 
     /**
      * 
      * @param field
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addJoin(String field);
 
@@ -307,7 +307,7 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
      * @param joinType
      * @param fetch
      * @param force
-     * @return
+     * @return {@link CriteriaFilter}
      */
     public CriteriaFilter<T> addJoin(String field, JoinType joinType, boolean fetch, boolean force);
 

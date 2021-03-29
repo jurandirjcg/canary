@@ -63,8 +63,8 @@ public class ComplexAttribute {
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute - {@link Attribute}
+     * @return {@link Boolean}
      */
     public boolean addAtribute(Attribute<?, ?> attribute) {
         return this.listAttribute.add(attribute);

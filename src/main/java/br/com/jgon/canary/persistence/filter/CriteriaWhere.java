@@ -176,9 +176,9 @@ public interface CriteriaWhere<T> {
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param field field
+     * @param value {@link Predicate}
+     * @return {@link CriteriaWhere}
      */
     public CriteriaFilter<T> addWhere(String field, Predicate value);
     
