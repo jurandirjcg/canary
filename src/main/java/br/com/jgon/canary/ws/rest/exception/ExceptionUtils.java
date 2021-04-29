@@ -42,32 +42,74 @@ public abstract class ExceptionUtils {
     public static Response toResponse(Exception exception) {
 
         ResponseError retorno = null;
-        if (exception instanceof ValidationException) {
-            retorno = configValidationException((ValidationException) exception);
-        } else if (exception instanceof ApplicationException) {
-            retorno = configApplicationException((ApplicationException) exception);
-        } else if (exception instanceof ApplicationRuntimeException) {
-            retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception);
-        } else if (exception.getCause() instanceof ApplicationRuntimeException) {
-            retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception.getCause());
-        } else if (exception instanceof ConstraintViolation) {
-            retorno = configConstraintViolationException((ConstraintViolation<?>) exception);
-        } else if (exception instanceof WebApplicationException) {
-            return ((WebApplicationException) exception).getResponse();
-        } else if (exception instanceof ConstraintViolationException) {
-            retorno = configConstraintViolationException((ConstraintViolationException) exception);
-        } else if (exception instanceof javax.validation.ValidationException) {
-            retorno = configValidationException((ValidationException) exception);
+        Throwable throwable;
+        if ((throwable = checkException(exception, ValidationException.class)) != null) {
+            retorno = configValidationException((ValidationException) throwable);
+        } else if ((throwable = checkException(exception, ApplicationException.class)) != null) {
+            retorno = configApplicationException((ApplicationException) throwable);
+        } else if ((throwable = checkException(exception, ApplicationRuntimeException.class)) != null) {
+            retorno = configApplicationRuntimeException((ApplicationRuntimeException) throwable);
+        } else if ((throwable = checkException(exception, ConstraintViolation.class)) != null) {
+            retorno = configConstraintViolationException((ConstraintViolation<?>) throwable);
+        } else if ((throwable = checkException(exception, WebApplicationException.class)) != null) {
+            return ((WebApplicationException) throwable).getResponse();
+        } else if ((throwable = checkException(exception, ConstraintViolationException.class)) != null) {
+            retorno = configConstraintViolationException((ConstraintViolationException) throwable);
+        } else if ((throwable = checkException(exception, javax.validation.ValidationException.class)) != null) {
+            retorno = configValidationException((javax.validation.ValidationException) throwable);
         } else {
             retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, MessageFactory.getMessage("default.message"),
                 MessageSeverity.ERROR);
             LOG.error("[toResponse]", exception);
         }
+        // if (exception instanceof ValidationException) {
+        //     retorno = configValidationException((ValidationException) exception);
+        // } else if (exception instanceof ApplicationException) {
+        //     retorno = configApplicationException((ApplicationException) exception);
+        // } else if (exception instanceof ApplicationRuntimeException) {
+        //     retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception);
+        // } else if (exception.getCause() instanceof ApplicationRuntimeException) {
+        //     retorno = configApplicationRuntimeException((ApplicationRuntimeException) exception.getCause());
+        // } else if (exception instanceof ConstraintViolation) {
+        //     retorno = configConstraintViolationException((ConstraintViolation<?>) exception);
+        // } else if (exception instanceof WebApplicationException) {
+        //     return ((WebApplicationException) exception).getResponse();
+        // } else if (exception instanceof ConstraintViolationException) {
+        //     retorno = configConstraintViolationException((ConstraintViolationException) exception);
+        // } else if (exception instanceof javax.validation.ValidationException) {
+        //     retorno = configValidationException((ValidationException) exception);
+        // } else {
+        //     retorno = new ResponseError(Response.Status.INTERNAL_SERVER_ERROR, MessageFactory.getMessage("default.message"),
+        //         MessageSeverity.ERROR);
+        //     LOG.error("[toResponse]", exception);
+        // }
         Integer status = retorno.getStatus();
         if (retorno.getErrors() != null && !retorno.getErrors().isEmpty()) {
             retorno.setStatus(null);
         }
         return Response.status(status).entity(retorno).header("Content-type", "application/json").build();
+    }
+
+    /**
+     * 
+     * @param <E>
+     * @param exception
+     * @param checkException
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private static <E extends Throwable> E checkException(Throwable exception, Class<?> checkException) {
+        if(checkException.isAssignableFrom(exception.getClass())){
+            return (E) exception;
+        } else if(exception.getCause() != null) {
+            if(checkException.isAssignableFrom(exception.getCause().getClass())){
+                return (E) exception.getCause();
+            } else {
+                return checkException(exception.getCause(), checkException);
+            }
+        }
+
+        return null;
     }
 
     public static ResponseError configValidationException(javax.validation.ValidationException exception) {
