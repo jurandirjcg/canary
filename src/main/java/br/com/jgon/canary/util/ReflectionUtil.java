@@ -854,6 +854,17 @@ public final class ReflectionUtil {
     }
 
     /**
+     * 
+     * @param klass
+     * @return
+     */
+    public static boolean isDateCalendarOrTemporal(Class<?> klass) {
+        return Date.class.isAssignableFrom(klass)
+        || Calendar.class.isAssignableFrom(klass)
+        || Temporal.class.isAssignableFrom(klass);
+    }
+
+    /**
      * Verifica se o atributo da classe é do tipo primitivo
      * 
      * @param klass - classe de pesquisa

@@ -48,6 +48,7 @@ import br.com.jgon.canary.persistence.filter.CriteriaFilterMetamodel;
 import br.com.jgon.canary.persistence.filter.CriteriaFilterUpdate;
 import br.com.jgon.canary.util.DateUtil;
 import br.com.jgon.canary.util.MessageSeverity;
+import br.com.jgon.canary.util.ReflectionUtil;
 
 /**
  * Define os filtros que serao utilizados para construir a criteria
@@ -587,25 +588,19 @@ class CriteriaFilterImpl<T>
             }
 
             if (!found && defaultIfNotMatch != null) {
-                if (defaultIfNotMatch.equals(RegexWhere.EQUAL)
-                        && value.matches("^" + regexPatternDateTime + "$")) {
-                    this.whereRestriction.add(field, Where.EQUAL, parseDate(value));
-                    return true;
-                } else if (defaultIfNotMatch.equals(RegexWhere.EQUAL)
-                        && value.matches("^[a-zA-Z0-9]" + regexPatternAlpha + "$")) {
-                    this.whereRestriction.add(field, Where.EQUAL, value);
-                    return true;
-                } else {
-                    boolean ret = configWhereRegex(field, fieldType, value,
-                            new RegexWhere[] {defaultIfNotMatch}, null);
-                    if (!ret) {
-                        Where whereAux = getWhereFromRegexWhere(defaultIfNotMatch);
-                        if (whereAux != null) {
-                            this.whereRestriction.add(field, whereAux, value);
-                            return true;
+                boolean ret = configWhereRegex(field, fieldType, value,
+                        new RegexWhere[] {defaultIfNotMatch}, null);
+                if (!ret) {
+                    Where whereAux = getWhereFromRegexWhere(defaultIfNotMatch);
+                    if (whereAux != null) {
+                        if(ReflectionUtil.isDateCalendarOrTemporal(fieldType)) {
+                            addWhereDateOrTemporal(fieldType, whereAux, field, parseDate(value));
                         } else {
-                            return false;
+                            this.whereRestriction.add(field, whereAux, value);
                         }
+                        return true;
+                    } else {
+                        return false;
                     }
                 }
             }
