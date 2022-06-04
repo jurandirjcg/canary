@@ -510,8 +510,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @param endValue
      * @return
      */
-    public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, E> attribute,
-            Temporal startValue, Temporal endValue);
+    public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, E> attribute, E startValue, E endValue);
 
     /**
      * 
@@ -520,8 +519,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @param endValue
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereBetween(ComplexAttribute attribute,
-            Temporal startValue, Temporal endValue);
+    public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereBetween(ComplexAttribute attribute, E startValue, E endValue);
 
     /**
      * 
@@ -732,7 +730,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @return
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereGreaterThan(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     /**
      * 
@@ -748,8 +746,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute,
-            Temporal value);
+    public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute, E value);
 
     /**
      * 
@@ -799,7 +796,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @return
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     /**
      * 
@@ -807,8 +804,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
-            Date value);
+    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, Date value);
 
     /**
      * 
@@ -816,8 +812,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
-            Temporal value);
+    public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, E value);
 
     /**
      * 
@@ -895,7 +890,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @return
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereLessThan(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     /**
      * 
@@ -911,7 +906,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThan(ComplexAttribute attribute, Temporal value);
+    public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereLessThan(ComplexAttribute attribute, E value);
 
     /**
      * 
@@ -959,7 +954,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @return
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     /**
      * 
@@ -976,8 +971,7 @@ public interface CriteriaWhereMetamodel<T> {
      * @param value
      * @return
      */
-    public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
-            Temporal value);
+    public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, E value);
 
     /**
      * 

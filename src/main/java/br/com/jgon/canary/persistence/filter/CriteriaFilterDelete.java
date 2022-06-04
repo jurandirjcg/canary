@@ -273,11 +273,10 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhere<T>, CriteriaWhere
 
     @Override
     public <E extends Temporal> CriteriaFilterDelete<T> addWhereBetween(Attribute<T, E> attribute,
-            Temporal startValue, Temporal endValue);
+            E startValue, E endValue);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute,
-            Temporal startValue, Temporal endValue);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereBetween(ComplexAttribute attribute, E startValue, E endValue);
 
     @Override
     public CriteriaFilterDelete<T> addWhereGreaterThan(Attribute<T, ?> attribute);
@@ -350,14 +349,13 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhere<T>, CriteriaWhere
 
     @Override
     public <E extends Temporal> CriteriaFilterDelete<T> addWhereGreaterThan(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereGreaterThan(ComplexAttribute attribute, Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThan(ComplexAttribute attribute,
-            Temporal value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereGreaterThan(ComplexAttribute attribute, E value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereGreaterThan(Attribute<T, Number> attribute,
@@ -372,15 +370,15 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhere<T>, CriteriaWhere
 
     @Override
     public <E extends Temporal> CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
             Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
-            Temporal value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
+            E value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(Attribute<T, Number> attribute,
@@ -395,13 +393,13 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhere<T>, CriteriaWhere
 
     @Override
     public <E extends Temporal> CriteriaFilterDelete<T> addWhereLessThan(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereLessThan(ComplexAttribute attribute, Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThan(ComplexAttribute attribute, Temporal value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereLessThan(ComplexAttribute attribute, E value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereLessThan(Attribute<T, Number> attribute, Number value);
@@ -415,15 +413,15 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhere<T>, CriteriaWhere
 
     @Override
     public <E extends Temporal> CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
             Date value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
-            Temporal value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
+            E value);
 
     @Override
     public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(Attribute<T, Number> attribute,
@@ -520,8 +518,8 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhere<T>, CriteriaWhere
     public CriteriaFilterDelete<T> addWhereBetween(String field, Date startValue, Date endValue);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereBetween(String field, Temporal startValue,
-            Temporal endValue);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereBetween(String field, E startValue,
+            E endValue);
 
     @Override
     public CriteriaFilterDelete<T> addWhereGreaterThan(String field);
@@ -610,15 +608,15 @@ public interface CriteriaFilterDelete<T> extends CriteriaWhere<T>, CriteriaWhere
             throws ApplicationRuntimeException;
 
     @Override
-    public <E> CriteriaFilterDelete<T> addWhereGreaterThan(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereGreaterThan(String field, E value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereGreaterThanOrEqualTo(String field, E value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThan(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereLessThan(String field, E value);
 
     @Override
-    public CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterDelete<T> addWhereLessThanOrEqualTo(String field, E value);
 
 }

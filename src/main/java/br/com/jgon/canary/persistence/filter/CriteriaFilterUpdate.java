@@ -288,11 +288,11 @@ public interface CriteriaFilterUpdate<T> extends CriteriaWhere<T>, CriteriaWhere
 
     @Override
     public <E extends Temporal> CriteriaFilterUpdate<T> addWhereBetween(Attribute<T, E> attribute,
-            Temporal startValue, Temporal endValue);
+            E startValue, E endValue);
 
     @Override
-    public CriteriaFilterUpdate<T> addWhereBetween(ComplexAttribute attribute,
-            Temporal startValue, Temporal endValue);
+    public <E extends Temporal> CriteriaFilterUpdate<T> addWhereBetween(ComplexAttribute attribute,
+            E startValue, E endValue);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereGreaterThan(Attribute<T, ?> attribute);
@@ -365,14 +365,14 @@ public interface CriteriaFilterUpdate<T> extends CriteriaWhere<T>, CriteriaWhere
 
     @Override
     public <E extends Temporal> CriteriaFilterUpdate<T> addWhereGreaterThan(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereGreaterThan(ComplexAttribute attribute, Date value);
 
     @Override
-    public CriteriaFilterUpdate<T> addWhereGreaterThan(ComplexAttribute attribute,
-            Temporal value);
+    public <E extends Temporal> CriteriaFilterUpdate<T> addWhereGreaterThan(ComplexAttribute attribute,
+            E value);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereGreaterThan(Attribute<T, Number> attribute,
@@ -387,15 +387,15 @@ public interface CriteriaFilterUpdate<T> extends CriteriaWhere<T>, CriteriaWhere
 
     @Override
     public <E extends Temporal> CriteriaFilterUpdate<T> addWhereGreaterThanOrEqualTo(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
             Date value);
 
     @Override
-    public CriteriaFilterUpdate<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
-            Temporal value);
+    public <E extends Temporal>CriteriaFilterUpdate<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
+            E value);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereGreaterThanOrEqualTo(Attribute<T, Number> attribute,
@@ -410,13 +410,13 @@ public interface CriteriaFilterUpdate<T> extends CriteriaWhere<T>, CriteriaWhere
 
     @Override
     public <E extends Temporal> CriteriaFilterUpdate<T> addWhereLessThan(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereLessThan(ComplexAttribute attribute, Date value);
 
     @Override
-    public CriteriaFilterUpdate<T> addWhereLessThan(ComplexAttribute attribute, Temporal value);
+    public <E extends Temporal> CriteriaFilterUpdate<T> addWhereLessThan(ComplexAttribute attribute, E value);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereLessThan(Attribute<T, Number> attribute, Number value);
@@ -430,15 +430,15 @@ public interface CriteriaFilterUpdate<T> extends CriteriaWhere<T>, CriteriaWhere
 
     @Override
     public <E extends Temporal> CriteriaFilterUpdate<T> addWhereLessThanOrEqualTo(
-            Attribute<T, E> attribute, Temporal value);
+            Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
             Date value);
 
     @Override
-    public CriteriaFilterUpdate<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
-            Temporal value);
+    public <E extends Temporal> CriteriaFilterUpdate<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
+            E value);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereLessThanOrEqualTo(Attribute<T, Number> attribute,
@@ -535,8 +535,7 @@ public interface CriteriaFilterUpdate<T> extends CriteriaWhere<T>, CriteriaWhere
     public CriteriaFilterUpdate<T> addWhereBetween(String field, Date startValue, Date endValue);
 
     @Override
-    public CriteriaFilterUpdate<T> addWhereBetween(String field, Temporal startValue,
-            Temporal endValue);
+    public <E extends Temporal> CriteriaFilterUpdate<T> addWhereBetween(String field, E startValue, E endValue);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereGreaterThan(String field);
@@ -616,8 +615,7 @@ public interface CriteriaFilterUpdate<T> extends CriteriaWhere<T>, CriteriaWhere
     public CriteriaFilterUpdate<T> addWhereNotIn(String field);
 
     @Override
-    public CriteriaFilterUpdate<T> addWhereBetween(String field, Double startValue,
-            Double endValue);
+    public CriteriaFilterUpdate<T> addWhereBetween(String field, Double startValue, Double endValue);
 
     @Override
     public CriteriaFilterUpdate<T> addWhereRegex(String field, Class<?> fieldType, String value,
@@ -625,15 +623,15 @@ public interface CriteriaFilterUpdate<T> extends CriteriaWhere<T>, CriteriaWhere
             throws ApplicationRuntimeException;
 
     @Override
-    public <E> CriteriaFilterUpdate<T> addWhereGreaterThan(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterUpdate<T> addWhereGreaterThan(String field, E value);
 
     @Override
-    public CriteriaFilterUpdate<T> addWhereGreaterThanOrEqualTo(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterUpdate<T> addWhereGreaterThanOrEqualTo(String field, E value);
 
     @Override
-    public CriteriaFilterUpdate<T> addWhereLessThan(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterUpdate<T> addWhereLessThan(String field, E value);
 
     @Override
-    public CriteriaFilterUpdate<T> addWhereLessThanOrEqualTo(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterUpdate<T> addWhereLessThanOrEqualTo(String field, E value);
 
 }

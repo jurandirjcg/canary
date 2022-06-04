@@ -1047,8 +1047,7 @@ class CriteriaManager<T> {
                     }
                 }
                 // --------- COMPLEX ----
-                List<SimpleEntry<Where, ?>> listWithValues = criteriaFilter != null ? criteriaFilter.getWhereRestriction(attributeName)
-                    : null;
+                List<SimpleEntry<Where, ?>> listWithValues = criteriaFilter != null ? criteriaFilter.getWhereRestriction(attributeName) : null;
 
                 if (listWithValues != null && !listWithValues.isEmpty()) {
                     for (SimpleEntry<Where, ?> withValues : listWithValues) {

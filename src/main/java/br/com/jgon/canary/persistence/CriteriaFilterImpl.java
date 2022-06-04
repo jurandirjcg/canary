@@ -23,7 +23,6 @@ import java.time.temporal.Temporal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -513,12 +512,7 @@ class CriteriaFilterImpl<T>
                 } else if (where.equals(Where.IN) || where.equals(Where.NOT_IN)) {
                     String[] val = m.group().replace(" ", "").split("\\,");
 
-                    if (val[0] != null
-                            && (Date.class.isAssignableFrom(fieldType)
-                                    || Calendar.class.isAssignableFrom(fieldType))
-                            || Temporal.class.isAssignableFrom(fieldType)) { // ||
-                                                                             // val[0].matches(regexPatternDateTime))){
-
+                    if (val[0] != null && ReflectionUtil.isDateCalendarOrTemporal(fieldType)) {
                         Date[] dates = new Date[val.length];
                         for (int i = 0; i < val.length; i++) {
                             dates[i] = parseDate(val[i]);
@@ -526,6 +520,19 @@ class CriteriaFilterImpl<T>
 
                         addWhereDateOrTemporal(fieldType, where, field, dates);
                         return true;
+                    } else if (val[0] != null && Number.class.isAssignableFrom(fieldType)) {
+                        Number[] numbers = new Number[val.length];
+                        for(int i = 0; i < val.length; i++){
+                            numbers[i] = NumberUtils.createNumber(val[i]);
+                        }
+
+                        if (where.equals(Where.IN)) {
+                            addWhereIn(field, numbers);
+                            return true;
+                        } else {
+                            addWhereNotIn(field, numbers);
+                            return true;
+                        }
                     } else {
                         if (where.equals(Where.IN)) {
                             addWhereIn(field, val);
@@ -537,9 +544,7 @@ class CriteriaFilterImpl<T>
                     }
                 } else {
                     String val = m.group();
-                    if (Date.class.isAssignableFrom(fieldType)
-                            || Calendar.class.isAssignableFrom(fieldType)
-                            || Temporal.class.isAssignableFrom(fieldType)) {// val.matches(regexPatternDateTime)){
+                    if (ReflectionUtil.isDateCalendarOrTemporal(fieldType)) {// val.matches(regexPatternDateTime)){
                         Date dt = parseDate(m.group());
                         if (val.matches(regexPatternDate) && (where.equals(Where.LESS_THAN)
                                 || where.equals(Where.LESS_THAN_OR_EQUAL_TO))) {
@@ -595,6 +600,8 @@ class CriteriaFilterImpl<T>
                     if (whereAux != null) {
                         if(ReflectionUtil.isDateCalendarOrTemporal(fieldType)) {
                             addWhereDateOrTemporal(fieldType, whereAux, field, parseDate(value));
+                        } else if (Number.class.isAssignableFrom(fieldType)) {
+                            this.whereRestriction.add(field, whereAux, NumberUtils.createNumber(value)); 
                         } else {
                             this.whereRestriction.add(field, whereAux, value);
                         }
@@ -1307,14 +1314,22 @@ class CriteriaFilterImpl<T>
 
     @Override
     public <E extends Temporal> CriteriaFilterImpl<T> addWhereBetween(Attribute<T, E> attribute,
-        Temporal startValue, Temporal endValue) {
+        E startValue, E endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(String field, Temporal startValue,
-        Temporal endValue) {
-        this.whereRestriction.add(field, Where.BETWEEN, new Temporal[] {startValue, endValue});
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereBetween(String field, E startValue, E endValue) {
+        if (LocalDate.class.isAssignableFrom(startValue.getClass())){
+            this.whereRestriction.add(field, Where.BETWEEN, new LocalDate[] {(LocalDate) startValue, (LocalDate) endValue});
+        } else if (LocalDateTime.class.isAssignableFrom(startValue.getClass())) {
+            this.whereRestriction.add(field, Where.BETWEEN, new LocalDateTime[] {(LocalDateTime) startValue, (LocalDateTime) endValue});
+        } else if (LocalTime.class.isAssignableFrom(startValue.getClass())) {
+            this.whereRestriction.add(field, Where.BETWEEN, new LocalDateTime[] {(LocalDateTime) startValue, (LocalDateTime) endValue});
+        } else {
+            this.whereRestriction.add(field, Where.BETWEEN, new Temporal[] {startValue, endValue});
+        }
+
         return this;
     }
 
@@ -1591,7 +1606,7 @@ class CriteriaFilterImpl<T>
     }
 
     @Override
-    public <E> CriteriaFilterImpl<T> addWhereGreaterThan(String field, Date value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThan(String field, Date value) {
         this.whereRestriction.add(field, Where.GREATER_THAN, value);
         return this;
     }
@@ -1602,7 +1617,7 @@ class CriteriaFilterImpl<T>
     }
 
     @Override
-    public <E> CriteriaFilterImpl<T> addWhereGreaterThan(String field, Number value) {
+    public CriteriaFilterImpl<T> addWhereGreaterThan(String field, Number value) {
         this.whereRestriction.add(field, Where.GREATER_THAN, value);
         return this;
     }
@@ -2058,8 +2073,7 @@ class CriteriaFilterImpl<T>
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, Temporal startValue,
-        Temporal endValue) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereBetween(ComplexAttribute attribute, E startValue, E endValue) {
         return addWhereBetween(attribute.getName(), startValue, endValue);
     }
 
@@ -2262,76 +2276,69 @@ class CriteriaFilterImpl<T>
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThan(ComplexAttribute attribute, Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereGreaterThan(ComplexAttribute attribute, E value) {
         this.addWhereGreaterThan(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThan(ComplexAttribute attribute, Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereLessThan(ComplexAttribute attribute, E value) {
         this.addWhereLessThan(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
-        Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, E value) {
         this.addWhereLessThanOrEqualTo(attribute.getName(), value);
         return this;
     }
 
     @Override
-    public <E> CriteriaFilterImpl<T> addWhereGreaterThan(String field, Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereGreaterThan(String field, E value) {
         this.whereRestriction.add(field, Where.GREATER_THAN, value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(String field, Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(String field, E value) {
         this.whereRestriction.add(field, Where.GREATER_THAN_OR_EQUAL_TO, value);
         return this;
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThan(String field, Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereLessThan(String field, E value) {
         this.whereRestriction.add(field, Where.LESS_THAN, value);
         return this;
     }
 
-
     @Override
-    public CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(String field, Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(String field, E value) {
         this.whereRestriction.add(field, Where.LESS_THAN_OR_EQUAL_TO, value);
         return this;
     }
 
     @Override
-    public <E extends Temporal> CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, E> attribute,
-        Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereGreaterThan(Attribute<T, E> attribute, E value) {
         return this.addWhereGreaterThan(attribute.getName(), value);
     }
 
     @Override
-    public <E extends Temporal> CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, E> attribute,
-        Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(Attribute<T, E> attribute, E value) {
         return this.addWhereGreaterThanOrEqualTo(attribute.getName(), value);
     }
 
     @Override
-    public <E extends Temporal> CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, E> attribute,
-        Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereLessThan(Attribute<T, E> attribute, E value) {
         return this.addWhereLessThan(attribute.getName(), value);
     }
 
     @Override
-    public <E extends Temporal> CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, E> attribute,
-        Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereLessThanOrEqualTo(Attribute<T, E> attribute, E value) {
         return this.addWhereLessThanOrEqualTo(attribute.getName(), value);
     }
 
     @Override
-    public CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
-        Temporal value) {
+    public <E extends Temporal> CriteriaFilterImpl<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, E value) {
         return this.addWhereLessThanOrEqualTo(attribute.getName(), value);
     }
 

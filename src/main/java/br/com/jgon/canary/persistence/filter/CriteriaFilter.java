@@ -382,7 +382,7 @@ public interface CriteriaFilter<T> extends CriteriaWhere<T> {
     public CriteriaFilter<T> addWhereBetween(String field, Date startValue, Date endValue);
 
     @Override
-    public CriteriaFilter<T> addWhereBetween(String field, Temporal startValue, Temporal endValue);
+    public <E extends Temporal> CriteriaFilter<T> addWhereBetween(String field, E startValue, E endValue);
 
     @Override
     public CriteriaFilter<T> addWhereGreaterThan(String field);

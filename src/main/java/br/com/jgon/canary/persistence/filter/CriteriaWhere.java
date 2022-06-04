@@ -374,7 +374,7 @@ public interface CriteriaWhere<T> {
      * @param endValue   endValue
      * @return {@link CriteriaWhere}
      */
-    public CriteriaWhere<T> addWhereBetween(String field, Temporal startValue, Temporal endValue);
+    public <E extends Temporal> CriteriaWhere<T> addWhereBetween(String field, E startValue, E endValue);
 
     /**
      * 
@@ -399,7 +399,7 @@ public interface CriteriaWhere<T> {
      * @param value value
      * @return {@link CriteriaWhere}
      */
-    public <E> CriteriaWhere<T> addWhereGreaterThan(String field, Temporal value);
+    public <E extends Temporal> CriteriaWhere<T> addWhereGreaterThan(String field, E value);
 
     /**
      *
@@ -431,7 +431,7 @@ public interface CriteriaWhere<T> {
      * @param value value
      * @return {@link CriteriaWhere}
      */
-    public CriteriaWhere<T> addWhereGreaterThanOrEqualTo(String field, Temporal value);
+    public <E extends Temporal> CriteriaWhere<T> addWhereGreaterThanOrEqualTo(String field, E value);
 
     /**
      *
@@ -483,7 +483,7 @@ public interface CriteriaWhere<T> {
      * @param value value
      * @return {@link CriteriaWhere}
      */
-    public CriteriaWhere<T> addWhereLessThan(String field, Temporal value);
+    public <E extends Temporal> CriteriaWhere<T> addWhereLessThan(String field, E value);
 
     /**
      * 
@@ -514,7 +514,7 @@ public interface CriteriaWhere<T> {
      * @param value value
      * @return {@link CriteriaWhere}
      */
-    public CriteriaWhere<T> addWhereLessThanOrEqualTo(String field, Temporal value);
+    public <E extends Temporal> CriteriaWhere<T> addWhereLessThanOrEqualTo(String field, E value);
 
     /**
      * 

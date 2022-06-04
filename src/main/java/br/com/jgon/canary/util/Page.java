@@ -45,7 +45,7 @@ public class Page<T> {
 		this.elementsPerPage = elementsPerPage;
 	}
 	
-	public Page(Collection<T> elements, Page<T> page) {
+	public <E> Page(Collection<T> elements, Page<E> page) {
 		super();
 		this.elements = elements;
 		this.totalElements = page.getTotalElements();

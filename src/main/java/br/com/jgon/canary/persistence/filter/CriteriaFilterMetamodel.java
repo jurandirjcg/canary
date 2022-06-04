@@ -598,19 +598,19 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>, CriteriaW
     public CriteriaFilterMetamodel<T> addWhereBetween(String field, Date startValue, Date endValue);
 
     @Override
-    public CriteriaFilterMetamodel<T> addWhereBetween(String field, Temporal startValue, Temporal endValue);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereBetween(String field, E startValue, E endValue);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereGreaterThan(String field);
 
     @Override
-    public <E> CriteriaFilterMetamodel<T> addWhereGreaterThan(String field, Date value);
+    public CriteriaFilterMetamodel<T> addWhereGreaterThan(String field, Date value);
 
     @Override
-    public <E> CriteriaFilterMetamodel<T> addWhereGreaterThan(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereGreaterThan(String field, E value);
 
     @Override
-    public <E> CriteriaFilterMetamodel<T> addWhereGreaterThan(String field, Number value);
+    public CriteriaFilterMetamodel<T> addWhereGreaterThan(String field, Number value);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(String field);
@@ -619,7 +619,7 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>, CriteriaW
     public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(String field, Date value);
 
     @Override
-    public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(String field, E value);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(String field, Number value);
@@ -640,7 +640,7 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>, CriteriaW
     public CriteriaFilterMetamodel<T> addWhereLessThan(String field, Date value);
 
     @Override
-    public CriteriaFilterMetamodel<T> addWhereLessThan(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereLessThan(String field, E value);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereLessThan(String field, Number value);
@@ -652,7 +652,7 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>, CriteriaW
     public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(String field, Date value);
 
     @Override
-    public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(String field, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(String field, E value);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(String field, Number value);
@@ -887,7 +887,7 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>, CriteriaW
     public CriteriaFilterMetamodel<T> addWhereBetween(ComplexAttribute attribute, Date startValue, Date endValue);
 
     @Override
-    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereBetween(Attribute<T, E> attribute, Temporal startValue, Temporal endValue);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereBetween(Attribute<T, E> attribute, E startValue, E endValue);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereGreaterThan(Attribute<T, ?> attribute);
@@ -896,10 +896,10 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>, CriteriaW
     public CriteriaFilterMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute);
 
     @Override
-    public CriteriaFilterMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute, E value);
 
     @Override
-    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereGreaterThan(Attribute<T, E> attribute, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereGreaterThan(Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, ?> attribute);
@@ -908,10 +908,10 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>, CriteriaW
     public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute);
 
     @Override
-    public CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, E value);
 
     @Override
-    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, E> attribute, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereIsNotNull(Attribute<T, ?> attribute);
@@ -938,22 +938,22 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>, CriteriaW
     public CriteriaFilterMetamodel<T> addWhereLessThan(ComplexAttribute attribute);
 
     @Override
-    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereLessThan(Attribute<T, E> attribute, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereLessThan(Attribute<T, E> attribute, E value);
 
     @Override
-    public CriteriaFilterMetamodel<T> addWhereLessThan(ComplexAttribute attribute, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereLessThan(ComplexAttribute attribute, E value);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(Attribute<T, ?> attribute);
 
     @Override
-    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(Attribute<T, E> attribute, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(Attribute<T, E> attribute, E value);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute);
 
     @Override
-    public CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, Temporal value);
+    public <E extends Temporal> CriteriaFilterMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, E value);
 
     @Override
     public CriteriaFilterMetamodel<T> addWhereNotEqual(Attribute<T, ?> attribute);
