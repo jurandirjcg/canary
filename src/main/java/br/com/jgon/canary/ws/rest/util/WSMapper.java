@@ -67,10 +67,10 @@ public class WSMapper {
 
     /**
      * 
-     * @param responseClass
-     * @param expression
-     * @param campos
-     * @return
+     * @param responseClass {@link Class}
+     * @param expression {@link String}
+     * @param campos {@link String}
+     * @return {@link List}
      */
     protected List<String> getCamposAjustados(Class<?> responseClass, String expression, String campos) {
         boolean sortAux = expression.equals(expSort);
@@ -361,9 +361,9 @@ public class WSMapper {
 
     /**
      * 
-     * @param ini
-     * @param exp
-     * @return
+     * @param ini {@link String}
+     * @param exp {@link String}
+     * @return {@link String}
      */
     public String ajustaCampos(String ini, String exp) {
         Pattern pattern = Pattern.compile(exp);
@@ -381,8 +381,8 @@ public class WSMapper {
 
     /**
      * 
-     * @param matcher
-     * @return
+     * @param matcher {@link Matcher}
+     * @return {@link String}
      */
     private String configuraRelacoes(Matcher matcher) {
         StringBuffer sb = new StringBuffer();

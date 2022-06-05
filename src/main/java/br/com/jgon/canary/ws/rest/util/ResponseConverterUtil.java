@@ -23,7 +23,6 @@ import br.com.jgon.canary.util.ReflectionUtil;
 
 /**
  * 
- * @author Jurandir C. Gonçalves
  * @since 17/11/2019
  *
  */
@@ -35,14 +34,13 @@ public abstract class ResponseConverterUtil {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves
      * @since 17/11/2019
      *
-     * @param <T>
-     * @param <O>
-     * @param returnType
-     * @param obj
-     * @return
+     * @param <T> generic type
+     * @param <O> generic type
+     * @param returnType {@link Class}
+     * @param obj object
+     * @return T
      */
     public static <T extends ResponseConverter<O>, O> T converter(Class<T> returnType, O obj) {
         try {
@@ -55,14 +53,13 @@ public abstract class ResponseConverterUtil {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves
      * @since 17/11/2019
      *
-     * @param <T>
-     * @param <O>
-     * @param returnType
-     * @param obj
-     * @return
+     * @param <T> generic type
+     * @param <O> generic type
+     * @param returnType {@link Class}
+     * @param obj {@link Collection}
+     * @return {@link List}
      */
     public static <T extends ResponseConverter<O>, O> List<T> converter(Class<T> returnType, Collection<O> obj) {
         try {
@@ -75,14 +72,13 @@ public abstract class ResponseConverterUtil {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves
      * @since 17/11/2019
      *
-     * @param <T>
-     * @param <O>
-     * @param returnType
-     * @param obj
-     * @return
+     * @param <T> generic type
+     * @param <O> generic type
+     * @param returnType {@link Class}
+     * @param obj {@link Page}
+     * @return {@link Page}
      */
     public static <T extends ResponseConverter<O>, O> Page<T> converter(Class<T> returnType, Page<O> obj) {
         try {

@@ -695,9 +695,12 @@ public final class ReflectionUtil {
     /**
      * Soma ou junta os valores dos campos do objeto
      * 
+     * @param <T> generic type
      * @param obj      - objeto primário
      * @param obj2     - objeto secundário
      * @param fieldOff - campos que nao serao concatenados
+     * @return generic type
+     * @throws Exception {@link Exception}
      */
 
     public static <T> T concatObject(T obj, T obj2, String... fieldOff) throws Exception {
@@ -799,8 +802,8 @@ public final class ReflectionUtil {
      * @param obj       - objeto
      * @param fieldName - nome atrivuto
      * @param value     - valor
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
+     * @throws IllegalAccessException IllegalAccessException
+     * @throws IllegalArgumentException IllegalArgumentException
      */
     public static void setFieldValue(Object obj, String fieldName, Object value) throws IllegalArgumentException, IllegalAccessException {
         List<Field> lFld = listAttributes(obj.getClass(), fieldName);
@@ -855,8 +858,8 @@ public final class ReflectionUtil {
 
     /**
      * 
-     * @param klass
-     * @return
+     * @param klass {@link Class}
+     * @return {@link Boolean}
      */
     public static boolean isDateCalendarOrTemporal(Class<?> klass) {
         return Date.class.isAssignableFrom(klass)
@@ -890,9 +893,10 @@ public final class ReflectionUtil {
 
     /**
      * 
+     * @param <T> generic type
      * @param obj   - objeto
      * @param field - atributo
-     * @return T
+     * @return T return
      */
     @SuppressWarnings("unchecked")
     public static <T> T getAttributteValue(Object obj, Field field) {
@@ -909,9 +913,10 @@ public final class ReflectionUtil {
      * campo.campo1.campo2 - retorna o valor do campo2 da hierarquia de objetos
      * Retorna null se null ou não encontrado
      * 
+     * @param <T> generic type
      * @param obj   - ojeto
      * @param field - atributo
-     * @return T
+     * @return T return
      */
     @SuppressWarnings("unchecked")
     public static <T> T getAttributteValue(Object obj, String field) {
@@ -1004,13 +1009,13 @@ public final class ReflectionUtil {
      * @author Jurandir C. Gonçalves
      * @since 26/10/2019
      *
-     * @param <T>
-     * @param searchList
-     * @param annotation
-     * @return
+     * @param <T> generic type
+     * @param searchList {@link Annotation}
+     * @param annotation {@link Class}
+     * @return T return
      */
     @SuppressWarnings("unchecked")
-    public static <T> T findAnnotation(Annotation[] searchList, Class<T> annotation) {
+    public static <T extends Annotation> T findAnnotation(Annotation[] searchList, Class<T> annotation) {
         if (searchList == null)
             return null;
         for (Annotation ann : searchList) {
@@ -1026,9 +1031,9 @@ public final class ReflectionUtil {
      * @author Jurandir C. Gonçalves
      * @since 17/11/2019
      *
-     * @param type
-     * @param position
-     * @return
+     * @param type {@link Type}
+     * @param position {@link Integer}
+     * @return {@link Class}
      */
     public static Class<?> returnParameterType(Type type, int position) {
         if (type instanceof ParameterizedType) {
@@ -1043,12 +1048,11 @@ public final class ReflectionUtil {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves
      * @since 24/11/2019
      *
-     * @param <E>
-     * @param collectionClass
-     * @return
+     * @param <E> generic type
+     * @param collectionClass {@link Class}
+     * @return E return
      */
     public static <E extends Collection<?>> Class<?> colletionContentType(Class<E> collectionClass) {
         return returnParameterType(collectionClass.getGenericSuperclass(), 0);
@@ -1057,17 +1061,16 @@ public final class ReflectionUtil {
     /**
      * Obtem instancia
      * 
-     * @author Jurandir C. Gonçalves
      * @since 17/11/2019
      *
-     * @param <E>
-     * @param klass
+     * @param <E> generic type
+     * @param klass {@link Class}
      * @param allDeclared - inclui construtores private e protected
-     * @return
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException
+     * @return E
+     * @throws InstantiationException InstantiationException
+     * @throws IllegalAccessException IllegalAccessException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws InvocationTargetException InvocationTargetException
      */
     @SuppressWarnings("unchecked")
     public static <E> E getInstance(Class<E> klass, boolean allDeclared)
@@ -1088,16 +1091,15 @@ public final class ReflectionUtil {
     /**
      * Obtem instancia mesmo que a classe esteja marcada como protected
      * 
-     * @author Jurandir C. Gonçalves
      * @since 03/01/2020
      *
-     * @param <E>
-     * @param klass
-     * @return
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException
+     * @param <E> generc type
+     * @param klass {@link Class}
+     * @return E
+     * @throws InstantiationException InstantiationException
+     * @throws IllegalAccessException IllegalAccessException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws InvocationTargetException InvocationTargetException
      */
     public static <E> E getInstance(Class<E> klass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         return getInstance(klass, true);

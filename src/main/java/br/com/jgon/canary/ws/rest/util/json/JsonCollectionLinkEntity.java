@@ -117,8 +117,8 @@ public class JsonCollectionLinkEntity {
 	}
 	/**
 	 * 
-	 * @param link
-	 * @return
+	 * @param link {@link Link}
+	 * @return {@link Boolean}
 	 */
 	public boolean addLink(Link link){
 		String templated = null;
@@ -130,7 +130,7 @@ public class JsonCollectionLinkEntity {
 	}
 	/**
 	 * 
-	 * @param links
+	 * @param links {@link List}
 	 */
 	public void addAllLink(List<Link> links){
 		for(Link lnk: links){

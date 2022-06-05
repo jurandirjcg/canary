@@ -35,958 +35,993 @@ public interface CriteriaWhereMetamodel<T> {
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link Attribute}
+     * @param value {@link Predicate}
+     * @return {@link CriteriaWhereMetamodel}
      */
-    public CriteriaWhere<T> addWhere(Attribute<T, ?> attribute, Predicate value);
+    public CriteriaWhereMetamodel<T> addWhere(Attribute<T, ?> attribute, Predicate value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link Predicate}
+     * @return {@link CriteriaWhereMetamodel}
      */
-    public CriteriaWhere<T> addWhere(ComplexAttribute attribute, Predicate value);
+    public CriteriaWhereMetamodel<T> addWhere(ComplexAttribute attribute, Predicate value);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereEqual(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute ComplexAttribute
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereEqual(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param values values
+     * @return {@link CriteriaWhereMetamodel}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhereMetamodel<T> addWhereEqual(Attribute<T, E> attribute, E... values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute ComplexAttribute
+     * @param values values
+     * @return {@link CriteriaWhereMetamodel}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhereMetamodel<T> addWhereEqual(ComplexAttribute attribute, E... values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param values {@link List}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereEqual(Attribute<T, E> attribute, List<E> values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute ComplexAttribute
+     * @param values {@link List}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereEqual(ComplexAttribute attribute, List<E> values);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereEqual(Attribute<T, E> attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute ComplexAttribute
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereEqual(ComplexAttribute attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param values values
+     * @return {@link CriteriaWhereMetamodel}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<T, E> attribute, E... values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute ComplexAttribute
+     * @param values values
+     * @return {@link CriteriaWhereMetamodel}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(ComplexAttribute attribute, E... values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param values {@link List}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<T, E> attribute,
             List<E> values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute ComplexAttribute
+     * @param values {@link List}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(ComplexAttribute attribute,
             List<E> values);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotEqual(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(Attribute<T, E> attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link ComplexAttribute}
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereNotEqual(ComplexAttribute attribute, E value);
 
     /**
      * 
-     * @param field
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param field {@link String}
+     * @param values {@link List}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereIn(String field, List<E> values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param values {@link List}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereIn(Attribute<T, E> attribute, List<E> values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link ComplexAttribute}
+     * @param values {@link List}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereIn(ComplexAttribute attribute, List<E> values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param values values
+     * @return {@link CriteriaWhereMetamodel}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhereMetamodel<T> addWhereIn(Attribute<T, E> attribute, E... values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link ComplexAttribute}
+     * @param values values
+     * @return {@link CriteriaWhereMetamodel}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhereMetamodel<T> addWhereIn(ComplexAttribute attribute, E... values);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereIn(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereIn(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param values values
+     * @return {@link CriteriaWhereMetamodel}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhereMetamodel<T> addWhereNotIn(Attribute<T, E> attribute, E... values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link ComplexAttribute}
+     * @param values values
+     * @return {@link CriteriaWhereMetamodel}
      */
     @SuppressWarnings("unchecked")
     public <E> CriteriaWhereMetamodel<T> addWhereNotIn(ComplexAttribute attribute, E... values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param values {@link List}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereNotIn(Attribute<T, E> attribute, List<E> values);
 
     /**
      * 
-     * @param attribute
-     * @param values
-     * @return
+     * @param <E> generic type
+     * @param attribute ComplexAttribute
+     * @param values {@link List}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereNotIn(ComplexAttribute attribute, List<E> values);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotIn(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotIn(ComplexAttribute attribute);
 
     /**
-     * @param attribute
-     * @param value
+     * @param attribute {@link Attribute}
+     * @param value {@link String}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereILike(Attribute<T, String> attribute, String value,
             MatchMode matchMode);
 
     /**
-     * @param attribute
-     * @param value
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link String}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereILike(ComplexAttribute attribute, String value,
             MatchMode matchMode);
 
     /**
      * 
-     * @param attribute
+     * @param attribute {@link Attribute}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereILike(Attribute<T, String> attribute,
             MatchMode matchMode);
 
     /**
      * 
-     * @param attribute
+     * @param attribute {@link ComplexAttribute}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereILike(ComplexAttribute attribute, MatchMode matchMode);
 
     /**
-     * @param attribute
-     * @param value
+     * @param attribute {@link Attribute}
+     * @param value {@link String}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotILike(Attribute<T, String> attribute, String value,
             MatchMode matchMode);
 
     /**
-     * @param attribute
-     * @param value
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link String}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotILike(ComplexAttribute attribute, String value,
             MatchMode matchMode);
 
     /**
-     * @param attribute
+     * @param attribute {@link Attribute}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotILike(Attribute<T, String> attribute,
             MatchMode matchMode);
 
     /**
-     * @param attribute
+     * @param attribute {@link ComplexAttribute}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotILike(ComplexAttribute attribute,
             MatchMode matchMode);
 
     /**
-     * @param attribute
-     * @param value
+     * @param attribute {@link Attribute}
+     * @param value {@link String}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLike(Attribute<T, String> attribute, String value,
             MatchMode matchMode);
 
     /**
-     * @param attribute
-     * @param value
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link String}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLike(ComplexAttribute attribute, String value,
             MatchMode matchMode);
 
     /**
      * 
-     * @param attribute
-     * @param matchMode
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param matchMode {@link br.com.jgon.canary.persistence.filter.CriteriaWhere.MatchMode}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLike(ComplexAttribute attribute, MatchMode matchMode);
 
     /**
      * 
-     * @param attribute
+     * @param attribute {@link Attribute}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLike(Attribute<T, String> attribute,
             MatchMode matchMode);
 
     /**
-     * @param attribute
+     * @param attribute {@link Attribute}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotLike(Attribute<T, String> attribute,
             MatchMode matchMode);
 
     /**
-     * @param attribute
+     * @param attribute {@link ComplexAttribute}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotLike(ComplexAttribute attribute,
             MatchMode matchMode);
 
     /**
-     * @param attribute
-     * @param value
+     * @param attribute {@link Attribute}
+     * @param value {@link String}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotLike(Attribute<T, String> attribute, String value,
             MatchMode matchMode);
 
     /**
-     * @param attribute
-     * @param value
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link String}
      * @param matchMode {@link MatchMode}
-     * @return
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotLike(ComplexAttribute attribute, String value,
             MatchMode matchMode);
 
-
-
     /**
      * 
-     * @param attribute
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param attribute {@link Attribute}
+     * @param startValue {@link Integer}
+     * @param endValue {@link Integer}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, Integer> attribute,
             Integer startValue, Integer endValue);
 
     /**
      * 
-     * @param attribute
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param startValue {@link Integer}
+     * @param endValue {@link Integer}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereBetween(ComplexAttribute attribute, Integer startValue,
             Integer endValue);
 
     /**
      * 
-     * @param attribute
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param attribute {@link Attribute}
+     * @param startValue {@link Short}
+     * @param endValue {@link Short}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, Short> attribute,
             Short startValue, Short endValue);
 
     /**
      * 
-     * @param attribute
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param startValue {@link Short}
+     * @param endValue {@link Short}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereBetween(ComplexAttribute attribute, Short startValue,
             Short endValue);
 
     /**
      * 
-     * @param attribute
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param attribute {@link Attribute}
+     * @param startValue {@link Long}
+     * @param endValue {@link Long}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, Long> attribute, Long startValue,
             Long endValue);
 
     /**
      * 
-     * @param attribute
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param startValue {@link Long}
+     * @param endValue {@link Long}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereBetween(ComplexAttribute attribute, Long startValue,
             Long endValue);
 
     /**
      * 
-     * @param attribute
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param attribute {@link Attribute}
+     * @param startValue {@link Date}
+     * @param endValue {@link Date}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, Date> attribute, Date startValue,
             Date endValue);
 
     /**
      * 
-     * @param attribute
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param startValue {@link Date}
+     * @param endValue {@link Date}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereBetween(ComplexAttribute attribute, Date startValue,
             Date endValue);
 
     /**
      * 
-     * @param attribute
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param startValue start value
+     * @param endValue end value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereBetween(Attribute<T, E> attribute, E startValue, E endValue);
 
     /**
      * 
-     * @param attribute
-     * @param startValue
-     * @param endValue
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link ComplexAttribute}
+     * @param startValue start value
+     * @param endValue end value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereBetween(ComplexAttribute attribute, E startValue, E endValue);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param anotherAttribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereLessThanField(Attribute<T, E> attribute,
             Attribute<T, E> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThanField(ComplexAttribute attribute,
             Attribute<T, ?> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThanField(ComplexAttribute attribute,
             ComplexAttribute anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param anotherAttribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereGreaterThanField(Attribute<T, E> attribute,
             Attribute<T, E> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThanField(ComplexAttribute attribute,
             Attribute<T, ?> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThanField(ComplexAttribute attribute,
             ComplexAttribute anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param anotherAttribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereLessThanOrEqualToField(Attribute<T, E> attribute,
             Attribute<T, E> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute,
             Attribute<T, ?> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualToField(ComplexAttribute attribute,
             ComplexAttribute anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param anotherAttribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualToField(
             Attribute<T, E> attribute, Attribute<T, E> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute,
             Attribute<T, ?> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualToField(ComplexAttribute attribute,
             ComplexAttribute anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param anotherAttribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereEqualField(Attribute<T, E> attribute,
             Attribute<T, E> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereEqualField(ComplexAttribute attribute,
             Attribute<T, ?> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereEqualField(ComplexAttribute attribute,
             ComplexAttribute anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @param anotherAttribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereEqualField(Attribute<T, ?> attribute,
             ComplexAttribute anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param anotherAttribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E> CriteriaWhereMetamodel<T> addWhereNotEqualField(Attribute<T, E> attribute,
             Attribute<T, E> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotEqualField(ComplexAttribute attribute,
             Attribute<T, ?> anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param anotherAttribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotEqualField(ComplexAttribute attribute,
             ComplexAttribute anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @param anotherAttribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @param anotherAttribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereNotEqualField(Attribute<T, ?> attribute,
             ComplexAttribute anotherAttribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThan(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link Attribute}
+     * @param value {@link Date}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThan(Attribute<T, Date> attribute, Date value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereGreaterThan(
             Attribute<T, E> attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link Date}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute, Date value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link ComplexAttribute}
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link Attribute}
+     * @param value {@link Number}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThan(Attribute<T, Number> attribute,
             Number value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link Number}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThan(ComplexAttribute attribute, Number value);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute);
 
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link Attribute}
+     * @param value {@link Date}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, Date> attribute,
             Date value);
 
     /**
      *
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(
             Attribute<T, E> attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link Date}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, Date value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link ComplexAttribute}
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link Attribute}
+     * @param value {@link Number}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(Attribute<T, Number> attribute,
             Number value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link Number}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereGreaterThanOrEqualTo(ComplexAttribute attribute,
             Number value);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereIsNotNull(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereIsNotNull(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereIsNull(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereIsNull(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThan(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThan(ComplexAttribute attribute);
 
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link Attribute}
+     * @param value {@link Date}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThan(Attribute<T, Date> attribute, Date value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereLessThan(
             Attribute<T, E> attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute ComplexAttribute
+     * @param value {@link Date}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThan(ComplexAttribute attribute, Date value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute ComplexAttribute
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereLessThan(ComplexAttribute attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link Attribute}
+     * @param value {@link Number}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThan(Attribute<T, Number> attribute, Number value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link Number}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThan(ComplexAttribute attribute, Number value);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link Attribute}
+     * @param value {@link Date}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(Attribute<T, Date> attribute,
             Date value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(
             Attribute<T, E> attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link Date}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
             Date value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute ComplexAttribute
+     * @param value value
+     * @return {@link CriteriaWhereMetamodel}
      */
     public <E extends Temporal> CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link Attribute}
+     * @param value {@link Number}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(Attribute<T, Number> attribute,
             Number value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param value {@link Number}
+     * @return {@link CriteriaWhereMetamodel}
      */
     public CriteriaWhereMetamodel<T> addWhereLessThanOrEqualTo(ComplexAttribute attribute,
             Number value);
@@ -1018,13 +1053,13 @@ public interface CriteriaWhereMetamodel<T> {
      * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam valores com formato
      * data/hora. Ex: &lt;=2000-10-20
      * 
-     * @param attribute
+     * @param attribute {@link Attribute}
      * @param value             regex com valor. Ex: &gt;10
      * @param regexToAnalyse    condicoes (Where) para analisar para analisar, se null verifica
      *                          todas.
      * @param defaultIfNotMatch padrao caso nao encontre referencia
-     * @return
-     * @throws ApplicationRuntimeException
+     * @return {@link CriteriaWhereMetamodel}
+     * @throws ApplicationRuntimeException {@link ApplicationRuntimeException}
      */
     public CriteriaWhereMetamodel<T> addWhereRegex(Attribute<T, ?> attribute, String value,
             RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
@@ -1057,18 +1092,16 @@ public interface CriteriaWhereMetamodel<T> {
      * Obs: com exececao das regex de like e ilike as demais instrucoes aceitam valores com formato
      * data/hora. Ex: &lt;=2000-10-20
      * 
-     * @param attribute
+     * @param attribute {@link ComplexAttribute}
      * @param value             regex com valor. Ex: &gt;10
      * @param regexToAnalyse    condicoes (Where) para analisar para analisar, se null verifica
      *                          todas.
      * @param defaultIfNotMatch padrao caso nao encontre referencia
-     * @return
-     * @throws ApplicationRuntimeException
+     * @return {@link CriteriaWhereMetamodel}
+     * @throws ApplicationRuntimeException {@link ApplicationRuntimeException}
      */
     public CriteriaWhereMetamodel<T> addWhereRegex(ComplexAttribute attribute, String value,
             RegexWhere[] regexToAnalyse, RegexWhere defaultIfNotMatch)
             throws ApplicationRuntimeException;
-
-
 
 }

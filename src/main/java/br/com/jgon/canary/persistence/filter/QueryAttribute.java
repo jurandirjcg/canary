@@ -33,18 +33,19 @@ public @interface QueryAttribute {
 	
 	/**
 	 * Nome do atributo na base
-	 * @return
+	 * @return {@link String}
 	 */
 	String value() default "";
 	
 	/**
 	 * Indica se o attributo e do tipo enum
-	 * @return
+	 * @return {@link Boolean}
 	 */
 	boolean isEnum() default false;
 	
 	/**
 	 * Utilizado em campos do tipo Collection, pois não é possível realizar reflection (Java generics)
+     * @return {@link Class}
 	 */
 	Class<?> collectionTarget() default void.class;
 }

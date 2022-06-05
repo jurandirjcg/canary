@@ -1250,6 +1250,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
 
     /**
      * 
+     * @param <E>         - generic type
      * @param obj         - objeto de pesquisa
      * @param resultClass - classe que indica o tipo de objeto de retorno
      * @param fields      - campos retornados

@@ -66,8 +66,8 @@ public class JsonHALLinkEntity {
 	
 	/**
 	 * 
-	 * @param link
-	 * @return
+	 * @param link {@link Link}
+	 * @return {@link Boolean}
 	 */
 	public boolean addLink(Link link){
 		Boolean templated = link.getParams().containsKey("templated");
@@ -76,7 +76,7 @@ public class JsonHALLinkEntity {
 	}
 	/**
 	 * 
-	 * @param links
+	 * @param links {@link List}
 	 */
 	public void addAllLink(List<Link> links){
 		for(Link lnk: links){

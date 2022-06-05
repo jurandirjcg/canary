@@ -354,6 +354,7 @@ public class GenericTree<T extends GenericConteudoTree> implements Serializable{
 	 * Retorna true se node foi adicionado ou ja existe e false se nao foi adicionado
 	 * @param nodeParent - nome do node pai
 	 * @param node - nome do node atual
+     * @param conteudo content
 	 * @return {@link Boolean}
 	 */
 	public boolean addNode(String nodeParent, String node, T conteudo){

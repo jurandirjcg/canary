@@ -1099,8 +1099,8 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 
     /**
      * 
-     * @param value
-     * @return
+     * @param value {@link String}
+     * @return {@link String}
      */
     public static String toSnakeCase(String value) {
         return value.replaceAll("([A-Z]+)", "\\_$1").toLowerCase();
@@ -1108,8 +1108,8 @@ public class LinkResponseFilter implements ContainerResponseFilter {
 
     /**
      * 
-     * @param value
-     * @return
+     * @param value {@link String}
+     * @return {@link String}
      */
     public static String toCamelCase(String value) {
         StringBuilder sb = new StringBuilder();

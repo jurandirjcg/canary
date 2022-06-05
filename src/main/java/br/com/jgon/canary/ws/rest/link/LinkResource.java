@@ -41,41 +41,41 @@ public @interface LinkResource {
 	/**
 	 * Indica qual sera o path inicial do link, default LinkResouceBasePath.COMPLETE
 	 * Ex: /page/recurso ou http://dominio.com/page/recurso
-	 * @return
+	 * @return {@link LinkResouceBasePath}
 	 */
 	LinkResouceBasePath basePath() default LinkResouceBasePath.COMPLETE;
 		
 	/**
 	 * Indica se inclui os query params vindos na requisicao, default false
-	 * @return
+	 * @return {@link Boolean}
 	 */
 	boolean includeRequestQueryParams() default false;	
 	/**
 	 * define parametros PATH - faz replace na ordem que esta definida na anotation Path.
 	 * Ex. path = /system/{id} e pathParameters = /user/${atributo_variavel} apos replace = /system/user/ATRIBUTO_VARIAVEL
 	 * Para obter o mesmo valor passado no parâmetro da chamada usar o identificador sem os caracteres '$' '#'. Ex: {valor_variavel_path}
-	 * @return
+	 * @return {@link String}
 	 */
 	String[] pathParameters() default {};
 	/**
 	 * define parametros QUERY - adiciona valores na query param
-	 * @return
+	 * @return {@link String}
 	 */
 	String[] queryParameters() default {};
 		
 	/**
 	 * 
-	 * @return
+	 * @return {@link LinkTarget}
 	 */
 	LinkTarget target() default LinkTarget.ENTITY;
 	/**
 	 *  Classe onde esta o metodo que tera os links clonados
-	 * @return
+	 * @return {@link Class}
 	 */
 	Class<?> serviceClass() default void.class;
 	/**
 	 * Metodo que tera os links clonados
-	 * @return
+	 * @return {@link String}
 	 */
 	String serviceMethodName() default ""; 
 		

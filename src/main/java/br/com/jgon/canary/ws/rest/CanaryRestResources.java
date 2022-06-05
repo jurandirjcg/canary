@@ -51,7 +51,7 @@ public abstract class CanaryRestResources {
 	/**
 	 * Adiciona classes de tratamento de exeção de chamadas REST
 	 * @param checkException: adicionar tratamento de excecoes ({@link ApplicationException} {@link ApplicationRuntimeException} {@link ValidationException} {@link WebApplicationException} {@link Exception}
-	 * @return
+	 * @return {@link Set}
 	 */
 	public static Set<Class<?>> getClasses(boolean checkException){
 		if(checkException){
@@ -63,7 +63,7 @@ public abstract class CanaryRestResources {
 	
 	/**
 	 * Adiciona classes de tratamento de chamadas REST, adiciona inclusive o tratamento de exceções
-	 * @return
+	 * @return {@link Set}
 	 */
 	public static Set<Class<?>> getClasses(){
 		return getClasses(true);

@@ -33,17 +33,19 @@ public interface CriteriaFilterUpdate<T> extends CriteriaWhere<T>, CriteriaWhere
 
     /**
      * 
-     * @param field
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param field {@link String}
+     * @param value value
+     * @return {@link CriteriaFilterUpdate}
      */
     public <E> CriteriaFilterUpdate<T> addUpdate(String field, E value);
 
     /**
      * 
-     * @param attribute
-     * @param value
-     * @return
+     * @param <E> generic type
+     * @param attribute {@link Attribute}
+     * @param value value
+     * @return {@link CriteriaFilterUpdate}
      */
     public <E> CriteriaFilterUpdate<T> addUpdate(Attribute<T, ?> attribute, E value);
 

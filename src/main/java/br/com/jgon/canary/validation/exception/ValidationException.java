@@ -24,8 +24,6 @@ import br.com.jgon.canary.validation.ValidateMessage;
 
 /**
  * 
- * @author Jurandir C. Goncalves
- * 
  * @version 1.0
  *
  */
@@ -47,7 +45,7 @@ public class ValidationException extends RuntimeException {
 
     /**
      * 
-     * @param validateMessage
+     * @param validateMessage {@link ValidateMessage}
      */
     public void add(ValidateMessage validateMessage) {
         listMessage.add(validateMessage);
@@ -56,7 +54,7 @@ public class ValidationException extends RuntimeException {
     /**
      * 
      * @since 18/06/2019
-     * @param constraintViolation
+     * @param constraintViolation {@link ConstraintViolation}
      */
     public void add(ConstraintViolation<?> constraintViolation) {
         listConstraintViolation.add(constraintViolation);
@@ -65,7 +63,7 @@ public class ValidationException extends RuntimeException {
     /**
      * 
      * @since 18/06/2019
-     * @param listConstraintViolation
+     * @param listConstraintViolation {@link Collection}
      */
     public void add(Collection<ConstraintViolation<?>> listConstraintViolation) {
         if (listConstraintViolation != null) {
@@ -75,7 +73,7 @@ public class ValidationException extends RuntimeException {
 
     /**
      * 
-     * @return
+     * @return {@link List}
      */
     public List<ValidateMessage> getListMessage() {
         return listMessage;

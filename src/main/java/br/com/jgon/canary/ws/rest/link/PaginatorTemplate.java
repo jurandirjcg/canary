@@ -41,54 +41,55 @@ public @interface PaginatorTemplate {
 	/**
 	 * Indica qual sera o path inicial do link, default LinkResouceBasePath.COMPLETE
 	 * Ex: /page/recurso ou http://dominio.com/page/recurso
-	 * @return
+	 * @return {@link LinkResouceBasePath}
 	 */
 	LinkResouceBasePath basePath() default LinkResouceBasePath.COMPLETE;
 		
 	/**
 	 * Indica se inclui os query params vindos na requisicao, default true
-	 * @return
+	 * @return {@link Boolean}
 	 */
 	boolean includeRequestQueryParams() default true;		
 	
 	/**
 	 * Inclui a exepressão de template para o parâmetro limit
+     * @return {@link Boolean}
 	 */
 	boolean includeLimitParamTemplate() default false;
 	
 	/**
 	 * define parametros PATH
-	 * @return
+	 * @return {@link String}
 	 */
 	String[] pathParameters() default {};
 	/**
 	 * define parametros QUERY
-	 * @return
+	 * @return {@link String}
 	 */
 	String[] queryParameters() default {};
 		
 	/**
 	 * Utilizado somente para controle interno
-	 * @return
+	 * @return {@link Class}
 	 */
 	Class<?> serviceClass() default void.class;
 	/**
 	 * Utilizado somente para controle interno
-	 * @return
+	 * @return {@link String}
 	 */
 	String serviceMethodName() default ""; 
 	
 	/**
 	 * Nome do parametro que indica a pagina, no template
 	 * default: {PAGINATION_PAGE_PARAM}
-	 * @return
+	 * @return {@link String}
 	 */
 	String pageParamName() default "{PAGE_PARAM}";
 	
 	/**
 	 * Nome do parametro que indica o numero de registros paginados, no template
 	 * default: {PAGINATION_LIMIT_PARAM}
-	 * @return
+	 * @return {@link String}
 	 */
 	String limitParamName() default "{LIMIT_PARAM}";
 		

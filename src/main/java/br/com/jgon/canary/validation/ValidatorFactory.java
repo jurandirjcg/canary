@@ -56,7 +56,7 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @return
+     * @return {@link ValidatorFactory}
      */
     public static ValidatorFactory getInstance() {
         return new ValidatorFactory();
@@ -64,7 +64,7 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param validateMessage
+     * @param validateMessage {@link ValidateMessage}
      */
     public void add(ValidateMessage validateMessage) {
         validatorException.add(validateMessage);
@@ -72,9 +72,9 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param key
-     * @param parametros
-     * @return
+     * @param key {@link String}
+     * @param parametros {@link Object}
+     * @return {@link String}
      */
     public static String i18n(String key, Object... parametros) {
         if (parametros == null || parametros.length == 0) {
@@ -91,9 +91,9 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param object
-     * @param campoMsg
-     * @return
+     * @param object {@link Object}
+     * @param campoMsg {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory required(Object object, String campoMsg) {
         if (isNull(object)) {
@@ -104,10 +104,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param object
-     * @param campoMsg
-     * @param regEx
-     * @return
+     * @param object String
+     * @param campoMsg {@link String}
+     * @param regEx {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory requiredRegExPattern(String object, String campoMsg, String regEx) {
         if (isNotNull(object) && !object.matches(regEx)) {
@@ -118,10 +118,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param object
-     * @param campoMsg
-     * @param value
-     * @return
+     * @param object {@link Object}
+     * @param campoMsg {@link String}
+     * @param value {@link Object}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory requiredValue(Object object, String campoMsg, Object value) {
         if (object != null && value != null && !object.equals(value)) {
@@ -132,10 +132,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param object
-     * @param campoMsg
-     * @param value
-     * @return
+     * @param object {@link Collection}
+     * @param campoMsg {@link String}
+     * @param value {@link Object}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory requiredValue(Collection<?> object, String campoMsg, Object value) {
         if (object != null && value != null && !object.contains(value)) {
@@ -146,11 +146,11 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param value
-     * @param testValue
-     * @param valueName
-     * @param testName
-     * @return
+     * @param value {@link Object}
+     * @param testValue {@link Object}
+     * @param valueName {@link String}
+     * @param testName {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory requiredIfNull(Object value, Object testValue, String valueName, String testName) {
         if (isNull(testValue) && isNull(value)) {
@@ -161,10 +161,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param value
-     * @param valueName
-     * @param testValue
-     * @return
+     * @param value {@link Object}
+     * @param valueName {@link String}
+     * @param testValue {@link Collection}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory requiredIfAnyNull(Object value, String valueName, Collection<SimpleEntry<String, Object>> testValue) {
         List<String> fieldNames = new ArrayList<String>();
@@ -188,10 +188,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param value
-     * @param valueName
-     * @param testValue
-     * @return
+     * @param value {@link Object}
+     * @param valueName {@link String}
+     * @param testValue {@link Collection}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory requiredIfAllNull(Object value, String valueName, Collection<SimpleEntry<String, Object>> testValue) {
         List<String> fieldNames = new ArrayList<String>();
@@ -217,11 +217,11 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param value
-     * @param testValue
-     * @param valueName
-     * @param testName
-     * @return
+     * @param value {@link Object}
+     * @param testValue {@link Object}
+     * @param valueName {@link String}
+     * @param testName {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory requiredIfNotNull(Object value, Object testValue, String valueName, String testName) {
         if (isNotNull(testValue) && isNull(value)) {
@@ -232,10 +232,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param value
-     * @param valueName
-     * @param testValue
-     * @return
+     * @param value {@link Object}
+     * @param valueName {@link String}
+     * @param testValue {@link Collection}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory requiredIfAllNotNull(Object value, String valueName, Collection<SimpleEntry<String, Object>> testValue) {
         List<String> fieldNames = new ArrayList<String>();
@@ -261,10 +261,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param value
-     * @param valueName
-     * @param testValue
-     * @return
+     * @param value {@link Object}
+     * @param valueName {@link String}
+     * @param testValue {@link Collection}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory requiredIfAnyNotNull(Object value, String valueName, Collection<SimpleEntry<String, Object>> testValue) {
         List<String> paramNames = new ArrayList<String>();
@@ -296,10 +296,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param value
-     * @param valueName
-     * @param testValue
-     * @return
+     * @param value {@link Object}
+     * @param valueName {@link String}
+     * @param testValue {@link Collection}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory requiredXOR(Object value, String valueName, Collection<SimpleEntry<String, Object>> testValue) {
         List<String> fieldNames = new ArrayList<String>();
@@ -323,10 +323,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param valor
-     * @param minimo
-     * @param campoMsg
-     * @return
+     * @param valor {@link Number}
+     * @param minimo {@link Number}
+     * @param campoMsg {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory lessThan(Number valor, Number minimo, String campoMsg) {
         if (valor.doubleValue() > minimo.doubleValue()) {
@@ -337,10 +337,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param valor
-     * @param minimo
-     * @param campoMsg
-     * @return
+     * @param valor {@link Date}
+     * @param minimo {@link Date}
+     * @param campoMsg {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory lessThan(Date valor, Date minimo, String campoMsg) {
         if (valor.after(minimo)) {
@@ -351,10 +351,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param valor
-     * @param maximo
-     * @param campoMsg
-     * @return
+     * @param valor {@link Number}
+     * @param maximo Number
+     * @param campoMsg {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory greaterThan(Number valor, Number maximo, String campoMsg) {
         if (valor.doubleValue() < maximo.doubleValue()) {
@@ -365,10 +365,10 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param valor
-     * @param minimo
-     * @param campoMsg
-     * @return
+     * @param valor {@link Date}
+     * @param minimo {@link Date}
+     * @param campoMsg {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory gt(Date valor, Date minimo, String campoMsg) {
         if (valor.before(minimo)) {
@@ -379,11 +379,11 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param valor
-     * @param min
-     * @param max
-     * @param campoMsg
-     * @return
+     * @param valor {@link Number}
+     * @param min {@link Number}
+     * @param max {@link Number}
+     * @param campoMsg {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory lessThanOrGreaterThan(Number valor, Number min, Number max, String campoMsg) {
         if (valor.doubleValue() > min.doubleValue() || valor.doubleValue() < max.doubleValue()) {
@@ -395,9 +395,9 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param valor
-     * @param campoMsg
-     * @return
+     * @param valor {@link String}
+     * @param campoMsg {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory isBlank(String valor, String campoMsg) {
         if (StringUtils.isNotBlank(valor)) {
@@ -408,9 +408,9 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param valor
-     * @param campoMsg
-     * @return
+     * @param valor {@link String}
+     * @param campoMsg {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory isNotBlank(String valor, String campoMsg) {
         if (StringUtils.isBlank(valor)) {
@@ -421,9 +421,9 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param obj
-     * @param campoMsg
-     * @return
+     * @param obj {@link Object}
+     * @param campoMsg {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory isNull(Object obj, String campoMsg) {
         if (isNotNull(obj)) {
@@ -434,9 +434,9 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param obj
-     * @param campoMsg
-     * @return
+     * @param obj {@link Object}
+     * @param campoMsg {@link String}
+     * @return {@link ValidatorFactory}
      */
     public ValidatorFactory isNotNull(Object obj, String campoMsg) {
         if (isNotNull(obj)) {
@@ -454,8 +454,8 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param object
-     * @return
+     * @param object {@link Object}
+     * @return {@link Boolean}
      */
     private boolean isNull(Object object) {
         if (object == null) {
@@ -468,8 +468,8 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param object
-     * @return
+     * @param object {@link Object}
+     * @return {@link Boolean}
      */
     private boolean isNotNull(Object object) {
         return !isNull(object);
@@ -477,8 +477,8 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param collection
-     * @return
+     * @param collection {@link Collection}
+     * @return {@link Boolean}
      */
     private boolean isNull(Collection<?> collection) {
         if (collection == null) {
@@ -494,9 +494,9 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @param parametros
-     * @param ultimoDivisorParametros
-     * @return
+     * @param parametros {@link List}
+     * @param ultimoDivisorParametros {@link String}
+     * @return {@link String}
      */
     public static String montaListaParametrosStringException(List<String> parametros, String ultimoDivisorParametros) {
 
@@ -531,7 +531,7 @@ public class ValidatorFactory {
 
     /**
      * 
-     * @throws ValidationException
+     * @throws ValidationException {@link ValidationException}
      */
     public void check() throws ValidationException {
         if (!validatorException.getListMessage().isEmpty()) {

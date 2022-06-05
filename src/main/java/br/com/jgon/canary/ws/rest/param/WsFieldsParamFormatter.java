@@ -104,9 +104,9 @@ public class WsFieldsParamFormatter implements ParamConverter<WSFieldParam>, Par
 
     /**
      * 
-     * @param serviceMethod
-     * @param params
-     * @return
+     * @param serviceMethod {@link Method}
+     * @param params {@link String}
+     * @return {@link String}
      */
     public String configRequiredParam(Method serviceMethod, String params) {
         List<LinkResource> listResources = new ArrayList<LinkResource>(1);

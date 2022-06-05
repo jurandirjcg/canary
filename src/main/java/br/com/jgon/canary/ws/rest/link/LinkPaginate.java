@@ -35,14 +35,14 @@ public @interface LinkPaginate {
     /**
      * Parametro responsavel por definir a pagina atual
      * 
-     * @return
+     * @return {@link String}
      */
     String pageParamName();
 
     /**
      * Parametro responsavel por definir o limite de registros por pagina
      * 
-     * @return
+     * @return {@link String}
      */
     String limitParamName();
 
@@ -50,6 +50,8 @@ public @interface LinkPaginate {
      * Define o nome do atributo que contem a colecao paginada.
      * Default: ultimo path param da requisicao
      * Ex: /v1/pacientes : "pacientes"
+     * 
+     * @return {@link String}
      */
     String embeddedCollectionName() default "";
 
@@ -57,111 +59,111 @@ public @interface LinkPaginate {
      * Indica qual sera o path inicial do link, default LinkResouceBasePath.COMPLETE
      * Ex: /page/recurso ou http://dominio.com/page/recurso
      * 
-     * @return
+     * @return {@link LinkResouceBasePath}
      */
     LinkResouceBasePath basePath() default LinkResouceBasePath.COMPLETE;
 
     /**
      * 
-     * @return
+     * @return {@link LinkTarget}
      */
     LinkTarget target() default LinkTarget.HEADER;
 
     /**
      * Define o link SELF
      * 
-     * @return
+     * @return {@link LinkResource}
      */
     LinkResource self() default @LinkResource(rel = "self", title = "Self", includeRequestQueryParams = true);
 
     /**
      * Define o link first
      * 
-     * @return
+     * @return {@link LinkResource}
      */
     LinkResource first() default @LinkResource(rel = "first", title = "First", includeRequestQueryParams = true);
 
     /**
      * Define o link previous
      * 
-     * @return
+     * @return {@link LinkResource}
      */
     LinkResource previous() default @LinkResource(rel = "prev", title = "Previous", includeRequestQueryParams = true);
 
     /**
      * Define o link next
      * 
-     * @return
+     * @return {@link LinkResource}
      */
     LinkResource next() default @LinkResource(rel = "next", title = "Next", includeRequestQueryParams = true);
 
     /**
      * Define o link last
      * 
-     * @return
+     * @return {@link LinkResource}
      */
     LinkResource last() default @LinkResource(rel = "last", title = "Last", includeRequestQueryParams = true);
 
     /**
      * Define o link com o template de navegacao
      * 
-     * @return
+     * @return {@link PaginatorTemplate}
      */
     PaginatorTemplate paginationTemplate() default @PaginatorTemplate(rel = "paginationTemplate", title = "Pagination Template");
 
     /**
      * Define os links dos obejtos da lista de paginacao
      * 
-     * @return
+     * @return {@link LinkResources}
      */
     LinkResources collectionLinks() default @LinkResources({});
 
     /**
      * Indica se utilizara o path completo
      * 
-     * @return
+     * @return {@link Boolean}
      */
     boolean absolutePath() default true;
 
     /**
      * Desativa o link self
      * 
-     * @return
+     * @return {@link Boolean}
      */
     boolean disableSelf() default false;
 
     /**
      * Desativa o link first
      * 
-     * @return
+     * @return {@link Boolean}
      */
     boolean disableFirst() default false;
 
     /**
      * Desativa o link previous
      * 
-     * @return
+     * @return {@link Boolean}
      */
     boolean disablePrevious() default false;
 
     /**
      * Desativa o link next
      * 
-     * @return
+     * @return {@link Boolean}
      */
     boolean disableNext() default false;
 
     /**
      * Desativa o link last
      * 
-     * @return
+     * @return {@link Boolean}
      */
     boolean disableLast() default false;
 
     /**
      * Desativa o link de template de paginacao
      * 
-     * @return
+     * @return {@link Boolean}
      */
     boolean disablePaginationTemplate() default false;
 

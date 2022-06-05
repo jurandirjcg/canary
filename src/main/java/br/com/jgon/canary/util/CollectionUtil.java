@@ -154,6 +154,8 @@ public class CollectionUtil {
 	
 	/**
 	 * Converte colecao de Object em colecao de String 
+     * 
+     * @param <T> generic type
 	 * @param collection - colecão
 	 * @return {@link Collection}
 	 */

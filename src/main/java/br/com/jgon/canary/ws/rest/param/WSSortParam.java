@@ -40,13 +40,19 @@ public class WSSortParam {
     /**
      * Compatibilidade com QueryParam
      * 
-     * @param fields
+     * @param fields {@link String}
      */
     public WSSortParam(String fields) {
         throw new WebApplicationException(new ApplicationRuntimeException(MessageSeverity.ERROR, null,
             MessageFactory.getMessage("message", "Construtor somente para compatibilidade com QueryParam REST")));
     }
 
+    /**
+     * 
+     * @param returnType {@link Class}
+     * @param fields {@link String}
+     * @param defaultSortParam {@link String}
+     */
     public WSSortParam(Class<?> returnType, String fields, String defaultSortParam) {
         this.returnType = returnType;
         this.sortParam = fields;
@@ -61,22 +67,42 @@ public class WSSortParam {
         }
     }
 
+    /**
+     * 
+     * @return {@link Class}
+     */
     public Class<?> getReturnType() {
         return returnType;
     }
 
+    /**
+     * 
+     * @param returnType {@link Class}
+     */
     public void setReturnType(Class<?> returnType) {
         this.returnType = returnType;
     }
 
+    /**
+     * 
+     * @return {@link String}
+     */
     public String getSortParam() {
         return sortParam;
     }
 
+    /**
+     * 
+     * @param sortParam {@link String}
+     */
     public void setSortParam(String sortParam) {
         this.sortParam = sortParam;
     }
 
+    /**
+     * 
+     * @return {@link List}
+     */
     public List<String> toList() {
         return listSort;
     }

@@ -33,17 +33,17 @@ import java.lang.annotation.Target;
 public @interface LinkResources {
 	/**
 	 * Multiplos {@link LinkResource}
-	 * @return
+	 * @return LinkResource
 	 */
 	LinkResource[] value() default {};
 	/**
 	 * Classe onde esta o metodo que tera os links clonados
-	 * @return
+	 * @return {@link Class}
 	 */
 	Class<?> serviceClass() default void.class;
 	/**
 	 * Metodo que tera os links clonados
-	 * @return
+	 * @return {@link String}
 	 */
 	String serviceMethodName() default ""; 
 		

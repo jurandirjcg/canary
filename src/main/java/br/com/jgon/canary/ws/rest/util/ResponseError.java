@@ -38,21 +38,32 @@ public class ResponseError {
     private String moreInformation;
     private List<ResponseError> errors;
 
+    /**
+     * 
+     * @param status {@link Status}
+     * @param message {@link String}
+     */
     public ResponseError(Status status, String message) {
         this(status, message, null, null, null);
     }
 
+    /**
+     * 
+     * @param status {@link Status}
+     * @param message {@link String}
+     * @param type {@link MessageSeverity}
+     */
     public ResponseError(Status status, String message, MessageSeverity type) {
         this(status, message, null, null, type);
     }
 
     /**
      * 
-     * @param status
-     * @param message
-     * @param errorCode
-     * @param moreInformation
-     * @param type
+     * @param status {@link Status}
+     * @param message {@link String}
+     * @param errorCode {@link Integer}
+     * @param moreInformation {@link String}
+     * @param type {@link MessageSeverity}
      */
     public ResponseError(Status status, String message, Integer errorCode, String moreInformation, MessageSeverity type) {
         super();
@@ -65,8 +76,8 @@ public class ResponseError {
 
     /**
      * 
-     * @param status
-     * @param type
+     * @param status {@link Status}
+     * @param type {@link MessageSeverity}
      */
     public ResponseError(Status status, MessageSeverity type) {
         super();

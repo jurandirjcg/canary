@@ -40,9 +40,9 @@ import br.com.jgon.canary.util.ReflectionUtil;
 public class StringEntityListener {
     /**
      * 
-     * @param obj
-     * @throws IllegalArgumentException
-     * @throws IllegalAccessException
+     * @param obj {@link Object}
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws IllegalAccessException IllegalAccessException
      */
     @PrePersist
     @PreUpdate

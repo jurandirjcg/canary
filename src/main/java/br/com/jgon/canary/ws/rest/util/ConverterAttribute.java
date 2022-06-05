@@ -33,13 +33,13 @@ public @interface ConverterAttribute {
 	
 	/**
 	 * Nome do atributo na base
-	 * @return
+	 * @return {@link String}
 	 */
 	String value() default "";
 	
 	/**
 	 * Ignora o atributo
-	 * @return
+	 * @return {@link Boolean}
 	 */
 	boolean ignore() default false;
 }

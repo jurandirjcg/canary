@@ -33,20 +33,23 @@ public @interface WSAttribute {
 	
 	/**
 	 * Nome do atributo na base
-	 * @return
+	 * @return {@link String}
 	 */
 	String value() default "";
 	/**
 	 * Quando true não mapeia o objeto complexo 
+     * @return {@link Boolean}
 	 */
 	boolean fixed() default false;
 	/**
 	 * Indica se deverá se o atributo devera ser mapeado caso o pai seja declarado - default true
 	 * Ex. atributo pai "pessoa" possui atributo "nome", se no servico for filtrado somente  "pessoa" este atributo indica o mapeamento tambem do atributo "nome", retornando no parse o valor pessoa.nome
+     * @return {@link Boolean}
 	 */
 	boolean autoInclude() default true;
 	/**
 	 * Utilizado em campos do tipo Collection para indicar o tipo contido
+     * @return {@link Class}
 	 */
 	Class<?> collectionType() default void.class;
 	
@@ -57,6 +60,7 @@ public @interface WSAttribute {
 	 * recursiveAttribute = "pessoa"
 	 * 
 	 * implementacao: endereco.pessoa = instância da Pessoa
+     * @return {@link String}
 	 */
 	String recursiveAttribute() default "";
 }

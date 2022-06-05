@@ -119,8 +119,9 @@ public abstract class ResponseConverter<O> {
 
     /**
      * 
-     * @param listObj
-     * @return
+     * @param <N> generic type
+     * @param listObj {@link Collection}
+     * @return {@link List}
      */
     public <N extends ResponseConverter<O>> List<N> converter(Collection<O> listObj) {
         if (listObj == null) {
@@ -136,8 +137,9 @@ public abstract class ResponseConverter<O> {
 
     /**
      * 
-     * @param paginacao
-     * @return
+     * @param <N> generic type
+     * @param paginacao {@link Page}
+     * @return {@link Page}
      */
     public <N extends ResponseConverter<O>> Page<N> converter(Page<O> paginacao) {
         Page<N> pRetorno = new Page<N>();
@@ -153,14 +155,13 @@ public abstract class ResponseConverter<O> {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves
      * @since 17/11/2019
      *
-     * @param <T>
-     * @param <O>
-     * @param returnType
-     * @param obj
-     * @return
+     * @param <T> generic type
+     * @param <O> generic type
+     * @param returnType {@link Class}
+     * @param obj object
+     * @return T
      */
     public static <T extends ResponseConverter<O>, O> T converter(Class<T> returnType, O obj) {
         try {
@@ -173,14 +174,13 @@ public abstract class ResponseConverter<O> {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves
      * @since 23/11/2019
      *
-     * @param <T>
-     * @param <O>
-     * @param returnType
-     * @param obj
-     * @return
+     * @param <T> generic type
+     * @param <O> generic type
+     * @param returnType {@link Class}
+     * @param obj object
+     * @return {@link Page}
      */
     public static <T extends ResponseConverter<O>, O> Page<T> converter(Class<T> returnType, Page<O> obj) {
         try {
@@ -193,14 +193,13 @@ public abstract class ResponseConverter<O> {
 
     /**
      * 
-     * @author Jurandir C. Gonçalves
      * @since 23/11/2019
      *
-     * @param <T>
-     * @param <O>
-     * @param returnType
-     * @param list
-     * @return
+     * @param <T> generic type
+     * @param <O> generic type
+     * @param returnType {@link Class}
+     * @param list {@link Collection}
+     * @return {@link Collection}
      */
     public static <T extends ResponseConverter<O>, O> Collection<T> converter(Class<T> returnType, Collection<O> list) {
         try {

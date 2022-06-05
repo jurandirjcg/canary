@@ -36,380 +36,382 @@ public interface CriteriaFilterMetamodel<T> extends CriteriaFilter<T>, CriteriaW
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link Attribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelect(Attribute<T, ?> attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelect(ComplexAttribute attribute, String alias);
 
     /**
      * 
-     * @param attributes
-     * @return
+     * @param attributes array of {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     @SuppressWarnings("unchecked")
     public CriteriaFilterMetamodel<T> addSelect(Attribute<T, ?>... attributes);
 
     /**
      * 
-     * @param attributes
-     * @return
+     * @param attributes array of {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelect(ComplexAttribute... attributes);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link Attribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectCount(Attribute<T, ?> attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectCount(ComplexAttribute attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectCount(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectCount(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectUpper(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectUpper(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link Attribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectUpper(Attribute<T, ?> attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectUpper(ComplexAttribute attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectLower(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectLower(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link Attribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectLower(Attribute<T, ?> attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectLower(ComplexAttribute attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link Attribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectMax(Attribute<T, ?> attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectMax(ComplexAttribute attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectMax(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectMax(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link Attribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectMin(Attribute<T, ?> attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute ComplexAttribute
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectMin(ComplexAttribute attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectMin(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectMin(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link Attribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectSum(Attribute<T, ?> attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectSum(ComplexAttribute attribute, String alias);
 
     /**
      *
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectSum(Attribute<T, ?> attribute);
 
     /**
      *
-     * @param attribute
-     * @return
+     * @param attribute ComplexAttribute
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectSum(ComplexAttribute attribute);
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link Attribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectAvg(Attribute<T, ?> attribute, String alias);
 
     /**
      * 
-     * @param attribute
-     * @param alias
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param alias {@link String}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectAvg(ComplexAttribute attribute, String alias);
 
     /**
      *
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectAvg(Attribute<T, ?> attribute);
 
     /**
      *
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelectAvg(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelect(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addSelect(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addOrderAsc(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addOrderAsc(ComplexAttribute attribute);
 
     /**
      * 
-     * @param fields
-     * @return
+     * @param fields array of {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     @SuppressWarnings("unchecked")
     public CriteriaFilterMetamodel<T> addOrderAsc(Attribute<T, ?>... fields);
 
     /**
      * 
-     * @param fields
-     * @return
+     * @param fields array of {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     @SuppressWarnings("unchecked")
     public CriteriaFilterMetamodel<T> addOrderDesc(Attribute<T, ?>... fields);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addOrderDesc(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addOrderDesc(ComplexAttribute attribute);
 
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addGroupBy(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addGroupBy(ComplexAttribute attribute);
 
     /**
      * 
-     * @param attribute
-     * @param joinType
-     * @param fetch
-     * @return
+     * @param attribute {@link Attribute}
+     * @param joinType {@link JoinType}
+     * @param fetch {@link Boolean}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addJoin(Attribute<T, ?> attribute, JoinType joinType, boolean fetch);
 
     /**
      * 
-     * @param attribute
-     * @param joinType
-     * @param fetch
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param joinType {@link JoinType}
+     * @param fetch {@link Boolean}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addJoin(ComplexAttribute attribute, JoinType joinType, boolean fetch);
 
     /**
      * 
-     * @param attribute
-     * @param joinType
-     * @return
+     * @param attribute {@link Attribute}
+     * @param joinType {@link JoinType}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addJoin(Attribute<T, ?> attribute, JoinType joinType);
 
     /**
      * 
-     * @param attribute
-     * @param joinType
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @param joinType {@link JoinType}
+     * @param fetch {@link Boolean}
+     * @param force {@link Boolean}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addJoin(ComplexAttribute attribute, JoinType joinType, boolean fetch, boolean force);
 
     /**
      * 
-     * @param attribute
-     * @param joinType
-     * @param fetch
-     * @param force
-     * @return
+     * @param attribute {@link Attribute}
+     * @param joinType {@link JoinType}
+     * @param fetch {@link Boolean}
+     * @param force {@link Boolean}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addJoin(Attribute<T, ?> attribute, JoinType joinType, boolean fetch, boolean force);
 
     /**
      * 
-     * @param attribute
-     * @param joinType
-     * @return
+     * @param attribute ComplexAttribute
+     * @param joinType {@link JoinType}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addJoin(ComplexAttribute attribute, JoinType joinType);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link Attribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addJoin(Attribute<T, ?> attribute);
 
     /**
      * 
-     * @param attribute
-     * @return
+     * @param attribute {@link ComplexAttribute}
+     * @return {@link CriteriaFilterMetamodel}
      */
     public CriteriaFilterMetamodel<T> addJoin(ComplexAttribute attribute);
 

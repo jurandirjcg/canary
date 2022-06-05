@@ -369,6 +369,7 @@ public interface CriteriaWhere<T> {
 
     /**
      * 
+     * @param <E>        generic type
      * @param field      field
      * @param startValue startValue
      * @param endValue   endValue
@@ -427,6 +428,7 @@ public interface CriteriaWhere<T> {
 
     /**
      * 
+     * @param <E> generic type
      * @param field field
      * @param value value
      * @return {@link CriteriaWhere}
@@ -479,6 +481,7 @@ public interface CriteriaWhere<T> {
 
     /**
      * 
+     * @param <E> generic type
      * @param field field
      * @param value value
      * @return {@link CriteriaWhere}
@@ -510,6 +513,7 @@ public interface CriteriaWhere<T> {
 
     /**
      * 
+     * @param <E> generic type
      * @param field field
      * @param value value
      * @return {@link CriteriaWhere}

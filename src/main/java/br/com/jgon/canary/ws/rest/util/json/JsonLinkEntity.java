@@ -42,8 +42,8 @@ public class JsonLinkEntity {
 
 	/**
 	 * 
-	 * @param entity
-	 * @param listLink
+	 * @param entity {@link Object}
+	 * @param listLink {@link List}
 	 */
 	public JsonLinkEntity(Object entity, List<LinkEntity> listLink) {
 		super();
@@ -69,8 +69,8 @@ public class JsonLinkEntity {
 	
 	/**
 	 * 
-	 * @param link
-	 * @return
+	 * @param link {@link Link}
+	 * @return {@link Boolean}
 	 */
 	public boolean addLink(Link link){
 		Boolean templated = link.getParams().containsKey("templated");
@@ -80,7 +80,7 @@ public class JsonLinkEntity {
 	
 	/**
 	 * 
-	 * @param links
+	 * @param links {@link List}
 	 */
 	public void addAllLink(List<Link> links){
 		for(Link lnk: links){

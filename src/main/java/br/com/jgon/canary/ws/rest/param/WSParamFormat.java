@@ -29,10 +29,14 @@ import java.lang.annotation.Target;
 @Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface WSParamFormat {
+    /**
+     * 
+     * @return {@link Class}
+     */
 	Class<?> value();
 	/**
 	 * Forca a inclusao do campo
-	 * @return
+	 * @return {@link String}
 	 */
 	String[] forceFields() default {};
 }

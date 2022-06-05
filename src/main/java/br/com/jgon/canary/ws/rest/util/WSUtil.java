@@ -22,8 +22,6 @@ import br.com.jgon.canary.util.Page;
 
 /**
  * Util de WebService
- *
- * @author Jurandir C. Goncalves
  * 
  * @version 1.0
  *
@@ -36,8 +34,9 @@ public class WSUtil {
 
     /**
      * 
-     * @param paginacao
-     * @return
+     * @param <T> generic type
+     * @param paginacao {@link Page}
+     * @return ResponseBuilder
      */
     public static <T> ResponseBuilder setPaginationToResponse(Page<T> paginacao) {
         return Response.ok().entity(paginacao.getElements())

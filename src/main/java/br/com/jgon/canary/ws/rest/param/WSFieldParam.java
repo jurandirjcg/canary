@@ -41,13 +41,19 @@ public class WSFieldParam {
     /**
      * Compatibilidade com QueryParam
      * 
-     * @param fields
+     * @param fields {@link String}
      */
     public WSFieldParam(String fields) {
         throw new WebApplicationException(new ApplicationRuntimeException(MessageSeverity.ERROR, null,
             MessageFactory.getMessage("message", "Construtor somente para compatibilidade com QueryParam REST")));
     }
 
+    /**
+     * 
+     * @param returnType {@link Class}
+     * @param fields {@link String}
+     * @param defaultFieldParam {@link String}
+     */
     public WSFieldParam(Class<?> returnType, String fields, String defaultFieldParam) {
         this.returnType = returnType;
         this.fieldParam = fields;
@@ -62,22 +68,42 @@ public class WSFieldParam {
         }
     }
 
+    /**
+     * 
+     * @return {@link Class}
+     */
     public Class<?> getReturnType() {
         return returnType;
     }
 
+    /**
+     * 
+     * @param returnType {@link Class}
+     */
     public void setReturnType(Class<?> returnType) {
         this.returnType = returnType;
     }
 
+    /**
+     * 
+     * @return {@link String}
+     */
     public String getFieldParam() {
         return fieldParam;
     }
 
+    /**
+     * 
+     * @param fieldParam {@link String}
+     */
     public void setFieldParam(String fieldParam) {
         this.fieldParam = fieldParam;
     }
 
+    /**
+     * 
+     * @return {@link List}
+     */
     public List<String> toList() {
         return listField;
     }
