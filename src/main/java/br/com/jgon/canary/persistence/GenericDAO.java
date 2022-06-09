@@ -1746,6 +1746,18 @@ public abstract class GenericDAO<T, K extends Serializable> {
     }
 
     /**
+     * 
+     * @param criteriaQuery
+     * @param distinct
+     * @return
+     * @throws ApplicationRuntimeException erro ao executar o count
+     */
+    protected Long getResultCount(CriteriaQuery<?> criteriaQuery, boolean distinct) throws ApplicationRuntimeException {
+        Root<T> root = getRoot(criteriaQuery);
+        return getResultCount(criteriaQuery, root, distinct);
+    }
+
+    /**
      * <b>COUNT</b> utilizando o campo chave da entidade (root) ou em ultimo caso a
      * entidade (root)
      * 
@@ -1756,8 +1768,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @throws ApplicationRuntimeException - erro ao contar
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private Long getResultCount(CriteriaQuery<?> criteriaQuery, Root<T> root, boolean distinct)
-            throws ApplicationRuntimeException {
+    private Long getResultCount(CriteriaQuery<?> criteriaQuery, Root<T> root, boolean distinct) {
         // SELECT
         Selection<?> sel = criteriaQuery.getSelection();
         // ORDER
@@ -1896,7 +1907,7 @@ public abstract class GenericDAO<T, K extends Serializable> {
         CriteriaManager<T> criteriaManager = getCriteriaManager(returnClass, (CriteriaFilterImpl<T>) criteriaFilter);
         CriteriaQuery<?> query = criteriaManager.getCriteriaQuery();
 
-        return getResultPaginate(returnClass, query, criteriaManager.getRootEntry(),
+        return getResultPaginate(returnClass, query, criteriaManager.getRootEntry(), false,
                 criteriaManager.getListCollectionRelation(), page, limit);
     }
 
@@ -1905,13 +1916,14 @@ public abstract class GenericDAO<T, K extends Serializable> {
      * @param <E>           E
      * @param returnClass   - classe de retorno
      * @param criteriaQuery - {@link CriteriaQuery}
+     * @param countDistinct - distinct count
      * @param page          - número da página
      * @param limit         - quantidade de registros por página
      * @return {@link Page}
      * @throws ApplicationRuntimeException - erro ao paginar
      */
     @SuppressWarnings("unchecked")
-    protected <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, int page, int limit)
+    protected <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, boolean countDistinct, int page, int limit)
             throws ApplicationRuntimeException {
         Root<T> root = null;
         for (Root<?> rootAux : criteriaQuery.getRoots()) {
@@ -1921,24 +1933,40 @@ public abstract class GenericDAO<T, K extends Serializable> {
             }
         }
 
-        return getResultPaginate(returnClass, criteriaQuery, root, null, page, limit);
+        return getResultPaginate(returnClass, criteriaQuery, root, countDistinct, null, page, limit);
+    }
+
+     /**
+     * 
+     * @param <E>           E
+     * @param returnClass   - classe de retorno
+     * @param criteriaQuery - {@link CriteriaQuery}
+     * @param page          - número da página
+     * @param limit         - quantidade de registros por página
+     * @return {@link Page}
+     * @throws ApplicationRuntimeException - erro ao paginar
+     */
+    protected <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, int page, int limit)
+            throws ApplicationRuntimeException {
+        return getResultPaginate(returnClass, criteriaQuery, false, page, limit);
     }
 
     /**
      * @param <E>                    E
      * @param returnClass            - classe de retorno
      * @param criteriaQuery          - {@link CriteriaQuery}
-     * @param listCollectionRelation - coleções relacionadas
      * @param root                   - {@link Root}
+     * @param countDistinct          - distinct no count
+     * @param listCollectionRelation - coleções relacionadas
      * @param page                   - número da página
      * @param limit                  - quantidade de registros por página
      * @return {@link Page}
      * @throws ApplicationRuntimeException - erro ao paginar
      */
-    private <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, Root<T> root,
+    private <E> Page<E> getResultPaginate(Class<E> returnClass, CriteriaQuery<?> criteriaQuery, Root<T> root, boolean countDistinct,
             Map<String, CriteriaFilterImpl<?>> listCollectionRelation, int page, int limit)
             throws ApplicationRuntimeException {
-        Long qtdeReg = this.getResultCount(criteriaQuery, root, false);
+        Long qtdeReg = this.getResultCount(criteriaQuery, root, countDistinct);
 
         Page<E> paginacao = new Page<E>(qtdeReg, limit, page);
 
